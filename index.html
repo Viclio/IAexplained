@@ -209,6 +209,26 @@
         width: 26px;
         height: 26px;
       }
+      .menu-toggle {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background: transparent;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-sm);
+        color: var(--color-text);
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .menu-toggle:hover {
+        border-color: #7b6bff;
+      }
+      .menu-toggle svg {
+        width: 18px;
+        height: 18px;
+      }
       .toc {
         display: flex;
         gap: var(--space-4);
@@ -227,8 +247,26 @@
         background: rgba(255, 255, 255, 0.04);
       }
       @media (max-width: 900px) {
+        .nav-inner {
+          flex-wrap: wrap;
+        }
+        .menu-toggle {
+          display: inline-flex;
+        }
         .toc {
           display: none;
+          flex-direction: column;
+          width: 100%;
+          gap: 2px;
+          padding-top: var(--space-2);
+          border-top: 1px solid var(--color-border);
+          margin-top: var(--space-2);
+        }
+        .toc.is-open {
+          display: flex;
+        }
+        .toc a {
+          padding: var(--space-2) var(--space-2);
         }
       }
 
@@ -881,7 +919,14 @@
           </svg>
           <span>Diffusion &amp; Pixels</span>
         </a>
-        <div class="toc">
+        <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Ouvrir le sommaire" aria-expanded="false" aria-controls="toc-menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <div class="toc" id="toc-menu">
           <a href="#introduction">Intro</a>
           <a href="#historique">Historique</a>
           <a href="#principes">Principes</a>
@@ -890,6 +935,7 @@
           <a href="#unet">U-Net</a>
           <a href="#clip">CLIP</a>
           <a href="#latent">Latent</a>
+          <a href="#explorateur-tokens">Tokens</a>
           <a href="#pipeline">Pipeline</a>
           <a href="#entrainement">Entraînement</a>
           <a href="#controle">Contrôle</a>
@@ -922,7 +968,7 @@
             <div class="hero-meta">
               <span>Lecture ≈ 40 min</span>
               <span>Sans prérequis avancés</span>
-              <span>12 chapitres · schémas inclus</span>
+              <span>13 chapitres · schémas inclus</span>
             </div>
           </div>
           <div class="hero-image">
@@ -2052,24 +2098,35 @@
             </p>
           </div>
 
-<!-- ==========================================
-       APP INTERACTIVE — ESPACE VECTORIEL DES TOKENS
-       ========================================== -->
-  <div class="app-embed" id="token-space-app">
-    <div class="app-header">
-      <span class="app-label">Application interactive</span>
-      <h3>Visualiser l'espace vectoriel des tokens</h3>
-      <p class="app-intro">
-        Chaque mot d'une phrase est encodé en un point dans un espace de très
-        grande dimension (768 chez CLIP, 1&nbsp;280 chez CLIP-L). Cette
-        démonstration projette un lexique de 200&nbsp;mots dans un espace
-        <strong>tridimensionnel simplifié</strong> selon trois axes
-        sémantiques&nbsp;: <em>vivant ↔ inanimé</em>,
-        <em>concret ↔ abstrait</em> et <em>positif ↔ négatif</em>.
-        Tape une phrase&nbsp;: les mots reconnus s'illuminent, et tu peux
-        observer leur position relative dans le nuage.
-      </p>
-    </div>
+
+
+
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ==========================================
+           SECTION 7bis — EXPLORATEUR DE TOKENS
+           ========================================== -->
+      <section id="explorateur-tokens">
+        <div class="container">
+          <span class="section-number">08 — DÉMONSTRATION INTERACTIVE</span>
+          <h2 class="section-title">
+            Explorateur de <em>tokens</em>
+          </h2>
+          <p class="section-lede">
+            Chaque mot d'une phrase est encodé en un point dans un espace de très
+            grande dimension (768 chez CLIP, 1&nbsp;280 chez CLIP-L). Cette
+            démonstration projette un lexique de plus de 1&nbsp;100&nbsp;mots dans
+            un espace <strong>tridimensionnel simplifié</strong>, selon trois jeux
+            d'axes permutables&nbsp;: sémantique, sensoriel, et temporel &amp;
+            social. Tape une phrase&nbsp;: les mots reconnus s'illuminent, et tu
+            peux observer leur position relative dans le nuage.
+          </p>
+
+          <div class="app-embed" id="token-space-app">
+
 
     <div class="app-controls">
       <input
@@ -2083,6 +2140,13 @@
         spellcheck="false"
       />
       <button type="button" id="ts-submit" class="ts-btn">Encoder</button>
+    </div>
+
+    <div class="ts-axis-switcher">
+      <span class="ts-axis-switcher-label">Axes&nbsp;:</span>
+      <button type="button" class="ts-axis-btn active" data-axisset="sem">Sémantique</button>
+      <button type="button" class="ts-axis-btn" data-axisset="sens">Sensoriel</button>
+      <button type="button" class="ts-axis-btn" data-axisset="temp">Temporel &amp; social</button>
     </div>
 
     <div class="app-suggestions">
@@ -2236,6 +2300,38 @@
       transition: all 0.15s;
     }
     .ts-chip:hover { border-color: #7b6bff; color: var(--color-text); }
+    .ts-axis-switcher {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin: -4px 0 var(--space-3);
+    }
+    .ts-axis-switcher-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--text-xs);
+      letter-spacing: 0.05em;
+      color: var(--color-text-faint, #6e6b8a);
+      margin-right: 4px;
+    }
+    .ts-axis-btn {
+      padding: 8px 16px;
+      background: transparent;
+      color: var(--color-text-muted);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      font-family: 'General Sans', sans-serif;
+      font-size: var(--text-sm);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .ts-axis-btn:hover { border-color: #7b6bff; color: var(--color-text); }
+    .ts-axis-btn.active {
+      background: #7b6bff;
+      border-color: #7b6bff;
+      color: white;
+    }
     .app-canvas-wrap {
       position: relative;
       background: radial-gradient(ellipse at center, #14102a 0%, #0a0818 100%);
@@ -2350,209 +2446,1168 @@
     // Axe Z (-1 → 1) : positif → négatif
     // Un léger jitter par catégorie regroupe les mots liés.
     // ============================================
-    const LEXICON = {
-      // ANIMAUX (vivant -0.9, concret -0.9, neutre)
-      "chat":       [-0.85, -0.85, -0.05, "animal"],
-      "chien":      [-0.83, -0.87, -0.15, "animal"],
-      "chien":      [-0.83, -0.87, -0.15, "animal"],
-      "chiot":      [-0.82, -0.85, -0.55, "animal"],
-      "chaton":     [-0.87, -0.83, -0.60, "animal"],
-      "oiseau":     [-0.88, -0.80, -0.30, "animal"],
-      "poisson":    [-0.75, -0.82, -0.05, "animal"],
-      "cheval":     [-0.80, -0.88, -0.20, "animal"],
-      "vache":      [-0.72, -0.85, -0.05, "animal"],
-      "lion":       [-0.78, -0.80, 0.10, "animal"],
-      "tigre":      [-0.76, -0.80, 0.15, "animal"],
-      "loup":       [-0.74, -0.78, 0.20, "animal"],
-      "renard":     [-0.82, -0.80, -0.10, "animal"],
-      "lapin":      [-0.86, -0.83, -0.35, "animal"],
-      "souris":     [-0.85, -0.85, 0.05, "animal"],
-      "papillon":   [-0.90, -0.75, -0.50, "animal"],
-      "dauphin":    [-0.80, -0.75, -0.55, "animal_marin"],
-      "requin":     [-0.72, -0.78, 0.40, "animal_marin"],
-      "baleine":    [-0.75, -0.72, -0.30, "animal_marin"],
-      "pieuvre":    [-0.78, -0.75, 0.00, "animal_marin"],
+        const LEXICON = {
+      "chat": { sem: [-0.85, -0.85, -0.05], sens: [-0.24, -0.03, -0.08], temp: [-0.69, -0.19, -0.87], cat: "animal" },
+      "chien": { sem: [-0.83, -0.87, -0.15], sens: [-0.28, 0.01, -0.12], temp: [-0.70, -0.25, -0.85], cat: "animal" },
+      "chiot": { sem: [-0.82, -0.85, -0.55], sens: [-0.29, 0.00, 0.01], temp: [-0.71, -0.17, -0.93], cat: "animal" },
+      "chaton": { sem: [-0.87, -0.83, -0.60], sens: [-0.36, -0.03, 0.01], temp: [-0.66, -0.14, -0.98], cat: "animal" },
+      "oiseau": { sem: [-0.88, -0.80, -0.30], sens: [-0.35, 0.02, 0.03], temp: [-0.68, -0.28, -0.88], cat: "animal" },
+      "poisson": { sem: [-0.75, -0.82, -0.05], sens: [-0.33, 0.01, -0.11], temp: [-0.71, -0.16, -0.93], cat: "animal" },
+      "cheval": { sem: [-0.80, -0.88, -0.20], sens: [-0.37, -0.01, -0.00], temp: [-0.60, -0.25, -0.89], cat: "animal" },
+      "vache": { sem: [-0.72, -0.85, -0.05], sens: [-0.32, 0.01, 0.02], temp: [-0.65, -0.18, -0.91], cat: "animal" },
+      "lion": { sem: [-0.78, -0.80, 0.10], sens: [-0.36, -0.03, -0.06], temp: [-0.69, -0.23, -0.96], cat: "animal" },
+      "tigre": { sem: [-0.76, -0.80, 0.15], sens: [-0.24, -0.07, -0.03], temp: [-0.71, -0.15, -0.85], cat: "animal" },
+      "loup": { sem: [-0.74, -0.78, 0.20], sens: [-0.28, 0.08, -0.13], temp: [-0.57, -0.17, -0.95], cat: "animal" },
+      "renard": { sem: [-0.82, -0.80, -0.10], sens: [-0.34, 0.04, -0.04], temp: [-0.68, -0.22, -0.96], cat: "animal" },
+      "lapin": { sem: [-0.86, -0.83, -0.35], sens: [-0.23, -0.02, -0.12], temp: [-0.72, -0.19, -0.85], cat: "animal" },
+      "souris": { sem: [-0.85, -0.85, 0.05], sens: [-0.32, 0.08, 0.02], temp: [-0.61, -0.25, -0.84], cat: "animal" },
+      "papillon": { sem: [-0.90, -0.75, -0.50], sens: [-0.23, 0.05, -0.06], temp: [-0.64, -0.24, -0.84], cat: "animal" },
+      "dauphin": { sem: [-0.80, -0.75, -0.55], sens: [0.05, 0.03, -0.54], temp: [-0.59, -0.20, -0.99], cat: "animal_marin" },
+      "requin": { sem: [-0.72, -0.78, 0.40], sens: [0.16, 0.05, -0.47], temp: [-0.67, -0.15, -0.86], cat: "animal_marin" },
+      "baleine": { sem: [-0.75, -0.72, -0.30], sens: [0.04, 0.11, -0.45], temp: [-0.53, -0.16, -0.92], cat: "animal_marin" },
+      "pieuvre": { sem: [-0.78, -0.75, 0.00], sens: [0.03, 0.01, -0.58], temp: [-0.62, -0.14, -0.97], cat: "animal_marin" },
+      "homme": { sem: [-0.65, -0.75, 0.00], sens: [0.08, 0.13, 0.20], temp: [-0.01, 0.30, -0.45], cat: "humain" },
+      "femme": { sem: [-0.68, -0.75, 0.00], sens: [-0.06, 0.05, 0.14], temp: [0.05, 0.40, -0.51], cat: "humain" },
+      "enfant": { sem: [-0.72, -0.75, -0.45], sens: [0.02, -0.01, 0.22], temp: [0.13, 0.38, -0.48], cat: "humain" },
+      "bébé": { sem: [-0.75, -0.75, -0.55], sens: [-0.06, 0.05, 0.13], temp: [0.06, 0.43, -0.44], cat: "humain" },
+      "personne": { sem: [-0.60, -0.60, 0.00], sens: [0.03, 0.02, 0.08], temp: [0.04, 0.39, -0.48], cat: "humain" },
+      "ami": { sem: [-0.55, -0.50, -0.70], sens: [-0.02, 0.08, 0.19], temp: [0.03, 0.62, -0.27], cat: "humain" },
+      "famille": { sem: [-0.45, -0.40, -0.65], sens: [0.03, -0.02, 0.21], temp: [0.07, 0.87, -0.38], cat: "humain" },
+      "enseignant": { sem: [-0.55, -0.55, -0.20], sens: [0.01, 0.03, 0.15], temp: [0.12, 0.28, -0.43], cat: "humain" },
+      "artiste": { sem: [-0.60, -0.55, -0.30], sens: [0.07, 0.04, 0.07], temp: [0.08, 0.31, -0.46], cat: "humain" },
+      "enfants": { sem: [-0.72, -0.75, -0.45], sens: [-0.00, 0.02, 0.22], temp: [-0.00, 0.39, -0.47], cat: "humain" },
+      "arbre": { sem: [-0.35, -0.85, -0.20], sens: [-0.10, -0.31, -0.22], temp: [-0.77, -0.33, -0.97], cat: "plante" },
+      "fleur": { sem: [-0.40, -0.80, -0.55], sens: [-0.05, -0.27, -0.09], temp: [-0.73, -0.32, -0.94], cat: "plante" },
+      "rose": { sem: [-0.42, -0.80, -0.60], sens: [-0.11, -0.41, -0.10], temp: [-0.65, -0.30, -0.88], cat: "plante" },
+      "herbe": { sem: [-0.30, -0.82, -0.15], sens: [-0.07, -0.29, -0.08], temp: [-0.72, -0.24, -0.91], cat: "plante" },
+      "forêt": { sem: [-0.30, -0.70, -0.40], sens: [-0.05, -0.41, -0.23], temp: [-0.74, -0.34, -0.93], cat: "plante" },
+      "jungle": { sem: [-0.28, -0.68, -0.10], sens: [-0.06, -0.36, -0.09], temp: [-0.70, -0.30, -0.90], cat: "plante" },
+      "table": { sem: [0.75, -0.90, 0.00], sens: [0.02, -0.14, 0.02], temp: [0.22, -0.16, 0.86], cat: "objet" },
+      "chaise": { sem: [0.75, -0.90, 0.00], sens: [0.07, -0.27, 0.06], temp: [0.33, -0.18, 0.89], cat: "objet" },
+      "canapé": { sem: [0.72, -0.88, -0.20], sens: [-0.07, -0.27, -0.07], temp: [0.36, -0.09, 0.85], cat: "objet" },
+      "lit": { sem: [0.70, -0.88, -0.30], sens: [0.04, -0.25, -0.01], temp: [0.34, -0.16, 0.92], cat: "objet" },
+      "livre": { sem: [0.65, -0.75, -0.25], sens: [-0.02, -0.26, 0.06], temp: [0.28, -0.06, 0.95], cat: "objet" },
+      "voiture": { sem: [0.80, -0.85, 0.00], sens: [0.59, 0.43, 0.04], temp: [0.68, -0.07, 1.00], cat: "vehicule" },
+      "vélo": { sem: [0.72, -0.85, -0.25], sens: [0.63, 0.32, 0.03], temp: [0.53, -0.03, 0.87], cat: "vehicule" },
+      "moto": { sem: [0.82, -0.85, -0.10], sens: [0.53, 0.37, 0.12], temp: [0.59, 0.00, 1.00], cat: "vehicule" },
+      "train": { sem: [0.85, -0.82, 0.00], sens: [0.55, 0.38, 0.05], temp: [0.57, -0.06, 0.90], cat: "vehicule" },
+      "avion": { sem: [0.83, -0.80, -0.05], sens: [0.60, 0.32, 0.06], temp: [0.58, -0.01, 0.90], cat: "vehicule" },
+      "bateau": { sem: [0.78, -0.82, -0.10], sens: [0.50, 0.32, 0.08], temp: [0.61, 0.07, 0.91], cat: "vehicule" },
+      "maison": { sem: [0.68, -0.82, -0.35], sens: [0.67, -0.11, -0.04], temp: [0.16, 0.43, 0.91], cat: "batiment" },
+      "château": { sem: [0.72, -0.78, -0.25], sens: [0.65, -0.13, -0.04], temp: [-0.88, 0.47, 0.47], cat: "batiment" },
+      "école": { sem: [0.65, -0.75, -0.15], sens: [0.68, -0.15, -0.06], temp: [0.08, 0.72, 0.57], cat: "batiment" },
+      "ville": { sem: [0.70, -0.70, -0.05], sens: [0.64, -0.13, 0.03], temp: [0.15, 0.44, 0.91], cat: "batiment" },
+      "porte": { sem: [0.85, -0.90, 0.00], sens: [0.01, -0.20, -0.08], temp: [0.35, -0.13, 0.98], cat: "objet" },
+      "fenêtre": { sem: [0.85, -0.88, -0.10], sens: [-0.08, -0.18, 0.06], temp: [0.22, -0.07, 0.83], cat: "objet" },
+      "téléphone": { sem: [0.85, -0.85, 0.00], sens: [-0.20, 0.32, -0.19], temp: [0.86, -0.21, 0.91], cat: "tech" },
+      "ordinateur": { sem: [0.85, -0.82, 0.00], sens: [-0.22, 0.37, -0.15], temp: [0.82, -0.17, 0.97], cat: "tech" },
+      "robot": { sem: [0.60, -0.60, 0.10], sens: [-0.15, 0.29, -0.19], temp: [0.94, -0.13, 1.00], cat: "tech" },
+      "pomme": { sem: [0.20, -0.90, -0.35], sens: [-0.32, -0.33, 0.13], temp: [-0.27, -0.16, -0.53], cat: "nourriture" },
+      "pain": { sem: [0.30, -0.90, -0.30], sens: [-0.44, -0.33, 0.12], temp: [-0.25, -0.15, -0.52], cat: "nourriture" },
+      "gâteau": { sem: [0.30, -0.88, -0.55], sens: [-0.33, -0.28, 0.08], temp: [-0.33, -0.26, -0.54], cat: "nourriture" },
+      "café": { sem: [0.35, -0.85, -0.25], sens: [-0.37, -0.22, 0.07], temp: [-0.22, -0.17, -0.56], cat: "nourriture" },
+      "vin": { sem: [0.32, -0.82, -0.20], sens: [-0.45, -0.29, 0.16], temp: [-0.23, -0.27, -0.51], cat: "nourriture" },
+      "eau": { sem: [0.20, -0.80, -0.30], sens: [-0.46, -0.33, 0.22], temp: [-0.24, -0.20, -0.55], cat: "nourriture" },
+      "océan": { sem: [0.30, -0.65, -0.30], sens: [0.76, -0.09, -0.50], temp: [-0.95, -0.08, -0.93], cat: "nature" },
+      "mer": { sem: [0.32, -0.65, -0.30], sens: [0.51, -0.15, -0.42], temp: [-0.88, -0.06, -0.90], cat: "nature" },
+      "montagne": { sem: [0.55, -0.75, -0.15], sens: [0.82, -0.07, -0.30], temp: [-0.84, -0.06, -0.94], cat: "nature" },
+      "rivière": { sem: [0.35, -0.68, -0.30], sens: [0.28, -0.23, 0.07], temp: [-0.86, -0.05, -0.98], cat: "nature" },
+      "soleil": { sem: [0.60, -0.65, -0.55], sens: [0.35, 0.20, 0.72], temp: [-0.98, -0.08, -1.00], cat: "nature" },
+      "lune": { sem: [0.62, -0.60, -0.45], sens: [0.26, -0.13, -0.05], temp: [-0.93, 0.01, -0.94], cat: "nature" },
+      "étoile": { sem: [0.65, -0.55, -0.55], sens: [0.29, -0.20, 0.07], temp: [-0.89, 0.03, -1.00], cat: "nature" },
+      "ciel": { sem: [0.50, -0.55, -0.40], sens: [0.22, -0.15, -0.06], temp: [-0.95, 0.03, -0.89], cat: "nature" },
+      "nuage": { sem: [0.45, -0.60, -0.25], sens: [0.20, -0.15, 0.06], temp: [-0.83, -0.07, -0.99], cat: "nature" },
+      "pluie": { sem: [0.40, -0.65, -0.10], sens: [-0.18, -0.05, -0.30], temp: [-0.98, -0.06, -0.92], cat: "nature" },
+      "neige": { sem: [0.45, -0.65, -0.30], sens: [-0.02, -0.16, -0.88], temp: [-0.83, -0.02, -0.95], cat: "nature" },
+      "feu": { sem: [0.50, -0.75, 0.05], sens: [0.09, 0.51, 0.79], temp: [-0.82, -0.02, -1.00], cat: "nature" },
+      "vent": { sem: [0.55, -0.50, -0.10], sens: [0.18, -0.26, 0.06], temp: [-0.95, 0.07, -0.98], cat: "nature" },
+      "plage": { sem: [0.35, -0.70, -0.50], sens: [0.27, -0.21, 0.03], temp: [-0.88, -0.03, -0.87], cat: "nature" },
+      "rouge": { sem: [0.15, -0.30, 0.10], sens: [-0.01, 0.01, -0.03], temp: [-0.06, 0.05, -0.08], cat: "couleur" },
+      "bleu": { sem: [0.15, -0.30, -0.30], sens: [-0.06, 0.02, 0.03], temp: [0.05, -0.04, -0.07], cat: "couleur" },
+      "vert": { sem: [0.10, -0.30, -0.35], sens: [-0.03, -0.05, 0.04], temp: [-0.03, -0.04, -0.02], cat: "couleur" },
+      "jaune": { sem: [0.15, -0.30, -0.40], sens: [0.02, 0.04, 0.07], temp: [-0.02, -0.06, -0.15], cat: "couleur" },
+      "noir": { sem: [0.20, -0.30, 0.35], sens: [0.04, -0.05, 0.01], temp: [-0.05, 0.02, -0.11], cat: "couleur" },
+      "blanc": { sem: [0.20, -0.30, -0.35], sens: [0.00, 0.08, -0.05], temp: [0.04, 0.01, -0.17], cat: "couleur" },
+      "orange": { sem: [0.15, -0.30, -0.30], sens: [-0.04, -0.06, 0.08], temp: [0.03, 0.08, -0.14], cat: "couleur" },
+      "violet": { sem: [0.15, -0.30, -0.10], sens: [-0.03, 0.04, -0.04], temp: [0.03, -0.03, -0.10], cat: "couleur" },
+      "rose_c": { sem: [0.10, -0.30, -0.55], sens: [-0.04, 0.01, -0.02], temp: [0.01, 0.06, -0.07], cat: "couleur" },
+      "gris": { sem: [0.25, -0.30, 0.20], sens: [-0.08, -0.02, -0.01], temp: [-0.02, -0.00, -0.13], cat: "couleur" },
+      "doré": { sem: [0.10, -0.30, -0.55], sens: [-0.01, 0.01, -0.03], temp: [-0.05, 0.05, -0.18], cat: "couleur" },
+      "argenté": { sem: [0.15, -0.30, -0.30], sens: [0.00, 0.06, 0.05], temp: [0.02, -0.02, -0.07], cat: "couleur" },
+      "bois": { sem: [0.60, -0.55, -0.20], sens: [0.04, -0.07, -0.07], temp: [-0.21, -0.02, 0.38], cat: "matiere" },
+      "métal": { sem: [0.75, -0.55, 0.05], sens: [0.05, -0.13, -0.05], temp: [-0.12, 0.07, 0.45], cat: "matiere" },
+      "verre": { sem: [0.72, -0.55, -0.10], sens: [-0.05, -0.16, -0.03], temp: [-0.16, -0.08, 0.44], cat: "matiere" },
+      "pierre": { sem: [0.68, -0.55, 0.00], sens: [0.08, -0.16, -0.04], temp: [-0.13, -0.06, 0.45], cat: "matiere" },
+      "tissu": { sem: [0.55, -0.55, -0.20], sens: [-0.06, -0.20, -0.01], temp: [-0.15, -0.05, 0.40], cat: "matiere" },
+      "papier": { sem: [0.60, -0.55, -0.15], sens: [0.07, -0.10, 0.04], temp: [-0.11, 0.06, 0.41], cat: "matiere" },
+      "court": { sem: [-0.10, 0.15, -0.20], sens: [0.08, 0.01, -0.06], temp: [0.02, 0.07, -0.05], cat: "action" },
+      "courir": { sem: [-0.10, 0.15, -0.20], sens: [-0.07, 0.06, 0.05], temp: [-0.01, -0.08, -0.00], cat: "action" },
+      "marche": { sem: [-0.10, 0.15, -0.15], sens: [-0.03, 0.05, 0.08], temp: [-0.04, -0.08, 0.01], cat: "action" },
+      "marcher": { sem: [-0.10, 0.15, -0.15], sens: [-0.06, 0.02, 0.04], temp: [0.05, -0.02, 0.05], cat: "action" },
+      "saute": { sem: [-0.10, 0.15, -0.30], sens: [-0.02, -0.05, 0.01], temp: [-0.05, -0.03, -0.04], cat: "action" },
+      "sauter": { sem: [-0.10, 0.15, -0.30], sens: [-0.07, 0.00, 0.01], temp: [-0.04, -0.07, 0.04], cat: "action" },
+      "dort": { sem: [-0.10, 0.20, -0.40], sens: [-0.01, -0.04, 0.05], temp: [-0.02, 0.07, -0.06], cat: "action" },
+      "dormir": { sem: [-0.10, 0.20, -0.40], sens: [-0.01, -0.03, 0.01], temp: [-0.06, 0.05, -0.04], cat: "action" },
+      "mange": { sem: [-0.15, 0.15, -0.10], sens: [0.00, -0.01, 0.02], temp: [-0.03, -0.01, 0.07], cat: "action" },
+      "manger": { sem: [-0.15, 0.15, -0.10], sens: [0.00, -0.03, 0.04], temp: [-0.03, 0.04, 0.05], cat: "action" },
+      "parle": { sem: [-0.15, 0.20, -0.20], sens: [-0.08, -0.07, -0.03], temp: [-0.04, -0.08, -0.02], cat: "action" },
+      "parler": { sem: [-0.15, 0.20, -0.20], sens: [0.01, -0.00, -0.02], temp: [-0.01, 0.00, -0.08], cat: "action" },
+      "chante": { sem: [-0.15, 0.25, -0.55], sens: [0.07, -0.06, 0.02], temp: [0.01, 0.06, 0.00], cat: "action" },
+      "chanter": { sem: [-0.15, 0.25, -0.55], sens: [0.04, 0.01, -0.03], temp: [0.06, 0.02, -0.07], cat: "action" },
+      "danse": { sem: [-0.15, 0.25, -0.60], sens: [-0.08, 0.06, 0.04], temp: [0.06, 0.05, -0.07], cat: "action" },
+      "danser": { sem: [-0.15, 0.25, -0.60], sens: [-0.07, -0.02, 0.01], temp: [0.03, -0.06, -0.04], cat: "action" },
+      "rit": { sem: [-0.20, 0.30, -0.75], sens: [-0.02, -0.02, 0.02], temp: [-0.01, -0.05, 0.02], cat: "action" },
+      "rire": { sem: [-0.20, 0.30, -0.75], sens: [0.00, -0.02, -0.01], temp: [-0.01, 0.04, 0.08], cat: "action" },
+      "pleure": { sem: [-0.20, 0.30, 0.60], sens: [0.03, -0.05, -0.01], temp: [0.01, 0.01, -0.05], cat: "action" },
+      "pleurer": { sem: [-0.20, 0.30, 0.60], sens: [0.05, 0.05, 0.06], temp: [0.04, 0.05, -0.07], cat: "action" },
+      "vole": { sem: [-0.05, 0.20, -0.35], sens: [-0.02, -0.06, 0.06], temp: [0.05, -0.06, -0.06], cat: "action" },
+      "voler": { sem: [-0.05, 0.20, -0.35], sens: [0.01, -0.02, -0.03], temp: [0.04, -0.08, 0.06], cat: "action" },
+      "nage": { sem: [-0.10, 0.20, -0.30], sens: [-0.08, 0.06, -0.04], temp: [0.05, 0.00, -0.01], cat: "action" },
+      "nager": { sem: [-0.10, 0.20, -0.30], sens: [-0.03, -0.05, -0.00], temp: [-0.06, -0.01, -0.01], cat: "action" },
+      "lit_v": { sem: [-0.15, 0.30, -0.20], sens: [-0.07, 0.04, -0.06], temp: [-0.03, -0.02, 0.04], cat: "action" },
+      "lire": { sem: [-0.15, 0.30, -0.20], sens: [-0.07, 0.07, -0.07], temp: [0.07, 0.03, 0.05], cat: "action" },
+      "écrit": { sem: [-0.15, 0.35, -0.15], sens: [-0.05, 0.01, 0.03], temp: [-0.00, 0.07, 0.05], cat: "action" },
+      "écrire": { sem: [-0.15, 0.35, -0.15], sens: [0.07, -0.02, -0.04], temp: [0.04, 0.05, -0.01], cat: "action" },
+      "pense": { sem: [-0.20, 0.55, -0.05], sens: [-0.24, 0.16, 0.01], temp: [-0.01, 0.03, -0.12], cat: "action_mentale" },
+      "penser": { sem: [-0.20, 0.55, -0.05], sens: [-0.20, 0.22, 0.03], temp: [-0.05, -0.04, -0.16], cat: "action_mentale" },
+      "rêve": { sem: [-0.15, 0.65, -0.50], sens: [-0.25, 0.23, -0.01], temp: [0.05, -0.06, -0.16], cat: "action_mentale" },
+      "rêver": { sem: [-0.15, 0.65, -0.50], sens: [-0.20, 0.16, 0.06], temp: [0.06, -0.00, -0.17], cat: "action_mentale" },
+      "aime": { sem: [-0.10, 0.55, -0.85], sens: [-0.23, 0.13, 0.06], temp: [-0.06, 0.16, -0.35], cat: "sentiment" },
+      "aimer": { sem: [-0.10, 0.55, -0.85], sens: [-0.30, 0.16, 0.05], temp: [-0.06, 0.12, -0.38], cat: "sentiment" },
+      "déteste": { sem: [-0.10, 0.55, 0.75], sens: [-0.30, 0.13, 0.01], temp: [-0.13, 0.04, -0.33], cat: "sentiment" },
+      "détester": { sem: [-0.10, 0.55, 0.75], sens: [-0.28, 0.13, 0.01], temp: [-0.10, 0.05, -0.35], cat: "sentiment" },
+      "joie": { sem: [0.20, 0.80, -0.90], sens: [0.01, 0.58, 0.53], temp: [-0.17, 0.28, -0.13], cat: "emotion" },
+      "bonheur": { sem: [0.20, 0.85, -0.90], sens: [-0.00, 0.32, 0.00], temp: [-0.13, 0.26, -0.19], cat: "emotion" },
+      "tristesse": { sem: [0.20, 0.80, 0.85], sens: [-0.04, -0.11, -0.50], temp: [-0.15, 0.32, -0.26], cat: "emotion" },
+      "peur": { sem: [0.20, 0.80, 0.70], sens: [-0.04, 0.65, -0.35], temp: [-0.14, 0.37, -0.15], cat: "emotion" },
+      "colère": { sem: [0.20, 0.80, 0.80], sens: [-0.00, 0.94, 0.72], temp: [-0.06, 0.28, -0.16], cat: "emotion" },
+      "amour": { sem: [0.15, 0.80, -0.90], sens: [-0.04, 0.38, -0.05], temp: [-0.09, 0.29, -0.22], cat: "emotion" },
+      "haine": { sem: [0.15, 0.80, 0.85], sens: [-0.03, 0.27, -0.07], temp: [-0.13, 0.26, -0.21], cat: "emotion" },
+      "surprise": { sem: [0.20, 0.75, -0.30], sens: [0.07, 0.23, 0.06], temp: [-0.17, 0.33, -0.15], cat: "emotion" },
+      "espoir": { sem: [0.20, 0.85, -0.75], sens: [0.04, 0.31, -0.05], temp: [-0.02, 0.23, -0.18], cat: "emotion" },
+      "désespoir": { sem: [0.20, 0.85, 0.85], sens: [-0.03, 0.24, -0.06], temp: [-0.09, 0.33, -0.23], cat: "emotion" },
+      "joyeux": { sem: [-0.40, 0.35, -0.85], sens: [0.01, 0.51, 0.57], temp: [-0.09, 0.03, -0.16], cat: "adj_emo" },
+      "heureux": { sem: [-0.40, 0.35, -0.85], sens: [-0.05, 0.10, -0.05], temp: [0.03, 0.03, -0.15], cat: "adj_emo" },
+      "triste": { sem: [-0.40, 0.35, 0.80], sens: [-0.02, -0.09, -0.57], temp: [-0.03, 0.10, -0.20], cat: "adj_emo" },
+      "en_colère": { sem: [-0.40, 0.35, 0.80], sens: [-0.07, 0.21, 0.02], temp: [-0.02, 0.03, -0.10], cat: "adj_emo" },
+      "calme": { sem: [0.00, 0.40, -0.55], sens: [-0.06, -0.81, -0.06], temp: [0.02, 0.13, -0.16], cat: "adj_emo" },
+      "paisible": { sem: [0.00, 0.40, -0.60], sens: [-0.06, -0.88, -0.05], temp: [-0.13, 0.03, -0.09], cat: "adj_emo" },
+      "tranquille": { sem: [0.00, 0.40, -0.55], sens: [-0.08, -0.92, -0.08], temp: [0.00, 0.05, -0.12], cat: "adj_emo" },
+      "furieux": { sem: [-0.40, 0.35, 0.85], sens: [-0.08, 0.83, 0.66], temp: [-0.08, 0.04, -0.19], cat: "adj_emo" },
+      "gentil": { sem: [-0.40, 0.35, -0.75], sens: [-0.05, 0.17, 0.03], temp: [-0.06, 0.03, -0.08], cat: "adj_emo" },
+      "méchant": { sem: [-0.40, 0.35, 0.75], sens: [-0.15, 0.10, 0.06], temp: [-0.02, 0.15, -0.21], cat: "adj_emo" },
+      "liberté": { sem: [0.30, 0.95, -0.75], sens: [-0.01, 0.10, 0.06], temp: [0.09, 0.51, -0.10], cat: "concept" },
+      "justice": { sem: [0.30, 0.95, -0.65], sens: [-0.02, 0.08, -0.08], temp: [0.07, 0.50, -0.06], cat: "concept" },
+      "vérité": { sem: [0.35, 0.95, -0.55], sens: [0.04, 0.10, 0.07], temp: [0.12, 0.50, -0.09], cat: "concept" },
+      "beauté": { sem: [0.30, 0.90, -0.70], sens: [0.01, 0.12, 0.01], temp: [0.18, 0.61, -0.10], cat: "concept" },
+      "mort": { sem: [0.30, 0.90, 0.80], sens: [-0.02, 0.05, 0.04], temp: [0.16, 0.53, 0.02], cat: "concept" },
+      "vie": { sem: [0.20, 0.85, -0.75], sens: [0.05, 0.10, 0.04], temp: [0.05, 0.52, -0.11], cat: "concept" },
+      "temps": { sem: [0.55, 0.90, 0.05], sens: [0.07, 0.10, 0.07], temp: [0.07, 0.58, 0.02], cat: "concept" },
+      "espace": { sem: [0.55, 0.90, 0.00], sens: [0.02, 0.10, 0.04], temp: [0.05, 0.58, -0.11], cat: "concept" },
+      "idée": { sem: [0.30, 0.90, -0.20], sens: [-0.06, 0.11, -0.03], temp: [0.08, 0.48, -0.03], cat: "concept" },
+      "rêve_n": { sem: [0.20, 0.85, -0.55], sens: [-0.08, 0.07, -0.04], temp: [0.12, 0.51, -0.11], cat: "concept" },
+      "guerre": { sem: [0.30, 0.85, 0.85], sens: [0.02, 0.87, 0.27], temp: [0.07, 0.73, 0.20], cat: "concept" },
+      "paix": { sem: [0.30, 0.85, -0.85], sens: [-0.07, -0.74, -0.19], temp: [0.07, 0.56, -0.33], cat: "concept" },
+      "science": { sem: [0.45, 0.85, -0.15], sens: [0.02, 0.03, -0.04], temp: [0.03, 0.55, -0.02], cat: "concept" },
+      "art": { sem: [0.30, 0.85, -0.50], sens: [0.08, 0.06, 0.02], temp: [0.15, 0.58, -0.02], cat: "concept" },
+      "musique": { sem: [0.35, 0.75, -0.75], sens: [-0.05, 0.17, 0.06], temp: [0.08, 0.60, 0.01], cat: "concept" },
+      "poésie": { sem: [0.30, 0.85, -0.65], sens: [-0.03, 0.17, 0.02], temp: [0.04, 0.47, -0.08], cat: "concept" },
+      "philosophie": { sem: [0.35, 0.95, -0.20], sens: [0.00, 0.11, -0.08], temp: [0.17, 0.51, -0.03], cat: "concept" },
+      "mémoire": { sem: [0.20, 0.80, -0.10], sens: [-0.04, 0.07, 0.03], temp: [0.05, 0.56, -0.10], cat: "concept" },
+      "silence": { sem: [0.45, 0.75, -0.20], sens: [0.06, 0.15, -0.00], temp: [0.08, 0.51, -0.06], cat: "concept" },
+      "puissant": { sem: [0.30, 0.70, 0.05], sens: [0.02, 0.04, 0.06], temp: [-0.07, 0.08, -0.01], cat: "adj_abs" },
+      "faible": { sem: [0.30, 0.70, 0.20], sens: [-0.04, 0.12, -0.06], temp: [0.06, 0.04, -0.05], cat: "adj_abs" },
+      "grand": { sem: [0.35, 0.55, -0.05], sens: [0.85, 0.14, -0.06], temp: [-0.04, 0.09, -0.04], cat: "adj_abs" },
+      "petit": { sem: [0.35, 0.55, -0.05], sens: [-0.77, -0.05, 0.04], temp: [0.05, 0.07, -0.07], cat: "adj_abs" },
+      "profond": { sem: [0.40, 0.75, -0.15], sens: [-0.01, 0.16, 0.00], temp: [-0.05, 0.04, 0.06], cat: "adj_abs" },
+      "beau": { sem: [0.30, 0.70, -0.65], sens: [0.03, 0.06, 0.03], temp: [0.08, 0.14, 0.01], cat: "adj_abs" },
+      "laid": { sem: [0.30, 0.70, 0.50], sens: [0.07, 0.05, -0.04], temp: [0.07, 0.09, -0.06], cat: "adj_abs" },
+      "vieux": { sem: [0.35, 0.60, 0.20], sens: [0.03, 0.03, -0.04], temp: [-0.88, 0.13, -0.02], cat: "adj_abs" },
+      "jeune": { sem: [0.30, 0.60, -0.40], sens: [-0.06, 0.05, -0.06], temp: [0.61, 0.05, -0.10], cat: "adj_abs" },
+      "nouveau": { sem: [0.35, 0.60, -0.40], sens: [-0.05, 0.11, 0.01], temp: [0.86, -0.02, 0.12], cat: "adj_abs" },
+      "ancien": { sem: [0.35, 0.60, 0.10], sens: [0.05, 0.15, -0.06], temp: [-0.96, 0.08, -0.02], cat: "adj_abs" },
 
-      // HUMAINS (vivant -0.7, concret -0.7)
-      "homme":      [-0.65, -0.75, 0.00, "humain"],
-      "femme":      [-0.68, -0.75, 0.00, "humain"],
-      "enfant":     [-0.72, -0.75, -0.45, "humain"],
-      "bébé":       [-0.75, -0.75, -0.55, "humain"],
-      "personne":   [-0.60, -0.60, 0.00, "humain"],
-      "ami":        [-0.55, -0.50, -0.70, "humain"],
-      "famille":    [-0.45, -0.40, -0.65, "humain"],
-      "enseignant": [-0.55, -0.55, -0.20, "humain"],
-      "artiste":    [-0.60, -0.55, -0.30, "humain"],
-      "enfants":    [-0.72, -0.75, -0.45, "humain"],
-
-      // PLANTES (vivant -0.4, concret -0.8)
-      "arbre":      [-0.35, -0.85, -0.20, "plante"],
-      "fleur":      [-0.40, -0.80, -0.55, "plante"],
-      "rose":       [-0.42, -0.80, -0.60, "plante"],
-      "herbe":      [-0.30, -0.82, -0.15, "plante"],
-      "forêt":      [-0.30, -0.70, -0.40, "plante"],
-      "jungle":     [-0.28, -0.68, -0.10, "plante"],
-
-      // OBJETS DU QUOTIDIEN (inanimé 0.7, concret -0.8)
-      "table":      [0.75, -0.90, 0.00, "objet"],
-      "chaise":     [0.75, -0.90, 0.00, "objet"],
-      "canapé":     [0.72, -0.88, -0.20, "objet"],
-      "lit":        [0.70, -0.88, -0.30, "objet"],
-      "livre":      [0.65, -0.75, -0.25, "objet"],
-      "voiture":    [0.80, -0.85, 0.00, "vehicule"],
-      "vélo":       [0.72, -0.85, -0.25, "vehicule"],
-      "moto":       [0.82, -0.85, -0.10, "vehicule"],
-      "train":      [0.85, -0.82, 0.00, "vehicule"],
-      "avion":      [0.83, -0.80, -0.05, "vehicule"],
-      "bateau":     [0.78, -0.82, -0.10, "vehicule"],
-      "maison":     [0.68, -0.82, -0.35, "batiment"],
-      "château":    [0.72, -0.78, -0.25, "batiment"],
-      "école":      [0.65, -0.75, -0.15, "batiment"],
-      "ville":      [0.70, -0.70, -0.05, "batiment"],
-      "porte":      [0.85, -0.90, 0.00, "objet"],
-      "fenêtre":    [0.85, -0.88, -0.10, "objet"],
-      "téléphone":  [0.85, -0.85, 0.00, "tech"],
-      "ordinateur": [0.85, -0.82, 0.00, "tech"],
-      "robot":      [0.60, -0.60, 0.10, "tech"],
-
-      // NOURRITURE (inanimé 0.3, concret -0.85)
-      "pomme":      [0.20, -0.90, -0.35, "nourriture"],
-      "pain":       [0.30, -0.90, -0.30, "nourriture"],
-      "gâteau":     [0.30, -0.88, -0.55, "nourriture"],
-      "café":       [0.35, -0.85, -0.25, "nourriture"],
-      "vin":        [0.32, -0.82, -0.20, "nourriture"],
-      "eau":        [0.20, -0.80, -0.30, "nourriture"],
-
-      // NATURE / ÉLÉMENTS (inanimé 0.5, concret -0.7)
-      "océan":      [0.30, -0.65, -0.30, "nature"],
-      "mer":        [0.32, -0.65, -0.30, "nature"],
-      "montagne":   [0.55, -0.75, -0.15, "nature"],
-      "rivière":    [0.35, -0.68, -0.30, "nature"],
-      "soleil":     [0.60, -0.65, -0.55, "nature"],
-      "lune":       [0.62, -0.60, -0.45, "nature"],
-      "étoile":     [0.65, -0.55, -0.55, "nature"],
-      "ciel":       [0.50, -0.55, -0.40, "nature"],
-      "nuage":      [0.45, -0.60, -0.25, "nature"],
-      "pluie":      [0.40, -0.65, -0.10, "nature"],
-      "neige":      [0.45, -0.65, -0.30, "nature"],
-      "feu":        [0.50, -0.75, 0.05, "nature"],
-      "vent":       [0.55, -0.50, -0.10, "nature"],
-      "plage":      [0.35, -0.70, -0.50, "nature"],
-
-      // COULEURS (concret -0.3, plutôt inanimé 0.2, teinte varie)
-      "rouge":      [0.15, -0.30, 0.10, "couleur"],
-      "bleu":       [0.15, -0.30, -0.30, "couleur"],
-      "vert":       [0.10, -0.30, -0.35, "couleur"],
-      "jaune":      [0.15, -0.30, -0.40, "couleur"],
-      "noir":       [0.20, -0.30, 0.35, "couleur"],
-      "blanc":      [0.20, -0.30, -0.35, "couleur"],
-      "orange":     [0.15, -0.30, -0.30, "couleur"],
-      "violet":     [0.15, -0.30, -0.10, "couleur"],
-      "rose_c":     [0.10, -0.30, -0.55, "couleur"],
-      "gris":       [0.25, -0.30, 0.20, "couleur"],
-      "doré":       [0.10, -0.30, -0.55, "couleur"],
-      "argenté":    [0.15, -0.30, -0.30, "couleur"],
-
-      // MATIÈRES (inanimé 0.6, concret -0.5)
-      "bois":       [0.60, -0.55, -0.20, "matiere"],
-      "métal":      [0.75, -0.55, 0.05, "matiere"],
-      "verre":      [0.72, -0.55, -0.10, "matiere"],
-      "pierre":     [0.68, -0.55, 0.00, "matiere"],
-      "tissu":      [0.55, -0.55, -0.20, "matiere"],
-      "papier":     [0.60, -0.55, -0.15, "matiere"],
-
-      // ACTIONS (inanimé 0.0, mi-abstrait 0.2)
-      "court":      [-0.10, 0.15, -0.20, "action"],
-      "courir":     [-0.10, 0.15, -0.20, "action"],
-      "marche":     [-0.10, 0.15, -0.15, "action"],
-      "marcher":    [-0.10, 0.15, -0.15, "action"],
-      "saute":      [-0.10, 0.15, -0.30, "action"],
-      "sauter":     [-0.10, 0.15, -0.30, "action"],
-      "dort":       [-0.10, 0.20, -0.40, "action"],
-      "dormir":     [-0.10, 0.20, -0.40, "action"],
-      "mange":      [-0.15, 0.15, -0.10, "action"],
-      "manger":     [-0.15, 0.15, -0.10, "action"],
-      "parle":      [-0.15, 0.20, -0.20, "action"],
-      "parler":     [-0.15, 0.20, -0.20, "action"],
-      "chante":     [-0.15, 0.25, -0.55, "action"],
-      "chanter":    [-0.15, 0.25, -0.55, "action"],
-      "danse":      [-0.15, 0.25, -0.60, "action"],
-      "danser":     [-0.15, 0.25, -0.60, "action"],
-      "rit":        [-0.20, 0.30, -0.75, "action"],
-      "rire":       [-0.20, 0.30, -0.75, "action"],
-      "pleure":     [-0.20, 0.30, 0.60, "action"],
-      "pleurer":    [-0.20, 0.30, 0.60, "action"],
-      "vole":       [-0.05, 0.20, -0.35, "action"],
-      "voler":      [-0.05, 0.20, -0.35, "action"],
-      "nage":       [-0.10, 0.20, -0.30, "action"],
-      "nager":      [-0.10, 0.20, -0.30, "action"],
-      "lit_v":      [-0.15, 0.30, -0.20, "action"],
-      "lire":       [-0.15, 0.30, -0.20, "action"],
-      "écrit":      [-0.15, 0.35, -0.15, "action"],
-      "écrire":     [-0.15, 0.35, -0.15, "action"],
-      "pense":      [-0.20, 0.55, -0.05, "action_mentale"],
-      "penser":     [-0.20, 0.55, -0.05, "action_mentale"],
-      "rêve":       [-0.15, 0.65, -0.50, "action_mentale"],
-      "rêver":      [-0.15, 0.65, -0.50, "action_mentale"],
-      "aime":       [-0.10, 0.55, -0.85, "sentiment"],
-      "aimer":      [-0.10, 0.55, -0.85, "sentiment"],
-      "déteste":    [-0.10, 0.55, 0.75, "sentiment"],
-      "détester":   [-0.10, 0.55, 0.75, "sentiment"],
-
-      // ÉMOTIONS (abstrait 0.7)
-      "joie":       [0.20, 0.80, -0.90, "emotion"],
-      "bonheur":    [0.20, 0.85, -0.90, "emotion"],
-      "tristesse":  [0.20, 0.80, 0.85, "emotion"],
-      "peur":       [0.20, 0.80, 0.70, "emotion"],
-      "colère":     [0.20, 0.80, 0.80, "emotion"],
-      "amour":      [0.15, 0.80, -0.90, "emotion"],
-      "haine":      [0.15, 0.80, 0.85, "emotion"],
-      "surprise":   [0.20, 0.75, -0.30, "emotion"],
-      "espoir":     [0.20, 0.85, -0.75, "emotion"],
-      "désespoir":  [0.20, 0.85, 0.85, "emotion"],
-      "joyeux":     [-0.40, 0.35, -0.85, "adj_emo"],
-      "heureux":    [-0.40, 0.35, -0.85, "adj_emo"],
-      "triste":     [-0.40, 0.35, 0.80, "adj_emo"],
-      "en_colère":  [-0.40, 0.35, 0.80, "adj_emo"],
-      "calme":      [0.00, 0.40, -0.55, "adj_emo"],
-      "paisible":   [0.00, 0.40, -0.60, "adj_emo"],
-      "tranquille": [0.00, 0.40, -0.55, "adj_emo"],
-      "furieux":    [-0.40, 0.35, 0.85, "adj_emo"],
-      "gentil":     [-0.40, 0.35, -0.75, "adj_emo"],
-      "méchant":    [-0.40, 0.35, 0.75, "adj_emo"],
-
-      // CONCEPTS ABSTRAITS (abstrait 0.9)
-      "liberté":    [0.30, 0.95, -0.75, "concept"],
-      "justice":    [0.30, 0.95, -0.65, "concept"],
-      "vérité":     [0.35, 0.95, -0.55, "concept"],
-      "beauté":     [0.30, 0.90, -0.70, "concept"],
-      "mort":       [0.30, 0.90, 0.80, "concept"],
-      "vie":        [0.20, 0.85, -0.75, "concept"],
-      "temps":      [0.55, 0.90, 0.05, "concept"],
-      "espace":     [0.55, 0.90, 0.00, "concept"],
-      "idée":       [0.30, 0.90, -0.20, "concept"],
-      "rêve_n":     [0.20, 0.85, -0.55, "concept"],
-      "guerre":     [0.30, 0.85, 0.85, "concept"],
-      "paix":       [0.30, 0.85, -0.85, "concept"],
-      "science":    [0.45, 0.85, -0.15, "concept"],
-      "art":        [0.30, 0.85, -0.50, "concept"],
-      "musique":    [0.35, 0.75, -0.75, "concept"],
-      "poésie":     [0.30, 0.85, -0.65, "concept"],
-      "philosophie":[0.35, 0.95, -0.20, "concept"],
-      "mémoire":    [0.20, 0.80, -0.10, "concept"],
-      "silence":    [0.45, 0.75, -0.20, "concept"],
-      "puissant":   [0.30, 0.70, 0.05, "adj_abs"],
-      "faible":     [0.30, 0.70, 0.20, "adj_abs"],
-      "grand":      [0.35, 0.55, -0.05, "adj_abs"],
-      "petit":      [0.35, 0.55, -0.05, "adj_abs"],
-      "profond":    [0.40, 0.75, -0.15, "adj_abs"],
-      "beau":       [0.30, 0.70, -0.65, "adj_abs"],
-      "laid":       [0.30, 0.70, 0.50, "adj_abs"],
-      "vieux":      [0.35, 0.60, 0.20, "adj_abs"],
-      "jeune":      [0.30, 0.60, -0.40, "adj_abs"],
-      "nouveau":    [0.35, 0.60, -0.40, "adj_abs"],
-      "ancien":     [0.35, 0.60, 0.10, "adj_abs"],
+      // ==== EXTENSION DU LEXIQUE (mots supplémentaires) ====
+      "hamster": { sem: [-0.96, -0.83, -0.12], sens: [-0.34, 0.05, 0.03], temp: [-0.62, -0.26, -0.80], cat: "animal_dom" },
+      "cochon d'inde": { sem: [-0.74, -0.78, -0.02], sens: [-0.28, -0.08, -0.11], temp: [-0.59, -0.13, -0.81], cat: "animal_dom" },
+      "furet": { sem: [-0.88, -0.88, -0.11], sens: [-0.34, 0.04, -0.00], temp: [-0.65, -0.23, -0.83], cat: "animal_dom" },
+      "perroquet": { sem: [-0.85, -0.92, -0.06], sens: [-0.23, 0.04, -0.04], temp: [-0.64, -0.17, -0.93], cat: "animal_dom" },
+      "canari": { sem: [-0.87, -0.94, -0.02], sens: [-0.34, 0.04, 0.05], temp: [-0.54, -0.20, -0.88], cat: "animal_dom" },
+      "tortue": { sem: [-0.91, -0.88, -0.05], sens: [-0.34, 0.03, 0.05], temp: [-0.65, -0.23, -0.83], cat: "animal_dom" },
+      "iguane": { sem: [-0.83, -0.76, -0.18], sens: [-0.28, -0.08, 0.03], temp: [-0.53, -0.15, -0.81], cat: "animal_dom" },
+      "gerbille": { sem: [-0.74, -0.94, -0.07], sens: [-0.28, -0.06, -0.14], temp: [-0.59, -0.13, -0.91], cat: "animal_dom" },
+      "poney": { sem: [-0.78, -0.95, -0.06], sens: [-0.38, -0.00, 0.04], temp: [-0.59, -0.13, -0.89], cat: "animal_dom" },
+      "âne": { sem: [-0.89, -0.87, -0.00], sens: [-0.30, -0.05, -0.07], temp: [-0.56, -0.14, -0.92], cat: "animal_dom" },
+      "mule": { sem: [-0.86, -0.86, -0.15], sens: [-0.23, -0.10, -0.10], temp: [-0.63, -0.13, -0.79], cat: "animal_dom" },
+      "chèvre": { sem: [-0.91, -0.76, -0.09], sens: [-0.34, 0.05, -0.11], temp: [-0.55, -0.24, -0.91], cat: "animal_dom" },
+      "mouton": { sem: [-0.83, -0.79, -0.01], sens: [-0.30, -0.05, 0.02], temp: [-0.55, -0.24, -0.81], cat: "animal_dom" },
+      "cochon": { sem: [-0.96, -0.84, -0.02], sens: [-0.23, 0.03, -0.06], temp: [-0.55, -0.16, -0.90], cat: "animal_dom" },
+      "dindon": { sem: [-0.76, -0.92, -0.15], sens: [-0.33, -0.03, -0.11], temp: [-0.63, -0.20, -0.87], cat: "animal_dom" },
+      "oie": { sem: [-0.94, -0.94, 0.02], sens: [-0.22, -0.06, -0.12], temp: [-0.56, -0.26, -0.80], cat: "animal_dom" },
+      "canard": { sem: [-0.91, -0.81, -0.06], sens: [-0.23, -0.02, -0.10], temp: [-0.65, -0.23, -0.86], cat: "animal_dom" },
+      "paon": { sem: [-0.93, -0.80, -0.07], sens: [-0.28, 0.02, 0.04], temp: [-0.55, -0.26, -0.78], cat: "animal_dom" },
+      "pigeon": { sem: [-0.76, -0.74, -0.21], sens: [-0.26, 0.08, -0.02], temp: [-0.54, -0.13, -0.86], cat: "animal_dom" },
+      "hérisson": { sem: [-0.80, -0.74, -0.19], sens: [-0.39, -0.02, -0.11], temp: [-0.58, -0.19, -0.88], cat: "animal_dom" },
+      "ours": { sem: [-0.86, -0.88, 0.21], sens: [0.06, 0.17, -0.07], temp: [-0.79, -0.31, -1.00], cat: "animal_sauvage" },
+      "léopard": { sem: [-0.74, -0.88, 0.01], sens: [0.16, 0.11, -0.00], temp: [-0.75, -0.28, -1.00], cat: "animal_sauvage" },
+      "panthère": { sem: [-0.83, -0.85, -0.00], sens: [0.17, 0.19, 0.00], temp: [-0.80, -0.32, -1.00], cat: "animal_sauvage" },
+      "guépard": { sem: [-0.67, -0.87, -0.02], sens: [0.17, 0.07, -0.11], temp: [-0.70, -0.18, -0.95], cat: "animal_sauvage" },
+      "hyène": { sem: [-0.76, -0.76, 0.11], sens: [0.05, 0.19, -0.02], temp: [-0.75, -0.21, -0.89], cat: "animal_sauvage" },
+      "chacal": { sem: [-0.86, -0.83, 0.06], sens: [0.06, 0.10, 0.00], temp: [-0.79, -0.27, -0.97], cat: "animal_sauvage" },
+      "bison": { sem: [-0.86, -0.77, 0.18], sens: [0.12, 0.07, -0.13], temp: [-0.72, -0.22, -0.98], cat: "animal_sauvage" },
+      "buffle": { sem: [-0.72, -0.72, 0.04], sens: [0.06, 0.16, 0.04], temp: [-0.75, -0.17, -0.91], cat: "animal_sauvage" },
+      "antilope": { sem: [-0.90, -0.75, 0.19], sens: [0.12, 0.09, -0.08], temp: [-0.81, -0.26, -0.92], cat: "animal_sauvage" },
+      "gazelle": { sem: [-0.71, -0.91, 0.09], sens: [0.05, 0.15, -0.07], temp: [-0.75, -0.26, -0.96], cat: "animal_sauvage" },
+      "girafe": { sem: [-0.70, -0.82, 0.11], sens: [0.04, 0.08, -0.05], temp: [-0.69, -0.31, -0.89], cat: "animal_sauvage" },
+      "hippopotame": { sem: [-0.69, -0.84, 0.01], sens: [0.04, 0.20, -0.14], temp: [-0.76, -0.28, -0.99], cat: "animal_sauvage" },
+      "rhinocéros": { sem: [-0.72, -0.84, 0.20], sens: [0.03, 0.15, -0.01], temp: [-0.72, -0.32, -0.99], cat: "animal_sauvage" },
+      "éléphant": { sem: [-0.89, -0.83, 0.05], sens: [0.18, 0.11, -0.03], temp: [-0.80, -0.29, -0.90], cat: "animal_sauvage" },
+      "zèbre": { sem: [-0.83, -0.73, 0.10], sens: [0.12, 0.05, -0.04], temp: [-0.77, -0.23, -0.87], cat: "animal_sauvage" },
+      "kangourou": { sem: [-0.84, -0.69, 0.13], sens: [0.20, 0.11, -0.12], temp: [-0.79, -0.22, -0.96], cat: "animal_sauvage" },
+      "koala": { sem: [-0.75, -0.74, 0.15], sens: [0.08, 0.08, -0.10], temp: [-0.79, -0.20, -1.00], cat: "animal_sauvage" },
+      "panda": { sem: [-0.76, -0.78, 0.02], sens: [0.07, 0.15, -0.14], temp: [-0.77, -0.29, -0.89], cat: "animal_sauvage" },
+      "gorille": { sem: [-0.80, -0.87, 0.01], sens: [0.18, 0.00, -0.12], temp: [-0.71, -0.17, -0.93], cat: "animal_sauvage" },
+      "chimpanzé": { sem: [-0.87, -0.92, 0.02], sens: [0.17, 0.07, -0.09], temp: [-0.81, -0.25, -1.00], cat: "animal_sauvage" },
+      "orang-outan": { sem: [-0.70, -0.83, 0.04], sens: [0.20, 0.12, -0.03], temp: [-0.75, -0.22, -0.87], cat: "animal_sauvage" },
+      "lynx": { sem: [-0.70, -0.70, -0.02], sens: [0.17, 0.01, -0.09], temp: [-0.78, -0.23, -1.00], cat: "animal_sauvage" },
+      "sanglier": { sem: [-0.72, -0.86, 0.17], sens: [0.14, 0.00, -0.15], temp: [-0.78, -0.21, -0.95], cat: "animal_sauvage" },
+      "blaireau": { sem: [-0.88, -0.91, 0.01], sens: [0.01, 0.13, -0.01], temp: [-0.78, -0.31, -0.92], cat: "animal_sauvage" },
+      "castor": { sem: [-0.84, -0.72, 0.21], sens: [0.03, 0.14, -0.01], temp: [-0.71, -0.17, -1.00], cat: "animal_sauvage" },
+      "loutre": { sem: [-0.81, -0.88, 0.14], sens: [0.19, 0.13, -0.03], temp: [-0.74, -0.23, -1.00], cat: "animal_sauvage" },
+      "raton laveur": { sem: [-0.82, -0.73, 0.15], sens: [0.15, 0.04, -0.08], temp: [-0.67, -0.27, -0.92], cat: "animal_sauvage" },
+      "opossum": { sem: [-0.76, -0.89, 0.15], sens: [0.00, 0.05, -0.10], temp: [-0.73, -0.19, -0.97], cat: "animal_sauvage" },
+      "paresseux": { sem: [-0.73, -0.76, 0.05], sens: [0.17, 0.03, 0.01], temp: [-0.72, -0.19, -0.95], cat: "animal_sauvage" },
+      "tatou": { sem: [-0.67, -0.69, 0.11], sens: [0.17, 0.19, 0.04], temp: [-0.72, -0.23, -0.95], cat: "animal_sauvage" },
+      "aigle": { sem: [-0.75, -0.68, -0.11], sens: [-0.18, 0.09, -0.19], temp: [-0.66, -0.21, -0.92], cat: "oiseau" },
+      "faucon": { sem: [-0.86, -0.78, -0.20], sens: [-0.15, 0.03, -0.19], temp: [-0.67, -0.33, -0.87], cat: "oiseau" },
+      "hibou": { sem: [-0.77, -0.78, -0.10], sens: [-0.11, 0.14, -0.02], temp: [-0.75, -0.25, -0.95], cat: "oiseau" },
+      "chouette": { sem: [-0.84, -0.71, -0.16], sens: [-0.24, 0.15, -0.01], temp: [-0.67, -0.21, -0.97], cat: "oiseau" },
+      "corbeau": { sem: [-0.92, -0.72, -0.13], sens: [-0.23, 0.13, -0.02], temp: [-0.75, -0.19, -0.93], cat: "oiseau" },
+      "pie": { sem: [-0.78, -0.67, -0.17], sens: [-0.20, 0.07, -0.19], temp: [-0.73, -0.31, -0.96], cat: "oiseau" },
+      "moineau": { sem: [-0.86, -0.90, -0.31], sens: [-0.12, 0.14, -0.09], temp: [-0.71, -0.27, -0.83], cat: "oiseau" },
+      "hirondelle": { sem: [-0.81, -0.78, -0.10], sens: [-0.12, 0.14, -0.06], temp: [-0.68, -0.30, -0.87], cat: "oiseau" },
+      "mésange": { sem: [-0.85, -0.69, -0.28], sens: [-0.20, 0.07, -0.03], temp: [-0.69, -0.30, -0.82], cat: "oiseau" },
+      "rouge-gorge": { sem: [-0.97, -0.88, -0.22], sens: [-0.20, 0.00, -0.07], temp: [-0.77, -0.33, -0.84], cat: "oiseau" },
+      "colibri": { sem: [-0.77, -0.80, -0.27], sens: [-0.27, 0.06, -0.13], temp: [-0.64, -0.32, -0.94], cat: "oiseau" },
+      "pélican": { sem: [-0.75, -0.73, -0.12], sens: [-0.21, 0.18, -0.18], temp: [-0.70, -0.32, -0.88], cat: "oiseau" },
+      "flamant rose": { sem: [-0.83, -0.86, -0.30], sens: [-0.28, 0.18, -0.15], temp: [-0.68, -0.25, -0.87], cat: "oiseau" },
+      "cygne": { sem: [-0.75, -0.79, -0.16], sens: [-0.21, 0.02, -0.00], temp: [-0.68, -0.27, -0.85], cat: "oiseau" },
+      "héron": { sem: [-0.79, -0.67, -0.25], sens: [-0.12, 0.18, -0.04], temp: [-0.64, -0.28, -0.87], cat: "oiseau" },
+      "autruche": { sem: [-0.94, -0.66, -0.19], sens: [-0.11, 0.14, -0.10], temp: [-0.73, -0.24, -0.86], cat: "oiseau" },
+      "toucan": { sem: [-0.77, -0.90, -0.17], sens: [-0.11, 0.16, -0.13], temp: [-0.62, -0.23, -0.95], cat: "oiseau" },
+      "perruche": { sem: [-0.91, -0.74, -0.30], sens: [-0.20, 0.19, -0.10], temp: [-0.68, -0.20, -0.94], cat: "oiseau" },
+      "albatros": { sem: [-0.93, -0.85, -0.12], sens: [-0.30, 0.15, -0.04], temp: [-0.77, -0.19, -0.87], cat: "oiseau" },
+      "goéland": { sem: [-0.94, -0.74, -0.18], sens: [-0.23, 0.01, -0.02], temp: [-0.68, -0.21, -0.93], cat: "oiseau" },
+      "abeille": { sem: [-0.98, -0.92, 0.00], sens: [-0.83, 0.07, 0.08], temp: [-0.69, -0.29, -0.92], cat: "insecte" },
+      "guêpe": { sem: [-0.79, -0.94, 0.07], sens: [-0.83, 0.07, -0.04], temp: [-0.67, -0.25, -0.94], cat: "insecte" },
+      "fourmi": { sem: [-0.81, -0.81, 0.06], sens: [-0.83, 0.07, 0.01], temp: [-0.67, -0.26, -0.91], cat: "insecte" },
+      "coccinelle": { sem: [-0.89, -0.94, 0.09], sens: [-0.74, -0.04, -0.04], temp: [-0.70, -0.27, -0.88], cat: "insecte" },
+      "libellule": { sem: [-0.86, -0.84, 0.10], sens: [-0.79, 0.10, -0.02], temp: [-0.68, -0.32, -0.95], cat: "insecte" },
+      "sauterelle": { sem: [-0.77, -0.88, -0.09], sens: [-0.71, 0.04, 0.03], temp: [-0.70, -0.27, -0.85], cat: "insecte" },
+      "criquet": { sem: [-0.76, -0.75, -0.02], sens: [-0.73, 0.04, 0.04], temp: [-0.69, -0.35, -0.85], cat: "insecte" },
+      "moustique": { sem: [-0.84, -0.83, 0.03], sens: [-0.74, -0.03, 0.06], temp: [-0.77, -0.23, -0.87], cat: "insecte" },
+      "mouche": { sem: [-0.86, -0.74, -0.01], sens: [-0.81, 0.03, 0.08], temp: [-0.82, -0.23, -0.95], cat: "insecte" },
+      "mite": { sem: [-0.84, -0.83, 0.10], sens: [-0.71, 0.12, 0.01], temp: [-0.69, -0.30, -0.93], cat: "insecte" },
+      "scarabée": { sem: [-0.89, -0.89, -0.11], sens: [-0.84, 0.08, 0.07], temp: [-0.82, -0.33, -0.91], cat: "insecte" },
+      "cafard": { sem: [-0.86, -0.93, -0.06], sens: [-0.68, -0.05, 0.02], temp: [-0.71, -0.35, -0.87], cat: "insecte" },
+      "puce": { sem: [-0.83, -0.79, -0.04], sens: [-0.81, 0.01, 0.09], temp: [-0.77, -0.29, -0.95], cat: "insecte" },
+      "tique": { sem: [-0.90, -0.83, 0.07], sens: [-0.69, 0.05, 0.09], temp: [-0.75, -0.36, -0.91], cat: "insecte" },
+      "termite": { sem: [-0.87, -0.92, 0.03], sens: [-0.72, 0.04, -0.08], temp: [-0.72, -0.37, -0.83], cat: "insecte" },
+      "cigale": { sem: [-0.90, -0.91, -0.03], sens: [-0.77, -0.02, -0.07], temp: [-0.80, -0.31, -0.90], cat: "insecte" },
+      "phasme": { sem: [-0.95, -0.93, 0.10], sens: [-0.78, 0.13, -0.04], temp: [-0.75, -0.37, -0.83], cat: "insecte" },
+      "mille-pattes": { sem: [-0.81, -0.86, 0.02], sens: [-0.84, 0.05, 0.05], temp: [-0.80, -0.37, -0.95], cat: "insecte" },
+      "scorpion": { sem: [-0.81, -0.90, 0.02], sens: [-0.78, 0.14, -0.03], temp: [-0.70, -0.32, -0.96], cat: "insecte" },
+      "araignée": { sem: [-0.95, -0.92, 0.08], sens: [-0.80, 0.06, 0.01], temp: [-0.69, -0.32, -0.85], cat: "insecte" },
+      "méduse": { sem: [-0.84, -0.80, -0.01], sens: [0.05, 0.15, -0.36], temp: [-0.58, -0.09, -0.93], cat: "animal_marin" },
+      "crabe": { sem: [-0.67, -0.83, -0.07], sens: [-0.05, 0.03, -0.54], temp: [-0.57, -0.18, -0.87], cat: "animal_marin" },
+      "homard": { sem: [-0.63, -0.75, 0.02], sens: [-0.05, -0.04, -0.50], temp: [-0.69, -0.13, -0.97], cat: "animal_marin" },
+      "crevette": { sem: [-0.76, -0.64, 0.11], sens: [0.08, 0.15, -0.42], temp: [-0.63, -0.13, -0.98], cat: "animal_marin" },
+      "étoile de mer": { sem: [-0.77, -0.85, 0.05], sens: [0.04, 0.12, -0.38], temp: [-0.63, -0.11, -0.87], cat: "animal_marin" },
+      "corail": { sem: [-0.73, -0.76, 0.11], sens: [0.09, 0.10, -0.52], temp: [-0.67, -0.18, -0.84], cat: "animal_marin" },
+      "calmar": { sem: [-0.81, -0.70, 0.06], sens: [0.07, 0.13, -0.37], temp: [-0.71, -0.09, -0.88], cat: "animal_marin" },
+      "anguille": { sem: [-0.73, -0.75, -0.09], sens: [0.10, 0.13, -0.40], temp: [-0.60, -0.12, -0.86], cat: "animal_marin" },
+      "raie": { sem: [-0.63, -0.83, 0.03], sens: [0.08, 0.03, -0.51], temp: [-0.60, -0.13, -0.99], cat: "animal_marin" },
+      "hippocampe": { sem: [-0.79, -0.87, -0.02], sens: [-0.00, 0.06, -0.40], temp: [-0.62, -0.22, -0.87], cat: "animal_marin" },
+      "phoque": { sem: [-0.80, -0.84, 0.01], sens: [0.00, -0.01, -0.36], temp: [-0.62, -0.20, -0.89], cat: "animal_marin" },
+      "otarie": { sem: [-0.79, -0.86, -0.07], sens: [0.05, 0.11, -0.40], temp: [-0.73, -0.09, -0.87], cat: "animal_marin" },
+      "morse": { sem: [-0.81, -0.67, -0.10], sens: [-0.02, 0.00, -0.53], temp: [-0.61, -0.09, -0.99], cat: "animal_marin" },
+      "narval": { sem: [-0.76, -0.81, -0.07], sens: [0.02, -0.05, -0.36], temp: [-0.73, -0.20, -0.90], cat: "animal_marin" },
+      "orque": { sem: [-0.82, -0.79, 0.12], sens: [0.11, 0.09, -0.36], temp: [-0.59, -0.07, -0.93], cat: "animal_marin" },
+      "thon": { sem: [-0.75, -0.73, -0.06], sens: [0.02, 0.07, -0.47], temp: [-0.65, -0.10, -0.90], cat: "animal_marin" },
+      "saumon": { sem: [-0.86, -0.66, 0.09], sens: [0.09, -0.02, -0.52], temp: [-0.69, -0.10, -0.98], cat: "animal_marin" },
+      "truite": { sem: [-0.70, -0.83, -0.00], sens: [0.14, 0.08, -0.50], temp: [-0.68, -0.09, -0.86], cat: "animal_marin" },
+      "carpe": { sem: [-0.78, -0.84, -0.07], sens: [-0.02, 0.07, -0.38], temp: [-0.59, -0.19, -1.00], cat: "animal_marin" },
+      "anchois": { sem: [-0.68, -0.69, -0.10], sens: [-0.03, 0.00, -0.48], temp: [-0.68, -0.12, -0.85], cat: "animal_marin" },
+      "tête": { sem: [-0.22, -0.80, 0.06], sens: [-0.25, 0.08, -0.03], temp: [0.03, 0.13, -0.26], cat: "corps_humain" },
+      "visage": { sem: [-0.21, -0.65, 0.06], sens: [-0.29, 0.08, -0.05], temp: [0.06, 0.27, -0.37], cat: "corps_humain" },
+      "œil": { sem: [-0.33, -0.59, -0.03], sens: [-0.14, -0.04, 0.09], temp: [0.03, 0.25, -0.33], cat: "corps_humain" },
+      "nez": { sem: [-0.26, -0.77, -0.08], sens: [-0.25, -0.00, 0.09], temp: [-0.06, 0.24, -0.31], cat: "corps_humain" },
+      "bouche": { sem: [-0.24, -0.81, -0.07], sens: [-0.27, -0.09, -0.03], temp: [-0.05, 0.13, -0.33], cat: "corps_humain" },
+      "oreille": { sem: [-0.23, -0.65, 0.08], sens: [-0.14, 0.09, -0.05], temp: [-0.08, 0.14, -0.27], cat: "corps_humain" },
+      "cheveux": { sem: [-0.20, -0.60, -0.00], sens: [-0.22, 0.08, -0.02], temp: [0.03, 0.21, -0.23], cat: "corps_humain" },
+      "main": { sem: [-0.29, -0.74, -0.05], sens: [-0.19, 0.04, 0.00], temp: [0.07, 0.24, -0.32], cat: "corps_humain" },
+      "bras": { sem: [-0.38, -0.80, 0.09], sens: [-0.10, -0.04, 0.09], temp: [0.01, 0.27, -0.27], cat: "corps_humain" },
+      "jambe": { sem: [-0.31, -0.63, 0.05], sens: [-0.11, 0.00, 0.03], temp: [0.05, 0.26, -0.31], cat: "corps_humain" },
+      "pied": { sem: [-0.22, -0.79, 0.10], sens: [-0.25, -0.03, 0.08], temp: [-0.05, 0.12, -0.38], cat: "corps_humain" },
+      "doigt": { sem: [-0.37, -0.59, 0.10], sens: [-0.17, -0.09, 0.02], temp: [-0.05, 0.28, -0.28], cat: "corps_humain" },
+      "genou": { sem: [-0.29, -0.74, 0.06], sens: [-0.27, -0.01, 0.03], temp: [-0.05, 0.25, -0.33], cat: "corps_humain" },
+      "coude": { sem: [-0.36, -0.73, -0.02], sens: [-0.30, -0.08, 0.03], temp: [-0.03, 0.16, -0.30], cat: "corps_humain" },
+      "épaule": { sem: [-0.32, -0.61, 0.05], sens: [-0.13, -0.01, 0.01], temp: [0.05, 0.14, -0.34], cat: "corps_humain" },
+      "dos": { sem: [-0.25, -0.77, 0.01], sens: [-0.25, 0.07, -0.03], temp: [-0.02, 0.23, -0.31], cat: "corps_humain" },
+      "ventre": { sem: [-0.38, -0.76, 0.06], sens: [-0.21, -0.07, -0.03], temp: [-0.02, 0.15, -0.31], cat: "corps_humain" },
+      "cœur": { sem: [-0.24, -0.61, -0.10], sens: [-0.24, 0.10, -0.02], temp: [-0.05, 0.18, -0.31], cat: "corps_humain" },
+      "poumon": { sem: [-0.41, -0.68, -0.11], sens: [-0.17, 0.05, -0.00], temp: [0.04, 0.22, -0.22], cat: "corps_humain" },
+      "cerveau": { sem: [-0.31, -0.58, 0.02], sens: [-0.12, 0.04, 0.07], temp: [-0.04, 0.19, -0.26], cat: "corps_humain" },
+      "peau": { sem: [-0.42, -0.62, 0.10], sens: [-0.20, -0.04, 0.02], temp: [0.07, 0.18, -0.34], cat: "corps_humain" },
+      "dent": { sem: [-0.28, -0.63, 0.11], sens: [-0.27, -0.04, -0.05], temp: [-0.06, 0.15, -0.35], cat: "corps_humain" },
+      "langue": { sem: [-0.38, -0.78, -0.06], sens: [-0.13, -0.01, 0.05], temp: [-0.08, 0.14, -0.34], cat: "corps_humain" },
+      "sourcil": { sem: [-0.38, -0.68, 0.03], sens: [-0.22, 0.07, -0.08], temp: [-0.04, 0.15, -0.34], cat: "corps_humain" },
+      "cou": { sem: [-0.30, -0.68, 0.04], sens: [-0.20, 0.10, -0.08], temp: [-0.06, 0.15, -0.24], cat: "corps_humain" },
+      "médecin": { sem: [-0.55, -0.31, 0.11], sens: [-0.02, 0.04, -0.01], temp: [0.11, 0.37, 0.11], cat: "profession" },
+      "infirmier": { sem: [-0.62, -0.49, -0.10], sens: [-0.00, 0.04, -0.04], temp: [0.03, 0.42, 0.07], cat: "profession" },
+      "avocat": { sem: [-0.46, -0.35, -0.04], sens: [0.01, 0.11, -0.09], temp: [0.17, 0.33, 0.10], cat: "profession" },
+      "juge": { sem: [-0.63, -0.45, -0.11], sens: [-0.10, 0.03, 0.03], temp: [0.09, 0.46, 0.06], cat: "profession" },
+      "policier": { sem: [-0.60, -0.30, 0.08], sens: [-0.09, -0.00, -0.08], temp: [0.15, 0.40, 0.12], cat: "profession" },
+      "pompier": { sem: [-0.46, -0.38, 0.01], sens: [0.04, -0.04, -0.03], temp: [0.09, 0.34, 0.09], cat: "profession" },
+      "professeur": { sem: [-0.66, -0.34, -0.03], sens: [0.01, 0.05, 0.02], temp: [0.11, 0.37, 0.12], cat: "profession" },
+      "ingénieur": { sem: [-0.53, -0.31, 0.04], sens: [-0.06, 0.06, -0.08], temp: [0.06, 0.38, 0.15], cat: "profession" },
+      "architecte": { sem: [-0.61, -0.39, 0.01], sens: [0.05, 0.14, -0.00], temp: [0.05, 0.45, 0.15], cat: "profession" },
+      "boulanger": { sem: [-0.46, -0.49, 0.00], sens: [-0.06, 0.15, 0.01], temp: [0.07, 0.40, 0.18], cat: "profession" },
+      "cuisinier": { sem: [-0.66, -0.40, -0.03], sens: [0.05, 0.14, -0.04], temp: [0.04, 0.38, 0.17], cat: "profession" },
+      "serveur": { sem: [-0.44, -0.46, -0.00], sens: [0.02, -0.04, 0.00], temp: [0.12, 0.47, 0.18], cat: "profession" },
+      "mécanicien": { sem: [-0.57, -0.30, -0.06], sens: [0.09, -0.01, 0.02], temp: [0.04, 0.45, 0.16], cat: "profession" },
+      "électricien": { sem: [-0.63, -0.36, 0.07], sens: [-0.00, 0.15, -0.05], temp: [0.09, 0.35, 0.07], cat: "profession" },
+      "plombier": { sem: [-0.56, -0.43, 0.04], sens: [0.08, 0.06, -0.02], temp: [0.06, 0.40, 0.18], cat: "profession" },
+      "agriculteur": { sem: [-0.66, -0.44, 0.09], sens: [0.02, 0.07, 0.01], temp: [0.10, 0.37, 0.06], cat: "profession" },
+      "pêcheur": { sem: [-0.62, -0.41, -0.09], sens: [0.00, -0.02, -0.07], temp: [0.04, 0.34, 0.09], cat: "profession" },
+      "journaliste": { sem: [-0.49, -0.33, -0.06], sens: [-0.08, 0.03, -0.06], temp: [0.17, 0.47, 0.11], cat: "profession" },
+      "écrivain": { sem: [-0.47, -0.31, 0.06], sens: [-0.09, 0.03, 0.06], temp: [0.06, 0.47, 0.07], cat: "profession" },
+      "peintre": { sem: [-0.51, -0.30, -0.07], sens: [-0.09, -0.02, -0.03], temp: [0.06, 0.35, 0.09], cat: "profession" },
+      "musicien": { sem: [-0.63, -0.31, 0.04], sens: [0.07, 0.09, -0.00], temp: [0.03, 0.48, 0.15], cat: "profession" },
+      "acteur": { sem: [-0.50, -0.30, -0.11], sens: [0.01, 0.10, -0.05], temp: [0.11, 0.43, 0.02], cat: "profession" },
+      "chanteur": { sem: [-0.44, -0.50, -0.12], sens: [0.08, 0.03, 0.04], temp: [0.11, 0.34, 0.07], cat: "profession" },
+      "danseur": { sem: [-0.59, -0.29, -0.05], sens: [-0.01, -0.02, 0.07], temp: [0.11, 0.34, 0.18], cat: "profession" },
+      "comptable": { sem: [-0.64, -0.34, -0.06], sens: [0.08, 0.06, 0.09], temp: [0.05, 0.34, 0.10], cat: "profession" },
+      "banquier": { sem: [-0.66, -0.40, -0.06], sens: [-0.10, 0.12, -0.05], temp: [0.08, 0.33, 0.10], cat: "profession" },
+      "vendeur": { sem: [-0.60, -0.42, -0.11], sens: [0.08, 0.11, 0.07], temp: [0.14, 0.35, 0.17], cat: "profession" },
+      "chauffeur": { sem: [-0.50, -0.35, -0.04], sens: [-0.05, 0.05, -0.05], temp: [0.05, 0.36, 0.09], cat: "profession" },
+      "pilote": { sem: [-0.60, -0.47, 0.05], sens: [-0.07, 0.01, 0.05], temp: [0.14, 0.36, 0.17], cat: "profession" },
+      "marin": { sem: [-0.46, -0.38, -0.05], sens: [-0.09, -0.02, 0.03], temp: [0.14, 0.46, 0.18], cat: "profession" },
+      "soldat": { sem: [-0.48, -0.46, -0.00], sens: [-0.04, -0.02, 0.07], temp: [0.15, 0.39, 0.15], cat: "profession" },
+      "secrétaire": { sem: [-0.50, -0.42, -0.11], sens: [0.07, 0.05, -0.07], temp: [0.13, 0.45, 0.16], cat: "profession" },
+      "chercheur": { sem: [-0.60, -0.29, 0.12], sens: [0.00, 0.13, 0.05], temp: [0.06, 0.37, 0.07], cat: "profession" },
+      "scientifique": { sem: [-0.65, -0.47, -0.00], sens: [0.09, 0.13, -0.06], temp: [0.16, 0.33, 0.05], cat: "profession" },
+      "astronaute": { sem: [-0.49, -0.42, -0.06], sens: [0.02, 0.01, -0.10], temp: [0.17, 0.44, 0.12], cat: "profession" },
+      "père": { sem: [-0.55, -0.42, -0.23], sens: [0.05, 0.01, 0.18], temp: [-0.14, 0.70, -0.25], cat: "famille" },
+      "mère": { sem: [-0.45, -0.48, -0.31], sens: [0.07, 0.02, 0.14], temp: [-0.08, 0.68, -0.36], cat: "famille" },
+      "frère": { sem: [-0.61, -0.38, -0.34], sens: [0.01, 0.02, 0.07], temp: [-0.15, 0.68, -0.30], cat: "famille" },
+      "sœur": { sem: [-0.46, -0.33, -0.28], sens: [0.04, -0.03, 0.18], temp: [-0.02, 0.71, -0.25], cat: "famille" },
+      "grand-père": { sem: [-0.51, -0.45, -0.23], sens: [0.02, 0.09, 0.17], temp: [-0.12, 0.79, -0.22], cat: "famille" },
+      "grand-mère": { sem: [-0.48, -0.44, -0.38], sens: [-0.06, 0.05, 0.19], temp: [-0.10, 0.70, -0.32], cat: "famille" },
+      "oncle": { sem: [-0.49, -0.43, -0.25], sens: [-0.08, -0.08, 0.03], temp: [-0.08, 0.76, -0.24], cat: "famille" },
+      "tante": { sem: [-0.62, -0.40, -0.46], sens: [0.07, -0.03, 0.20], temp: [-0.14, 0.79, -0.32], cat: "famille" },
+      "cousin": { sem: [-0.60, -0.36, -0.38], sens: [-0.05, -0.06, 0.10], temp: [-0.13, 0.79, -0.28], cat: "famille" },
+      "cousine": { sem: [-0.49, -0.36, -0.41], sens: [0.03, -0.10, 0.05], temp: [-0.11, 0.70, -0.24], cat: "famille" },
+      "neveu": { sem: [-0.45, -0.29, -0.27], sens: [0.08, -0.09, 0.10], temp: [-0.02, 0.81, -0.32], cat: "famille" },
+      "nièce": { sem: [-0.53, -0.47, -0.36], sens: [-0.04, 0.05, 0.19], temp: [-0.08, 0.75, -0.35], cat: "famille" },
+      "époux": { sem: [-0.65, -0.38, -0.46], sens: [0.05, -0.03, 0.20], temp: [-0.07, 0.75, -0.33], cat: "famille" },
+      "épouse": { sem: [-0.63, -0.52, -0.24], sens: [0.02, -0.09, 0.05], temp: [-0.16, 0.76, -0.37], cat: "famille" },
+      "fiancé": { sem: [-0.54, -0.29, -0.33], sens: [-0.01, -0.04, 0.07], temp: [-0.18, 0.75, -0.23], cat: "famille" },
+      "fiancée": { sem: [-0.63, -0.39, -0.38], sens: [0.10, 0.02, 0.19], temp: [-0.02, 0.76, -0.32], cat: "famille" },
+      "beau-père": { sem: [-0.60, -0.44, -0.35], sens: [-0.03, 0.01, 0.10], temp: [-0.03, 0.81, -0.33], cat: "famille" },
+      "belle-mère": { sem: [-0.43, -0.42, -0.27], sens: [-0.02, 0.06, 0.02], temp: [-0.04, 0.83, -0.32], cat: "famille" },
+      "parrain": { sem: [-0.62, -0.50, -0.41], sens: [-0.02, 0.04, 0.13], temp: [-0.02, 0.72, -0.26], cat: "famille" },
+      "marraine": { sem: [-0.60, -0.46, -0.35], sens: [0.04, 0.07, 0.07], temp: [-0.09, 0.79, -0.26], cat: "famille" },
+      "pantalon": { sem: [0.56, -0.82, -0.07], sens: [-0.03, -0.09, 0.01], temp: [0.08, 0.00, 0.56], cat: "vetement" },
+      "chemise": { sem: [0.48, -0.74, 0.12], sens: [-0.05, -0.15, -0.04], temp: [0.17, 0.02, 0.61], cat: "vetement" },
+      "robe": { sem: [0.58, -0.82, 0.00], sens: [0.07, -0.02, 0.11], temp: [0.11, -0.11, 0.60], cat: "vetement" },
+      "jupe": { sem: [0.47, -0.81, -0.03], sens: [-0.09, -0.04, 0.14], temp: [0.04, -0.11, 0.58], cat: "vetement" },
+      "manteau": { sem: [0.57, -0.86, 0.11], sens: [0.01, -0.01, 0.05], temp: [0.17, -0.12, 0.52], cat: "vetement" },
+      "veste": { sem: [0.47, -0.73, -0.08], sens: [-0.09, -0.12, 0.01], temp: [0.07, -0.03, 0.61], cat: "vetement" },
+      "pull": { sem: [0.55, -0.69, 0.06], sens: [-0.08, -0.00, -0.04], temp: [0.04, 0.02, 0.53], cat: "vetement" },
+      "short": { sem: [0.43, -0.84, 0.01], sens: [0.03, -0.07, -0.03], temp: [0.04, -0.12, 0.55], cat: "vetement" },
+      "maillot": { sem: [0.57, -0.73, 0.12], sens: [-0.00, -0.17, 0.11], temp: [0.09, -0.01, 0.67], cat: "vetement" },
+      "chaussette": { sem: [0.51, -0.77, 0.10], sens: [0.04, -0.11, -0.05], temp: [0.08, 0.02, 0.57], cat: "vetement" },
+      "chaussure": { sem: [0.67, -0.66, 0.07], sens: [-0.02, -0.04, 0.13], temp: [0.14, -0.07, 0.66], cat: "vetement" },
+      "botte": { sem: [0.48, -0.75, -0.01], sens: [0.08, -0.02, 0.11], temp: [0.09, -0.08, 0.54], cat: "vetement" },
+      "sandale": { sem: [0.60, -0.81, 0.05], sens: [-0.06, -0.15, 0.06], temp: [0.06, -0.08, 0.58], cat: "vetement" },
+      "chapeau": { sem: [0.47, -0.69, 0.02], sens: [-0.08, -0.06, -0.03], temp: [0.11, -0.09, 0.58], cat: "vetement" },
+      "casquette": { sem: [0.48, -0.87, 0.10], sens: [-0.02, -0.11, 0.14], temp: [0.10, 0.03, 0.58], cat: "vetement" },
+      "écharpe": { sem: [0.62, -0.81, 0.08], sens: [0.02, -0.14, 0.02], temp: [0.04, -0.05, 0.65], cat: "vetement" },
+      "gant": { sem: [0.58, -0.78, -0.01], sens: [0.03, -0.02, 0.13], temp: [0.17, -0.01, 0.53], cat: "vetement" },
+      "ceinture": { sem: [0.65, -0.74, 0.04], sens: [-0.00, -0.09, 0.05], temp: [0.14, -0.01, 0.64], cat: "vetement" },
+      "cravate": { sem: [0.61, -0.73, 0.09], sens: [-0.06, -0.04, 0.11], temp: [0.07, -0.06, 0.57], cat: "vetement" },
+      "costume": { sem: [0.45, -0.65, 0.03], sens: [0.02, -0.13, 0.01], temp: [0.16, -0.01, 0.57], cat: "vetement" },
+      "pyjama": { sem: [0.49, -0.84, -0.07], sens: [0.01, -0.07, -0.03], temp: [0.13, -0.03, 0.53], cat: "vetement" },
+      "survêtement": { sem: [0.51, -0.84, 0.02], sens: [-0.08, -0.08, 0.08], temp: [0.05, -0.05, 0.64], cat: "vetement" },
+      "imperméable": { sem: [0.45, -0.70, 0.04], sens: [-0.04, -0.04, 0.08], temp: [0.17, -0.09, 0.66], cat: "vetement" },
+      "gilet": { sem: [0.43, -0.75, 0.11], sens: [0.07, -0.07, 0.12], temp: [0.03, -0.05, 0.53], cat: "vetement" },
+      "bonnet": { sem: [0.50, -0.70, 0.00], sens: [-0.03, -0.06, -0.01], temp: [0.06, -0.00, 0.63], cat: "vetement" },
+      "banane": { sem: [0.15, -0.96, -0.52], sens: [-0.41, -0.30, 0.03], temp: [-0.26, -0.13, -0.65], cat: "fruit" },
+      "citron": { sem: [0.17, -1.00, -0.50], sens: [-0.55, -0.23, 0.08], temp: [-0.25, -0.25, -0.63], cat: "fruit" },
+      "fraise": { sem: [0.25, -0.81, -0.50], sens: [-0.46, -0.31, 0.07], temp: [-0.35, -0.19, -0.63], cat: "fruit" },
+      "framboise": { sem: [0.12, -0.92, -0.29], sens: [-0.54, -0.26, 0.02], temp: [-0.26, -0.24, -0.57], cat: "fruit" },
+      "cerise": { sem: [0.04, -0.80, -0.36], sens: [-0.56, -0.27, 0.15], temp: [-0.32, -0.18, -0.61], cat: "fruit" },
+      "raisin": { sem: [0.09, -1.00, -0.42], sens: [-0.58, -0.33, 0.07], temp: [-0.32, -0.21, -0.57], cat: "fruit" },
+      "pêche": { sem: [0.05, -1.00, -0.38], sens: [-0.52, -0.28, 0.17], temp: [-0.34, -0.16, -0.59], cat: "fruit" },
+      "poire": { sem: [0.20, -0.91, -0.33], sens: [-0.49, -0.22, 0.17], temp: [-0.30, -0.28, -0.64], cat: "fruit" },
+      "abricot": { sem: [0.19, -0.96, -0.42], sens: [-0.51, -0.37, 0.03], temp: [-0.23, -0.15, -0.55], cat: "fruit" },
+      "ananas": { sem: [0.18, -0.84, -0.41], sens: [-0.55, -0.39, 0.18], temp: [-0.36, -0.18, -0.58], cat: "fruit" },
+      "mangue": { sem: [0.18, -1.00, -0.35], sens: [-0.51, -0.35, 0.16], temp: [-0.37, -0.27, -0.60], cat: "fruit" },
+      "kiwi": { sem: [0.13, -1.00, -0.34], sens: [-0.46, -0.35, 0.17], temp: [-0.32, -0.27, -0.56], cat: "fruit" },
+      "pastèque": { sem: [0.15, -0.89, -0.49], sens: [-0.42, -0.30, 0.00], temp: [-0.32, -0.24, -0.66], cat: "fruit" },
+      "melon": { sem: [0.23, -0.80, -0.41], sens: [-0.41, -0.23, 0.11], temp: [-0.37, -0.20, -0.60], cat: "fruit" },
+      "figue": { sem: [0.24, -1.00, -0.44], sens: [-0.47, -0.28, 0.17], temp: [-0.33, -0.19, -0.57], cat: "fruit" },
+      "prune": { sem: [0.11, -0.83, -0.33], sens: [-0.41, -0.37, 0.04], temp: [-0.37, -0.27, -0.54], cat: "fruit" },
+      "noix de coco": { sem: [0.19, -0.97, -0.48], sens: [-0.55, -0.39, 0.18], temp: [-0.29, -0.26, -0.67], cat: "fruit" },
+      "citron vert": { sem: [0.17, -0.95, -0.28], sens: [-0.43, -0.36, 0.09], temp: [-0.34, -0.20, -0.55], cat: "fruit" },
+      "grenade": { sem: [0.07, -0.85, -0.45], sens: [-0.46, -0.28, 0.06], temp: [-0.30, -0.20, -0.54], cat: "fruit" },
+      "carotte": { sem: [0.12, -0.90, -0.14], sens: [-0.33, -0.33, 0.09], temp: [-0.32, -0.24, -0.62], cat: "legume" },
+      "tomate": { sem: [0.13, -0.82, -0.26], sens: [-0.31, -0.30, -0.06], temp: [-0.35, -0.20, -0.52], cat: "legume" },
+      "pomme de terre": { sem: [0.14, -0.82, -0.30], sens: [-0.34, -0.31, 0.01], temp: [-0.30, -0.19, -0.61], cat: "legume" },
+      "oignon": { sem: [0.21, -0.80, -0.28], sens: [-0.27, -0.37, 0.04], temp: [-0.36, -0.12, -0.54], cat: "legume" },
+      "ail": { sem: [-0.01, -0.84, -0.18], sens: [-0.26, -0.39, -0.07], temp: [-0.26, -0.26, -0.60], cat: "legume" },
+      "poivron": { sem: [0.07, -0.91, -0.17], sens: [-0.27, -0.32, -0.02], temp: [-0.29, -0.14, -0.54], cat: "legume" },
+      "courgette": { sem: [0.20, -1.00, -0.23], sens: [-0.36, -0.35, 0.02], temp: [-0.25, -0.21, -0.58], cat: "legume" },
+      "aubergine": { sem: [0.01, -0.79, -0.31], sens: [-0.32, -0.21, 0.06], temp: [-0.37, -0.27, -0.59], cat: "legume" },
+      "brocoli": { sem: [0.00, -0.90, -0.17], sens: [-0.30, -0.30, -0.08], temp: [-0.36, -0.21, -0.63], cat: "legume" },
+      "chou": { sem: [0.19, -0.82, -0.18], sens: [-0.36, -0.39, 0.02], temp: [-0.26, -0.21, -0.60], cat: "legume" },
+      "laitue": { sem: [0.16, -0.93, -0.25], sens: [-0.34, -0.30, 0.09], temp: [-0.24, -0.21, -0.63], cat: "legume" },
+      "épinard": { sem: [-0.01, -0.85, -0.28], sens: [-0.25, -0.34, 0.02], temp: [-0.25, -0.12, -0.57], cat: "legume" },
+      "haricot vert": { sem: [0.21, -0.97, -0.22], sens: [-0.37, -0.35, -0.08], temp: [-0.26, -0.21, -0.55], cat: "legume" },
+      "petit pois": { sem: [-0.01, -0.97, -0.08], sens: [-0.33, -0.32, -0.01], temp: [-0.30, -0.18, -0.65], cat: "legume" },
+      "concombre": { sem: [0.19, -0.87, -0.32], sens: [-0.35, -0.29, -0.07], temp: [-0.35, -0.13, -0.68], cat: "legume" },
+      "radis": { sem: [0.05, -0.79, -0.22], sens: [-0.27, -0.38, -0.08], temp: [-0.27, -0.17, -0.59], cat: "legume" },
+      "betterave": { sem: [0.12, -0.84, -0.16], sens: [-0.43, -0.22, 0.02], temp: [-0.23, -0.17, -0.52], cat: "legume" },
+      "poireau": { sem: [0.10, -0.98, -0.11], sens: [-0.44, -0.38, 0.00], temp: [-0.22, -0.13, -0.57], cat: "legume" },
+      "navet": { sem: [0.18, -0.92, -0.10], sens: [-0.43, -0.22, -0.04], temp: [-0.25, -0.27, -0.55], cat: "legume" },
+      "artichaut": { sem: [0.18, -0.92, -0.19], sens: [-0.41, -0.30, -0.02], temp: [-0.38, -0.22, -0.59], cat: "legume" },
+      "soupe": { sem: [0.10, -0.81, -0.56], sens: [-0.07, -0.18, 0.44], temp: [0.11, 0.29, -0.11], cat: "plat" },
+      "salade": { sem: [0.12, -0.73, -0.58], sens: [-0.00, -0.18, 0.43], temp: [0.16, 0.36, -0.18], cat: "plat" },
+      "pizza": { sem: [0.21, -0.69, -0.57], sens: [-0.01, -0.08, 0.39], temp: [0.10, 0.23, -0.22], cat: "plat" },
+      "pâtes": { sem: [0.05, -0.73, -0.52], sens: [0.07, -0.05, 0.41], temp: [0.02, 0.32, -0.15], cat: "plat" },
+      "riz": { sem: [-0.02, -0.85, -0.42], sens: [-0.09, -0.01, 0.29], temp: [0.05, 0.28, -0.15], cat: "plat" },
+      "omelette": { sem: [0.19, -0.92, -0.47], sens: [0.10, -0.16, 0.45], temp: [0.06, 0.23, -0.12], cat: "plat" },
+      "ragoût": { sem: [0.03, -0.73, -0.50], sens: [0.08, -0.15, 0.37], temp: [0.07, 0.35, -0.14], cat: "plat" },
+      "tarte": { sem: [0.07, -0.83, -0.40], sens: [-0.06, -0.07, 0.40], temp: [0.12, 0.32, -0.08], cat: "plat" },
+      "quiche": { sem: [0.04, -0.72, -0.46], sens: [-0.07, -0.20, 0.38], temp: [0.06, 0.38, -0.10], cat: "plat" },
+      "sandwich": { sem: [0.07, -0.84, -0.50], sens: [-0.10, -0.13, 0.31], temp: [0.05, 0.37, -0.20], cat: "plat" },
+      "burger": { sem: [-0.01, -0.78, -0.54], sens: [0.02, -0.17, 0.40], temp: [0.04, 0.32, -0.09], cat: "plat" },
+      "sushi": { sem: [0.06, -0.74, -0.51], sens: [0.02, -0.11, 0.34], temp: [0.14, 0.33, -0.17], cat: "plat" },
+      "couscous": { sem: [0.14, -0.79, -0.51], sens: [0.09, -0.12, 0.32], temp: [0.10, 0.24, -0.18], cat: "plat" },
+      "paella": { sem: [0.05, -0.78, -0.46], sens: [-0.02, -0.17, 0.42], temp: [0.13, 0.37, -0.19], cat: "plat" },
+      "curry": { sem: [0.14, -0.71, -0.53], sens: [-0.05, -0.03, 0.35], temp: [0.12, 0.33, -0.22], cat: "plat" },
+      "fondue": { sem: [0.16, -0.85, -0.61], sens: [-0.03, -0.06, 0.37], temp: [0.05, 0.25, -0.09], cat: "plat" },
+      "raclette": { sem: [0.01, -0.91, -0.40], sens: [0.03, -0.19, 0.30], temp: [0.12, 0.28, -0.09], cat: "plat" },
+      "crêpe": { sem: [0.02, -0.82, -0.48], sens: [-0.10, -0.08, 0.45], temp: [0.04, 0.33, -0.18], cat: "plat" },
+      "gaufre": { sem: [0.09, -0.88, -0.44], sens: [-0.03, -0.07, 0.27], temp: [0.16, 0.30, -0.23], cat: "plat" },
+      "biscuit": { sem: [-0.00, -0.89, -0.57], sens: [0.08, -0.02, 0.26], temp: [0.15, 0.28, -0.16], cat: "plat" },
+      "jus": { sem: [0.03, -0.81, -0.12], sens: [-0.23, -0.14, 0.09], temp: [0.02, 0.07, -0.14], cat: "boisson" },
+      "limonade": { sem: [0.10, -0.92, -0.15], sens: [-0.18, -0.01, 0.09], temp: [0.07, -0.07, -0.21], cat: "boisson" },
+      "soda": { sem: [0.20, -0.80, -0.26], sens: [-0.10, -0.11, 0.01], temp: [-0.06, -0.05, -0.27], cat: "boisson" },
+      "thé": { sem: [0.26, -0.92, -0.11], sens: [-0.17, -0.05, 0.06], temp: [0.03, -0.03, -0.17], cat: "boisson" },
+      "chocolat chaud": { sem: [0.03, -0.82, -0.05], sens: [-0.13, -0.05, 0.00], temp: [0.08, 0.02, -0.12], cat: "boisson" },
+      "bière": { sem: [0.07, -0.82, -0.08], sens: [-0.08, -0.14, 0.16], temp: [-0.08, 0.03, -0.15], cat: "boisson" },
+      "cidre": { sem: [0.03, -0.86, -0.03], sens: [-0.06, -0.04, 0.19], temp: [-0.05, 0.03, -0.20], cat: "boisson" },
+      "champagne": { sem: [0.05, -0.75, -0.27], sens: [-0.16, -0.13, 0.05], temp: [-0.02, 0.03, -0.17], cat: "boisson" },
+      "whisky": { sem: [0.22, -0.89, -0.24], sens: [-0.18, -0.20, 0.07], temp: [-0.04, -0.05, -0.24], cat: "boisson" },
+      "rhum": { sem: [0.25, -0.81, -0.10], sens: [-0.21, -0.16, 0.11], temp: [0.05, 0.06, -0.16], cat: "boisson" },
+      "cocktail": { sem: [0.13, -0.74, -0.14], sens: [-0.20, -0.06, 0.15], temp: [0.06, 0.07, -0.19], cat: "boisson" },
+      "smoothie": { sem: [0.05, -0.84, -0.21], sens: [-0.24, -0.09, 0.05], temp: [-0.06, 0.01, -0.15], cat: "boisson" },
+      "lait": { sem: [0.14, -0.96, -0.18], sens: [-0.17, -0.16, 0.06], temp: [-0.04, -0.02, -0.23], cat: "boisson" },
+      "yaourt à boire": { sem: [0.16, -0.93, -0.09], sens: [-0.15, -0.05, 0.13], temp: [0.05, 0.06, -0.13], cat: "boisson" },
+      "infusion": { sem: [0.09, -0.97, -0.15], sens: [-0.17, -0.09, 0.05], temp: [0.02, -0.02, -0.23], cat: "boisson" },
+      "cappuccino": { sem: [0.06, -0.95, -0.06], sens: [-0.21, -0.12, 0.13], temp: [0.01, 0.03, -0.26], cat: "boisson" },
+      "armoire": { sem: [0.74, -1.00, 0.09], sens: [0.27, -0.18, 0.01], temp: [0.06, -0.16, 0.68], cat: "meuble" },
+      "commode": { sem: [0.72, -0.83, -0.01], sens: [0.25, -0.27, 0.01], temp: [0.04, -0.11, 0.73], cat: "meuble" },
+      "étagère": { sem: [0.64, -0.78, -0.12], sens: [0.31, -0.26, 0.07], temp: [0.05, -0.17, 0.82], cat: "meuble" },
+      "bureau": { sem: [0.68, -1.00, 0.10], sens: [0.25, -0.12, 0.01], temp: [0.15, -0.05, 0.79], cat: "meuble" },
+      "tabouret": { sem: [0.87, -0.95, 0.02], sens: [0.22, -0.19, -0.10], temp: [0.09, -0.10, 0.71], cat: "meuble" },
+      "fauteuil": { sem: [0.67, -0.97, 0.00], sens: [0.29, -0.20, 0.03], temp: [0.12, -0.06, 0.74], cat: "meuble" },
+      "canapé-lit": { sem: [0.77, -0.81, 0.01], sens: [0.39, -0.17, -0.06], temp: [0.10, -0.06, 0.80], cat: "meuble" },
+      "buffet": { sem: [0.76, -0.88, 0.07], sens: [0.37, -0.17, 0.08], temp: [0.11, -0.17, 0.80], cat: "meuble" },
+      "bibliothèque": { sem: [0.81, -0.96, -0.01], sens: [0.30, -0.23, -0.06], temp: [0.16, -0.06, 0.74], cat: "meuble" },
+      "penderie": { sem: [0.80, -0.93, 0.08], sens: [0.23, -0.29, -0.01], temp: [0.12, -0.05, 0.83], cat: "meuble" },
+      "coffre": { sem: [0.83, -1.00, -0.10], sens: [0.28, -0.14, -0.05], temp: [0.11, -0.04, 0.79], cat: "meuble" },
+      "banc": { sem: [0.74, -0.92, 0.01], sens: [0.28, -0.18, 0.07], temp: [0.03, -0.06, 0.83], cat: "meuble" },
+      "miroir": { sem: [0.83, -0.98, -0.12], sens: [0.37, -0.19, -0.04], temp: [0.05, -0.09, 0.70], cat: "meuble" },
+      "lampe": { sem: [0.82, -0.84, 0.03], sens: [0.23, -0.13, -0.07], temp: [0.14, -0.11, 0.74], cat: "meuble" },
+      "rideau": { sem: [0.67, -0.99, 0.01], sens: [0.21, -0.29, 0.01], temp: [0.09, -0.16, 0.80], cat: "meuble" },
+      "tapis": { sem: [0.78, -0.96, -0.09], sens: [0.38, -0.25, -0.01], temp: [0.02, -0.13, 0.80], cat: "meuble" },
+      "coussin": { sem: [0.78, -1.00, -0.01], sens: [0.27, -0.19, 0.06], temp: [0.17, -0.09, 0.77], cat: "meuble" },
+      "matelas": { sem: [0.73, -1.00, 0.12], sens: [0.24, -0.14, -0.08], temp: [0.15, -0.08, 0.83], cat: "meuble" },
+      "berceau": { sem: [0.70, -0.86, 0.01], sens: [0.38, -0.19, -0.00], temp: [0.06, -0.18, 0.78], cat: "meuble" },
+      "paravent": { sem: [0.81, -0.88, 0.00], sens: [0.32, -0.11, 0.07], temp: [0.04, -0.05, 0.78], cat: "meuble" },
+      "marteau": { sem: [0.72, -0.81, -0.11], sens: [-0.06, 0.07, -0.01], temp: [0.35, -0.08, 0.90], cat: "outil" },
+      "tournevis": { sem: [0.89, -0.86, 0.02], sens: [-0.10, 0.10, -0.04], temp: [0.35, -0.03, 0.82], cat: "outil" },
+      "clou": { sem: [0.82, -0.83, 0.05], sens: [0.06, 0.15, 0.01], temp: [0.33, -0.14, 0.82], cat: "outil" },
+      "vis": { sem: [0.85, -0.74, -0.07], sens: [0.04, 0.14, 0.04], temp: [0.29, -0.11, 0.81], cat: "outil" },
+      "pince": { sem: [0.86, -0.81, -0.12], sens: [0.08, 0.19, -0.09], temp: [0.34, -0.03, 0.84], cat: "outil" },
+      "scie": { sem: [0.77, -0.83, 0.08], sens: [-0.01, 0.07, -0.03], temp: [0.30, -0.17, 0.91], cat: "outil" },
+      "perceuse": { sem: [0.71, -0.94, 0.02], sens: [0.06, 0.18, -0.05], temp: [0.29, -0.10, 0.81], cat: "outil" },
+      "clé à molette": { sem: [0.69, -0.79, -0.02], sens: [0.05, 0.09, -0.08], temp: [0.23, -0.10, 0.88], cat: "outil" },
+      "échelle": { sem: [0.86, -0.81, 0.02], sens: [-0.02, 0.04, -0.05], temp: [0.32, -0.03, 0.84], cat: "outil" },
+      "pelle": { sem: [0.75, -0.78, -0.08], sens: [0.03, 0.06, -0.04], temp: [0.28, -0.13, 0.86], cat: "outil" },
+      "râteau": { sem: [0.76, -0.80, -0.03], sens: [0.07, 0.12, 0.03], temp: [0.32, -0.09, 0.90], cat: "outil" },
+      "brouette": { sem: [0.69, -0.87, -0.10], sens: [0.07, 0.09, -0.04], temp: [0.30, -0.06, 0.86], cat: "outil" },
+      "tondeuse": { sem: [0.89, -0.90, 0.05], sens: [0.04, 0.08, -0.07], temp: [0.37, -0.04, 0.91], cat: "outil" },
+      "niveau": { sem: [0.79, -0.87, 0.10], sens: [-0.01, 0.20, 0.09], temp: [0.32, -0.06, 0.92], cat: "outil" },
+      "mètre ruban": { sem: [0.89, -0.86, -0.05], sens: [-0.09, 0.02, -0.09], temp: [0.34, -0.04, 0.77], cat: "outil" },
+      "ciseaux": { sem: [0.81, -0.89, -0.10], sens: [0.04, 0.12, -0.05], temp: [0.30, -0.04, 0.79], cat: "outil" },
+      "agrafeuse": { sem: [0.86, -0.85, -0.01], sens: [0.02, 0.13, 0.08], temp: [0.35, -0.11, 0.83], cat: "outil" },
+      "colle": { sem: [0.83, -0.87, -0.07], sens: [0.09, 0.20, -0.08], temp: [0.27, -0.12, 0.78], cat: "outil" },
+      "corde": { sem: [0.73, -0.82, -0.09], sens: [0.05, 0.08, -0.01], temp: [0.37, -0.16, 0.80], cat: "outil" },
+      "chaîne": { sem: [0.70, -0.78, 0.04], sens: [0.00, 0.13, 0.07], temp: [0.30, -0.05, 0.82], cat: "outil" },
+      "guitare": { sem: [0.43, -0.69, -0.39], sens: [0.18, 0.27, -0.05], temp: [-0.00, 0.05, 0.24], cat: "instrument_musique" },
+      "piano": { sem: [0.64, -0.80, -0.40], sens: [0.16, 0.16, -0.05], temp: [-0.01, 0.09, 0.29], cat: "instrument_musique" },
+      "violon": { sem: [0.54, -0.63, -0.35], sens: [0.15, 0.15, 0.09], temp: [-0.01, 0.05, 0.24], cat: "instrument_musique" },
+      "flûte": { sem: [0.66, -0.79, -0.32], sens: [0.00, 0.24, -0.03], temp: [-0.00, 0.07, 0.28], cat: "instrument_musique" },
+      "trompette": { sem: [0.48, -0.61, -0.46], sens: [0.18, 0.11, -0.02], temp: [0.07, 0.13, 0.30], cat: "instrument_musique" },
+      "batterie": { sem: [0.46, -0.79, -0.31], sens: [0.13, 0.29, -0.07], temp: [-0.02, 0.12, 0.37], cat: "instrument_musique" },
+      "saxophone": { sem: [0.47, -0.74, -0.32], sens: [0.20, 0.13, 0.10], temp: [-0.00, 0.02, 0.35], cat: "instrument_musique" },
+      "harpe": { sem: [0.58, -0.74, -0.40], sens: [0.03, 0.14, -0.06], temp: [-0.07, 0.07, 0.30], cat: "instrument_musique" },
+      "tambour": { sem: [0.49, -0.79, -0.38], sens: [0.04, 0.11, -0.02], temp: [-0.04, 0.08, 0.35], cat: "instrument_musique" },
+      "accordéon": { sem: [0.44, -0.66, -0.31], sens: [0.14, 0.12, 0.00], temp: [-0.01, 0.12, 0.27], cat: "instrument_musique" },
+      "clarinette": { sem: [0.45, -0.66, -0.42], sens: [0.14, 0.12, 0.00], temp: [-0.04, 0.05, 0.30], cat: "instrument_musique" },
+      "violoncelle": { sem: [0.45, -0.66, -0.51], sens: [0.07, 0.25, -0.05], temp: [-0.05, 0.05, 0.36], cat: "instrument_musique" },
+      "xylophone": { sem: [0.56, -0.68, -0.46], sens: [0.05, 0.22, -0.07], temp: [0.02, 0.13, 0.35], cat: "instrument_musique" },
+      "tuba": { sem: [0.49, -0.66, -0.36], sens: [0.18, 0.23, -0.01], temp: [0.07, 0.16, 0.30], cat: "instrument_musique" },
+      "banjo": { sem: [0.55, -0.81, -0.49], sens: [0.05, 0.23, 0.04], temp: [-0.01, 0.10, 0.23], cat: "instrument_musique" },
+      "ukulélé": { sem: [0.54, -0.66, -0.29], sens: [0.13, 0.23, -0.09], temp: [-0.04, 0.10, 0.32], cat: "instrument_musique" },
+      "orgue": { sem: [0.56, -0.78, -0.31], sens: [0.06, 0.23, 0.01], temp: [-0.08, 0.07, 0.32], cat: "instrument_musique" },
+      "triangle": { sem: [0.47, -0.74, -0.35], sens: [0.14, 0.18, -0.04], temp: [0.07, 0.15, 0.28], cat: "instrument_musique" },
+      "cymbale": { sem: [0.48, -0.72, -0.28], sens: [0.03, 0.22, -0.03], temp: [0.07, 0.16, 0.34], cat: "instrument_musique" },
+      "maracas": { sem: [0.58, -0.67, -0.47], sens: [0.00, 0.27, -0.02], temp: [-0.05, 0.14, 0.28], cat: "instrument_musique" },
+      "football": { sem: [-0.11, 0.03, -0.29], sens: [0.08, 0.47, 0.14], temp: [0.20, 0.53, 0.02], cat: "sport" },
+      "basketball": { sem: [-0.04, 0.17, -0.21], sens: [0.21, 0.49, 0.30], temp: [0.22, 0.50, 0.04], cat: "sport" },
+      "tennis": { sem: [-0.01, 0.05, -0.37], sens: [0.14, 0.57, 0.30], temp: [0.17, 0.63, 0.04], cat: "sport" },
+      "natation": { sem: [-0.16, 0.12, -0.24], sens: [0.11, 0.49, 0.19], temp: [0.14, 0.62, 0.08], cat: "sport" },
+      "athlétisme": { sem: [-0.17, 0.08, -0.33], sens: [0.13, 0.53, 0.17], temp: [0.21, 0.50, 0.07], cat: "sport" },
+      "cyclisme": { sem: [-0.21, 0.16, -0.39], sens: [0.11, 0.51, 0.22], temp: [0.23, 0.49, 0.09], cat: "sport" },
+      "boxe": { sem: [-0.11, 0.04, -0.32], sens: [0.16, 0.60, 0.14], temp: [0.12, 0.50, 0.04], cat: "sport" },
+      "judo": { sem: [-0.09, 0.20, -0.32], sens: [0.18, 0.46, 0.23], temp: [0.26, 0.60, 0.14], cat: "sport" },
+      "karaté": { sem: [-0.02, 0.03, -0.23], sens: [0.12, 0.62, 0.11], temp: [0.24, 0.60, 0.12], cat: "sport" },
+      "escalade": { sem: [0.00, 0.01, -0.22], sens: [0.13, 0.53, 0.17], temp: [0.17, 0.59, 0.03], cat: "sport" },
+      "ski": { sem: [-0.18, 0.17, -0.24], sens: [0.23, 0.53, 0.21], temp: [0.13, 0.55, 0.08], cat: "sport" },
+      "snowboard": { sem: [0.01, 0.07, -0.35], sens: [0.20, 0.63, 0.10], temp: [0.21, 0.53, 0.08], cat: "sport" },
+      "surf": { sem: [0.01, 0.08, -0.22], sens: [0.18, 0.62, 0.15], temp: [0.24, 0.56, 0.09], cat: "sport" },
+      "golf": { sem: [0.01, 0.18, -0.40], sens: [0.24, 0.56, 0.11], temp: [0.17, 0.58, 0.11], cat: "sport" },
+      "rugby": { sem: [-0.04, 0.14, -0.18], sens: [0.08, 0.45, 0.20], temp: [0.20, 0.58, 0.02], cat: "sport" },
+      "volleyball": { sem: [-0.14, 0.10, -0.31], sens: [0.23, 0.50, 0.24], temp: [0.21, 0.47, 0.05], cat: "sport" },
+      "handball": { sem: [-0.00, 0.13, -0.30], sens: [0.09, 0.52, 0.27], temp: [0.15, 0.50, 0.05], cat: "sport" },
+      "escrime": { sem: [-0.21, 0.11, -0.41], sens: [0.22, 0.46, 0.13], temp: [0.21, 0.57, 0.05], cat: "sport" },
+      "équitation": { sem: [-0.11, 0.22, -0.26], sens: [0.20, 0.64, 0.13], temp: [0.21, 0.54, 0.08], cat: "sport" },
+      "gymnastique": { sem: [-0.05, 0.20, -0.26], sens: [0.25, 0.58, 0.21], temp: [0.15, 0.59, 0.17], cat: "sport" },
+      "patinage": { sem: [0.01, 0.14, -0.19], sens: [0.24, 0.60, 0.23], temp: [0.17, 0.57, 0.02], cat: "sport" },
+      "aviron": { sem: [-0.15, 0.22, -0.19], sens: [0.14, 0.61, 0.30], temp: [0.12, 0.59, 0.06], cat: "sport" },
+      "badminton": { sem: [-0.04, 0.02, -0.24], sens: [0.23, 0.61, 0.11], temp: [0.26, 0.54, 0.13], cat: "sport" },
+      "plongée": { sem: [-0.05, 0.09, -0.36], sens: [0.21, 0.62, 0.21], temp: [0.13, 0.60, 0.04], cat: "sport" },
+      "puzzle": { sem: [0.12, 0.20, -0.55], sens: [-0.19, 0.19, 0.04], temp: [0.22, 0.32, 0.24], cat: "jeu" },
+      "dominos": { sem: [0.30, 0.20, -0.60], sens: [-0.10, 0.26, -0.08], temp: [0.18, 0.24, 0.25], cat: "jeu" },
+      "échecs": { sem: [0.32, 0.17, -0.49], sens: [-0.06, 0.12, 0.04], temp: [0.16, 0.25, 0.16], cat: "jeu" },
+      "dames": { sem: [0.13, 0.13, -0.47], sens: [-0.05, 0.26, 0.03], temp: [0.18, 0.23, 0.27], cat: "jeu" },
+      "cartes": { sem: [0.14, 0.05, -0.60], sens: [-0.09, 0.25, -0.10], temp: [0.28, 0.37, 0.27], cat: "jeu" },
+      "dés": { sem: [0.18, 0.18, -0.57], sens: [-0.12, 0.26, -0.02], temp: [0.25, 0.35, 0.21], cat: "jeu" },
+      "billard": { sem: [0.31, 0.07, -0.44], sens: [-0.17, 0.14, 0.03], temp: [0.26, 0.31, 0.27], cat: "jeu" },
+      "fléchettes": { sem: [0.13, 0.12, -0.59], sens: [-0.15, 0.13, -0.03], temp: [0.26, 0.34, 0.12], cat: "jeu" },
+      "bowling": { sem: [0.24, 0.14, -0.59], sens: [-0.13, 0.18, -0.04], temp: [0.27, 0.37, 0.17], cat: "jeu" },
+      "cerf-volant": { sem: [0.25, 0.07, -0.65], sens: [-0.15, 0.19, -0.02], temp: [0.22, 0.29, 0.22], cat: "jeu" },
+      "toupie": { sem: [0.14, 0.04, -0.63], sens: [-0.16, 0.28, 0.06], temp: [0.25, 0.29, 0.22], cat: "jeu" },
+      "yo-yo": { sem: [0.15, 0.21, -0.58], sens: [-0.08, 0.13, 0.05], temp: [0.19, 0.27, 0.20], cat: "jeu" },
+      "marelle": { sem: [0.16, 0.16, -0.65], sens: [-0.11, 0.25, -0.09], temp: [0.19, 0.31, 0.23], cat: "jeu" },
+      "cache-cache": { sem: [0.10, 0.05, -0.64], sens: [-0.06, 0.14, 0.02], temp: [0.16, 0.25, 0.27], cat: "jeu" },
+      "colin-maillard": { sem: [0.15, 0.15, -0.46], sens: [-0.16, 0.13, 0.06], temp: [0.20, 0.22, 0.23], cat: "jeu" },
+      "devinette": { sem: [0.14, -0.02, -0.52], sens: [-0.02, 0.13, 0.06], temp: [0.27, 0.27, 0.25], cat: "jeu" },
+      "charade": { sem: [0.09, 0.05, -0.50], sens: [-0.19, 0.21, -0.07], temp: [0.24, 0.28, 0.14], cat: "jeu" },
+      "mots croisés": { sem: [0.20, 0.18, -0.56], sens: [-0.08, 0.12, -0.05], temp: [0.13, 0.37, 0.15], cat: "jeu" },
+      "camion": { sem: [0.83, -0.73, 0.02], sens: [0.52, 0.22, 0.16], temp: [0.50, 0.04, 0.90], cat: "vehicule2" },
+      "tracteur": { sem: [0.80, -0.91, 0.05], sens: [0.50, 0.22, 0.08], temp: [0.62, -0.00, 0.93], cat: "vehicule2" },
+      "bus": { sem: [0.75, -0.78, 0.10], sens: [0.48, 0.36, 0.04], temp: [0.62, 0.06, 0.97], cat: "vehicule2" },
+      "tramway": { sem: [0.71, -0.93, 0.08], sens: [0.57, 0.40, 0.05], temp: [0.60, -0.03, 0.92], cat: "vehicule2" },
+      "métro": { sem: [0.81, -0.92, 0.05], sens: [0.48, 0.33, 0.08], temp: [0.57, -0.01, 0.93], cat: "vehicule2" },
+      "hélicoptère": { sem: [0.84, -0.77, -0.12], sens: [0.48, 0.36, 0.17], temp: [0.61, -0.00, 0.94], cat: "vehicule2" },
+      "fusée": { sem: [0.84, -0.95, 0.10], sens: [0.50, 0.31, 0.01], temp: [0.53, -0.02, 0.88], cat: "vehicule2" },
+      "sous-marin": { sem: [0.77, -0.86, 0.10], sens: [0.55, 0.38, 0.10], temp: [0.51, 0.04, 0.96], cat: "vehicule2" },
+      "voilier": { sem: [0.90, -0.83, -0.01], sens: [0.59, 0.23, 0.16], temp: [0.59, -0.00, 0.93], cat: "vehicule2" },
+      "kayak": { sem: [0.73, -0.85, 0.07], sens: [0.49, 0.35, 0.09], temp: [0.53, 0.03, 0.94], cat: "vehicule2" },
+      "canoë": { sem: [0.76, -0.90, 0.00], sens: [0.58, 0.38, 0.09], temp: [0.50, -0.00, 0.91], cat: "vehicule2" },
+      "scooter": { sem: [0.74, -0.89, 0.07], sens: [0.61, 0.26, 0.17], temp: [0.49, 0.05, 0.90], cat: "vehicule2" },
+      "camping-car": { sem: [0.71, -0.85, -0.09], sens: [0.60, 0.36, 0.05], temp: [0.61, -0.04, 0.94], cat: "vehicule2" },
+      "corbillard": { sem: [0.80, -0.92, -0.07], sens: [0.51, 0.27, 0.00], temp: [0.59, -0.07, 0.88], cat: "vehicule2" },
+      "charrette": { sem: [0.92, -0.88, 0.11], sens: [0.55, 0.26, 0.19], temp: [0.55, 0.04, 0.86], cat: "vehicule2" },
+      "luge": { sem: [0.85, -0.78, -0.02], sens: [0.49, 0.38, 0.06], temp: [0.54, 0.07, 0.97], cat: "vehicule2" },
+      "traîneau": { sem: [0.88, -0.75, -0.10], sens: [0.46, 0.37, 0.07], temp: [0.48, -0.08, 0.86], cat: "vehicule2" },
+      "hôpital": { sem: [0.68, -0.74, 0.12], sens: [0.50, -0.15, -0.06], temp: [0.14, 0.46, 0.76], cat: "batiment" },
+      "gare": { sem: [0.75, -0.71, 0.12], sens: [0.55, -0.17, 0.01], temp: [0.06, 0.50, 0.67], cat: "batiment" },
+      "aéroport": { sem: [0.76, -0.69, 0.04], sens: [0.55, -0.15, 0.07], temp: [0.09, 0.52, 0.72], cat: "batiment" },
+      "musée": { sem: [0.72, -0.79, 0.09], sens: [0.56, -0.04, -0.02], temp: [0.05, 0.48, 0.72], cat: "batiment" },
+      "théâtre": { sem: [0.77, -0.83, 0.05], sens: [0.63, -0.11, -0.06], temp: [0.06, 0.45, 0.68], cat: "batiment" },
+      "cinéma": { sem: [0.59, -0.84, 0.03], sens: [0.54, -0.13, -0.05], temp: [0.13, 0.50, 0.81], cat: "batiment" },
+      "bibliothèque_bat": { sem: [0.61, -0.75, 0.12], sens: [0.56, -0.18, -0.09], temp: [0.04, 0.52, 0.72], cat: "batiment" },
+      "église": { sem: [0.65, -0.71, 0.08], sens: [0.68, -0.03, -0.03], temp: [0.16, 0.50, 0.78], cat: "batiment" },
+      "cathédrale": { sem: [0.65, -0.65, 0.05], sens: [0.68, -0.06, 0.01], temp: [0.18, 0.51, 0.72], cat: "batiment" },
+      "mosquée": { sem: [0.72, -0.78, 0.09], sens: [0.67, -0.01, -0.07], temp: [0.16, 0.42, 0.79], cat: "batiment" },
+      "temple": { sem: [0.59, -0.86, 0.05], sens: [0.62, -0.18, -0.02], temp: [0.12, 0.57, 0.69], cat: "batiment" },
+      "supermarché": { sem: [0.63, -0.82, 0.11], sens: [0.60, -0.19, 0.01], temp: [0.15, 0.57, 0.67], cat: "batiment" },
+      "restaurant": { sem: [0.62, -0.70, 0.12], sens: [0.61, -0.05, -0.05], temp: [0.13, 0.51, 0.81], cat: "batiment" },
+      "hôtel": { sem: [0.74, -0.78, 0.10], sens: [0.57, -0.16, -0.01], temp: [0.13, 0.57, 0.81], cat: "batiment" },
+      "usine": { sem: [0.60, -0.79, 0.01], sens: [0.54, -0.08, -0.01], temp: [0.16, 0.53, 0.70], cat: "batiment" },
+      "ferme": { sem: [0.77, -0.73, 0.06], sens: [0.63, -0.01, -0.10], temp: [0.05, 0.48, 0.82], cat: "batiment" },
+      "grange": { sem: [0.67, -0.84, -0.07], sens: [0.65, -0.12, 0.01], temp: [0.14, 0.54, 0.71], cat: "batiment" },
+      "tour": { sem: [0.72, -0.72, 0.07], sens: [0.62, -0.08, 0.01], temp: [0.04, 0.56, 0.72], cat: "batiment" },
+      "pont": { sem: [0.78, -0.85, 0.02], sens: [0.54, -0.13, -0.10], temp: [0.08, 0.44, 0.67], cat: "batiment" },
+      "phare": { sem: [0.76, -0.64, -0.11], sens: [0.66, -0.07, 0.00], temp: [0.06, 0.43, 0.75], cat: "batiment" },
+      "stade": { sem: [0.69, -0.63, -0.10], sens: [0.57, -0.13, -0.06], temp: [0.05, 0.43, 0.71], cat: "batiment" },
+      "gymnase": { sem: [0.60, -0.83, 0.03], sens: [0.59, -0.10, 0.05], temp: [0.03, 0.50, 0.82], cat: "batiment" },
+      "tribunal": { sem: [0.65, -0.76, -0.04], sens: [0.63, -0.03, -0.04], temp: [0.08, 0.49, 0.75], cat: "batiment" },
+      "mairie": { sem: [0.64, -0.67, -0.10], sens: [0.66, -0.16, 0.00], temp: [0.03, 0.47, 0.71], cat: "batiment" },
+      "prison": { sem: [0.75, -0.63, 0.04], sens: [0.68, -0.01, -0.07], temp: [0.17, 0.47, 0.80], cat: "batiment" },
+      "caserne": { sem: [0.66, -0.63, 0.06], sens: [0.69, -0.07, 0.03], temp: [0.16, 0.47, 0.71], cat: "batiment" },
+      "vallée": { sem: [0.40, -0.57, -0.04], sens: [0.67, -0.01, 0.06], temp: [-0.37, 0.24, -0.54], cat: "lieu_geo" },
+      "plateau": { sem: [0.34, -0.61, -0.12], sens: [0.59, -0.04, -0.01], temp: [-0.35, 0.16, -0.48], cat: "lieu_geo" },
+      "désert": { sem: [0.43, -0.58, 0.02], sens: [0.70, -0.03, 0.14], temp: [-0.22, 0.13, -0.49], cat: "lieu_geo" },
+      "canyon": { sem: [0.46, -0.48, -0.11], sens: [0.70, -0.20, -0.02], temp: [-0.37, 0.25, -0.56], cat: "lieu_geo" },
+      "glacier": { sem: [0.33, -0.45, 0.11], sens: [0.54, -0.02, 0.05], temp: [-0.23, 0.27, -0.50], cat: "lieu_geo" },
+      "volcan": { sem: [0.29, -0.49, 0.05], sens: [0.63, -0.01, 0.15], temp: [-0.32, 0.28, -0.52], cat: "lieu_geo" },
+      "île": { sem: [0.31, -0.54, -0.03], sens: [0.68, -0.09, 0.14], temp: [-0.35, 0.15, -0.52], cat: "lieu_geo" },
+      "péninsule": { sem: [0.42, -0.45, 0.11], sens: [0.52, -0.02, 0.07], temp: [-0.36, 0.25, -0.62], cat: "lieu_geo" },
+      "archipel": { sem: [0.46, -0.50, 0.07], sens: [0.56, -0.05, 0.03], temp: [-0.24, 0.26, -0.54], cat: "lieu_geo" },
+      "delta": { sem: [0.36, -0.63, 0.08], sens: [0.55, -0.01, 0.07], temp: [-0.31, 0.17, -0.52], cat: "lieu_geo" },
+      "fjord": { sem: [0.27, -0.45, -0.07], sens: [0.68, -0.01, 0.08], temp: [-0.26, 0.22, -0.62], cat: "lieu_geo" },
+      "cascade": { sem: [0.46, -0.50, 0.06], sens: [0.65, -0.19, 0.05], temp: [-0.23, 0.14, -0.58], cat: "lieu_geo" },
+      "grotte": { sem: [0.45, -0.48, -0.01], sens: [0.57, -0.05, 0.04], temp: [-0.23, 0.19, -0.63], cat: "lieu_geo" },
+      "falaise": { sem: [0.44, -0.58, -0.12], sens: [0.67, -0.08, 0.05], temp: [-0.31, 0.18, -0.49], cat: "lieu_geo" },
+      "dune": { sem: [0.28, -0.64, -0.08], sens: [0.63, -0.18, 0.01], temp: [-0.23, 0.28, -0.51], cat: "lieu_geo" },
+      "marais": { sem: [0.30, -0.54, 0.04], sens: [0.60, -0.07, 0.06], temp: [-0.37, 0.15, -0.60], cat: "lieu_geo" },
+      "toundra": { sem: [0.28, -0.58, 0.04], sens: [0.66, -0.07, -0.04], temp: [-0.29, 0.16, -0.55], cat: "lieu_geo" },
+      "savane": { sem: [0.36, -0.48, 0.02], sens: [0.60, -0.14, 0.07], temp: [-0.23, 0.15, -0.62], cat: "lieu_geo" },
+      "prairie": { sem: [0.32, -0.46, -0.07], sens: [0.69, -0.04, -0.01], temp: [-0.29, 0.19, -0.50], cat: "lieu_geo" },
+      "steppe": { sem: [0.43, -0.52, 0.00], sens: [0.54, -0.19, 0.07], temp: [-0.35, 0.18, -0.50], cat: "lieu_geo" },
+      "racine": { sem: [0.35, -0.65, 0.04], sens: [0.16, -0.03, 0.15], temp: [-0.77, 0.01, -0.87], cat: "nature2" },
+      "branche": { sem: [0.15, -0.67, -0.05], sens: [0.17, -0.06, 0.05], temp: [-0.81, -0.06, -0.97], cat: "nature2" },
+      "feuille": { sem: [0.19, -0.48, -0.03], sens: [0.27, -0.10, 0.09], temp: [-0.79, -0.02, -0.88], cat: "nature2" },
+      "écorce": { sem: [0.21, -0.64, -0.06], sens: [0.14, -0.01, 0.05], temp: [-0.79, 0.02, -0.97], cat: "nature2" },
+      "graine": { sem: [0.29, -0.44, -0.09], sens: [0.13, -0.08, 0.03], temp: [-0.76, -0.02, -0.89], cat: "nature2" },
+      "pollen": { sem: [0.23, -0.49, 0.06], sens: [0.20, -0.12, 0.02], temp: [-0.85, 0.06, -0.89], cat: "nature2" },
+      "mousse": { sem: [0.14, -0.54, 0.02], sens: [0.12, -0.11, 0.18], temp: [-0.77, 0.05, -0.96], cat: "nature2" },
+      "lichen": { sem: [0.37, -0.58, 0.05], sens: [0.28, -0.07, 0.03], temp: [-0.86, -0.03, -0.89], cat: "nature2" },
+      "champignon": { sem: [0.25, -0.56, -0.02], sens: [0.13, -0.07, 0.02], temp: [-0.78, 0.05, -0.91], cat: "nature2" },
+      "algue": { sem: [0.32, -0.50, -0.12], sens: [0.12, -0.11, 0.08], temp: [-0.80, -0.05, -0.83], cat: "nature2" },
+      "corail_n": { sem: [0.19, -0.58, 0.10], sens: [0.17, -0.00, 0.13], temp: [-0.84, 0.04, -0.95], cat: "nature2" },
+      "sable": { sem: [0.16, -0.51, 0.07], sens: [0.24, -0.14, 0.05], temp: [-0.81, 0.02, -0.92], cat: "nature2" },
+      "roche": { sem: [0.16, -0.48, 0.04], sens: [0.19, -0.01, 0.17], temp: [-0.75, 0.01, -0.87], cat: "nature2" },
+      "boue": { sem: [0.17, -0.66, -0.01], sens: [0.17, -0.06, 0.09], temp: [-0.77, 0.05, -0.95], cat: "nature2" },
+      "argile": { sem: [0.29, -0.63, 0.03], sens: [0.26, -0.05, 0.14], temp: [-0.80, 0.01, -0.93], cat: "nature2" },
+      "terre": { sem: [0.27, -0.59, -0.12], sens: [0.15, -0.15, 0.19], temp: [-0.75, 0.07, -0.90], cat: "nature2" },
+      "poussière": { sem: [0.23, -0.61, 0.05], sens: [0.28, -0.06, 0.02], temp: [-0.81, -0.06, -0.84], cat: "nature2" },
+      "brume": { sem: [0.22, -0.44, -0.11], sens: [0.30, -0.02, 0.19], temp: [-0.74, 0.02, -0.86], cat: "nature2" },
+      "rosée": { sem: [0.32, -0.53, -0.01], sens: [0.18, -0.12, 0.14], temp: [-0.82, 0.05, -0.98], cat: "nature2" },
+      "givre": { sem: [0.22, -0.53, 0.05], sens: [0.28, -0.15, 0.05], temp: [-0.82, 0.03, -0.83], cat: "nature2" },
+      "orage": { sem: [0.32, -0.34, -0.11], sens: [0.14, 0.31, -0.07], temp: [-0.12, 0.11, -0.68], cat: "meteo" },
+      "tonnerre": { sem: [0.27, -0.40, -0.12], sens: [0.10, 0.35, -0.09], temp: [-0.09, 0.13, -0.62], cat: "meteo" },
+      "éclair": { sem: [0.20, -0.28, -0.06], sens: [0.13, 0.32, -0.03], temp: [-0.14, 0.15, -0.55], cat: "meteo" },
+      "tempête": { sem: [0.23, -0.44, 0.11], sens: [0.19, 0.29, -0.05], temp: [-0.16, 0.15, -0.55], cat: "meteo" },
+      "ouragan": { sem: [0.23, -0.29, 0.00], sens: [0.02, 0.27, 0.01], temp: [-0.05, 0.14, -0.66], cat: "meteo" },
+      "tornade": { sem: [0.21, -0.40, -0.05], sens: [0.08, 0.24, -0.09], temp: [-0.02, 0.02, -0.64], cat: "meteo" },
+      "brouillard": { sem: [0.35, -0.48, -0.05], sens: [0.16, 0.35, 0.06], temp: [-0.07, 0.07, -0.68], cat: "meteo" },
+      "canicule": { sem: [0.37, -0.48, -0.09], sens: [0.18, 0.28, 0.07], temp: [-0.03, 0.07, -0.54], cat: "meteo" },
+      "gel": { sem: [0.22, -0.39, -0.12], sens: [0.13, 0.28, -0.00], temp: [-0.04, 0.08, -0.66], cat: "meteo" },
+      "verglas": { sem: [0.22, -0.47, -0.06], sens: [0.03, 0.36, 0.00], temp: [-0.11, 0.04, -0.66], cat: "meteo" },
+      "arc-en-ciel": { sem: [0.23, -0.30, -0.06], sens: [0.15, 0.26, 0.10], temp: [-0.09, 0.11, -0.56], cat: "meteo" },
+      "tempête de neige": { sem: [0.36, -0.39, 0.02], sens: [0.17, 0.33, -0.09], temp: [-0.15, 0.09, -0.65], cat: "meteo" },
+      "sécheresse": { sem: [0.30, -0.39, -0.03], sens: [0.05, 0.28, 0.07], temp: [-0.13, 0.04, -0.56], cat: "meteo" },
+      "inondation": { sem: [0.36, -0.32, -0.08], sens: [0.03, 0.24, 0.02], temp: [-0.03, 0.11, -0.59], cat: "meteo" },
+      "mousson": { sem: [0.21, -0.40, -0.08], sens: [0.03, 0.25, -0.07], temp: [-0.16, 0.11, -0.61], cat: "meteo" },
+      "turquoise": { sem: [0.19, -0.24, 0.05], sens: [0.04, -0.08, 0.04], temp: [-0.05, -0.00, -0.03], cat: "couleur2" },
+      "indigo": { sem: [0.05, -0.41, 0.05], sens: [-0.10, -0.01, -0.07], temp: [0.05, -0.02, -0.05], cat: "couleur2" },
+      "magenta": { sem: [0.11, -0.38, -0.05], sens: [-0.03, 0.05, -0.00], temp: [0.03, -0.06, -0.03], cat: "couleur2" },
+      "cyan": { sem: [0.23, -0.26, 0.02], sens: [-0.01, -0.02, -0.08], temp: [-0.04, -0.07, -0.10], cat: "couleur2" },
+      "beige": { sem: [0.08, -0.37, 0.10], sens: [0.01, -0.01, 0.09], temp: [0.05, -0.05, -0.06], cat: "couleur2" },
+      "kaki": { sem: [0.08, -0.19, -0.07], sens: [-0.03, -0.06, -0.03], temp: [0.00, 0.07, -0.13], cat: "couleur2" },
+      "bordeaux": { sem: [0.06, -0.32, -0.04], sens: [0.06, 0.03, 0.03], temp: [-0.02, -0.04, -0.14], cat: "couleur2" },
+      "corail_c": { sem: [0.11, -0.31, -0.05], sens: [-0.05, -0.09, 0.07], temp: [0.07, -0.08, -0.14], cat: "couleur2" },
+      "ivoire": { sem: [0.19, -0.19, 0.05], sens: [-0.07, -0.06, 0.04], temp: [0.06, -0.01, -0.14], cat: "couleur2" },
+      "anthracite": { sem: [0.08, -0.35, -0.06], sens: [-0.07, -0.05, 0.01], temp: [-0.02, 0.07, -0.15], cat: "couleur2" },
+      "pastel": { sem: [0.15, -0.41, -0.01], sens: [-0.07, -0.05, -0.04], temp: [-0.06, -0.07, -0.18], cat: "couleur2" },
+      "fluo": { sem: [0.21, -0.40, -0.06], sens: [0.01, 0.03, 0.08], temp: [0.05, -0.05, -0.05], cat: "couleur2" },
+      "cuivré": { sem: [0.11, -0.33, 0.11], sens: [-0.05, -0.02, 0.04], temp: [0.02, 0.02, -0.18], cat: "couleur2" },
+      "bronze_c": { sem: [0.27, -0.22, -0.03], sens: [0.06, 0.01, -0.03], temp: [-0.06, 0.06, -0.05], cat: "couleur2" },
+      "émeraude": { sem: [0.19, -0.34, 0.07], sens: [0.01, -0.06, -0.00], temp: [0.02, 0.00, -0.15], cat: "couleur2" },
+      "cercle": { sem: [0.48, -0.56, -0.09], sens: [-0.09, -0.22, -0.08], temp: [-0.03, 0.10, 0.22], cat: "forme" },
+      "carré": { sem: [0.46, -0.62, -0.07], sens: [-0.05, -0.15, -0.05], temp: [0.01, 0.06, 0.32], cat: "forme" },
+      "rectangle": { sem: [0.33, -0.66, 0.11], sens: [-0.05, -0.17, 0.04], temp: [-0.07, 0.10, 0.28], cat: "forme" },
+      "losange": { sem: [0.41, -0.60, -0.02], sens: [-0.01, -0.22, -0.03], temp: [0.04, -0.01, 0.22], cat: "forme" },
+      "ovale": { sem: [0.49, -0.72, -0.08], sens: [0.07, -0.16, -0.05], temp: [-0.04, 0.10, 0.32], cat: "forme" },
+      "cube": { sem: [0.38, -0.56, -0.02], sens: [-0.10, -0.19, 0.03], temp: [0.04, 0.11, 0.32], cat: "forme" },
+      "sphère": { sem: [0.33, -0.66, -0.07], sens: [0.02, -0.29, 0.02], temp: [0.03, 0.06, 0.36], cat: "forme" },
+      "pyramide": { sem: [0.43, -0.57, -0.12], sens: [-0.06, -0.20, 0.07], temp: [-0.07, 0.08, 0.26], cat: "forme" },
+      "cylindre": { sem: [0.34, -0.49, -0.09], sens: [0.08, -0.12, -0.08], temp: [-0.07, 0.05, 0.26], cat: "forme" },
+      "cône": { sem: [0.35, -0.62, 0.10], sens: [-0.08, -0.21, -0.04], temp: [-0.05, -0.01, 0.31], cat: "forme" },
+      "spirale": { sem: [0.48, -0.56, 0.06], sens: [0.03, -0.18, -0.08], temp: [-0.07, 0.05, 0.32], cat: "forme" },
+      "étoile_f": { sem: [0.50, -0.71, 0.03], sens: [0.08, -0.18, -0.03], temp: [-0.03, 0.12, 0.30], cat: "forme" },
+      "hexagone": { sem: [0.49, -0.54, 0.11], sens: [0.09, -0.13, 0.08], temp: [-0.05, -0.02, 0.37], cat: "forme" },
+      "polygone": { sem: [0.41, -0.57, 0.05], sens: [0.08, -0.26, -0.09], temp: [0.04, 0.06, 0.22], cat: "forme" },
+      "plastique": { sem: [0.59, -0.59, 0.08], sens: [0.00, -0.17, -0.03], temp: [-0.01, -0.02, 0.59], cat: "materiau2" },
+      "béton": { sem: [0.69, -0.48, -0.05], sens: [-0.02, -0.11, 0.13], temp: [-0.07, -0.13, 0.55], cat: "materiau2" },
+      "céramique": { sem: [0.60, -0.66, -0.04], sens: [-0.03, -0.11, 0.05], temp: [-0.07, -0.02, 0.64], cat: "materiau2" },
+      "porcelaine": { sem: [0.69, -0.59, 0.06], sens: [0.00, -0.17, 0.14], temp: [0.05, -0.13, 0.67], cat: "materiau2" },
+      "cuir": { sem: [0.70, -0.47, 0.11], sens: [-0.07, -0.24, 0.06], temp: [0.05, 0.03, 0.62], cat: "materiau2" },
+      "laine": { sem: [0.72, -0.44, -0.04], sens: [-0.03, -0.20, 0.03], temp: [-0.08, -0.04, 0.53], cat: "materiau2" },
+      "coton": { sem: [0.59, -0.52, -0.11], sens: [-0.03, -0.12, 0.08], temp: [-0.03, -0.06, 0.63], cat: "materiau2" },
+      "soie": { sem: [0.71, -0.50, 0.02], sens: [-0.05, -0.14, 0.01], temp: [-0.03, -0.00, 0.56], cat: "materiau2" },
+      "caoutchouc": { sem: [0.62, -0.62, 0.02], sens: [0.05, -0.12, 0.02], temp: [-0.04, -0.05, 0.54], cat: "materiau2" },
+      "carton": { sem: [0.54, -0.63, -0.10], sens: [0.09, -0.21, 0.01], temp: [0.05, 0.02, 0.66], cat: "materiau2" },
+      "brique": { sem: [0.71, -0.51, 0.10], sens: [-0.06, -0.08, 0.01], temp: [-0.04, -0.01, 0.58], cat: "materiau2" },
+      "marbre": { sem: [0.68, -0.64, 0.01], sens: [0.02, -0.16, -0.04], temp: [0.05, -0.13, 0.58], cat: "materiau2" },
+      "granit": { sem: [0.54, -0.66, 0.12], sens: [0.07, -0.23, 0.08], temp: [-0.06, -0.01, 0.57], cat: "materiau2" },
+      "acier": { sem: [0.74, -0.65, 0.01], sens: [0.03, -0.10, 0.05], temp: [-0.03, -0.02, 0.65], cat: "materiau2" },
+      "aluminium": { sem: [0.73, -0.46, 0.06], sens: [-0.07, -0.10, 0.13], temp: [-0.02, -0.12, 0.61], cat: "materiau2" },
+      "cristal": { sem: [0.67, -0.59, -0.07], sens: [-0.03, -0.21, 0.04], temp: [0.01, 0.02, 0.59], cat: "materiau2" },
+      "cire": { sem: [0.59, -0.64, 0.11], sens: [0.05, -0.14, 0.11], temp: [-0.07, -0.02, 0.57], cat: "materiau2" },
+      "résine": { sem: [0.56, -0.53, 0.08], sens: [0.06, -0.23, 0.00], temp: [0.02, -0.11, 0.52], cat: "materiau2" },
+      "smartphone": { sem: [0.25, -0.40, 0.12], sens: [-0.13, 0.28, -0.05], temp: [0.95, -0.12, 0.98], cat: "technologie" },
+      "tablette": { sem: [0.40, -0.39, 0.04], sens: [-0.17, 0.13, 0.00], temp: [0.91, -0.11, 0.92], cat: "technologie" },
+      "logiciel": { sem: [0.19, -0.36, -0.02], sens: [-0.13, 0.15, -0.14], temp: [0.93, -0.09, 0.95], cat: "technologie" },
+      "application": { sem: [0.22, -0.18, 0.08], sens: [-0.01, 0.17, -0.06], temp: [0.95, -0.17, 1.00], cat: "technologie" },
+      "internet": { sem: [0.40, -0.39, 0.14], sens: [-0.20, 0.11, 0.04], temp: [0.86, -0.18, 0.92], cat: "technologie" },
+      "réseau": { sem: [0.28, -0.32, -0.00], sens: [-0.18, 0.20, -0.03], temp: [0.90, -0.18, 0.96], cat: "technologie" },
+      "algorithme": { sem: [0.33, -0.26, 0.04], sens: [-0.07, 0.30, -0.01], temp: [0.90, -0.20, 0.97], cat: "technologie" },
+      "intelligence artificielle": { sem: [0.21, -0.25, 0.06], sens: [-0.12, 0.28, -0.04], temp: [0.84, -0.15, 0.99], cat: "technologie" },
+      "robot_t": { sem: [0.41, -0.29, 0.20], sens: [-0.17, 0.25, -0.13], temp: [0.94, -0.16, 0.90], cat: "technologie" },
+      "drone": { sem: [0.41, -0.37, 0.01], sens: [-0.11, 0.22, -0.02], temp: [0.95, -0.16, 1.00], cat: "technologie" },
+      "satellite": { sem: [0.38, -0.36, 0.14], sens: [-0.10, 0.13, -0.15], temp: [0.96, -0.08, 0.94], cat: "technologie" },
+      "imprimante 3d": { sem: [0.25, -0.19, 0.07], sens: [-0.13, 0.12, -0.02], temp: [0.87, -0.08, 0.92], cat: "technologie" },
+      "réalité virtuelle": { sem: [0.41, -0.33, 0.18], sens: [-0.06, 0.17, -0.10], temp: [0.83, -0.19, 0.90], cat: "technologie" },
+      "cryptomonnaie": { sem: [0.34, -0.20, 0.08], sens: [-0.00, 0.24, -0.06], temp: [0.92, -0.14, 0.89], cat: "technologie" },
+      "capteur": { sem: [0.30, -0.20, 0.04], sens: [-0.19, 0.23, 0.01], temp: [0.90, -0.10, 1.00], cat: "technologie" },
+      "microprocesseur": { sem: [0.38, -0.26, 0.05], sens: [-0.09, 0.14, -0.07], temp: [0.83, -0.09, 0.92], cat: "technologie" },
+      "écran": { sem: [0.34, -0.23, 0.06], sens: [-0.09, 0.17, -0.06], temp: [0.83, -0.22, 0.92], cat: "technologie" },
+      "clavier": { sem: [0.34, -0.32, 0.02], sens: [-0.01, 0.20, -0.09], temp: [0.87, -0.12, 0.89], cat: "technologie" },
+      "physique": { sem: [0.40, 0.63, 0.10], sens: [0.13, 0.13, -0.07], temp: [0.30, 0.22, 0.16], cat: "science" },
+      "chimie": { sem: [0.26, 0.50, 0.04], sens: [0.11, 0.08, 0.08], temp: [0.36, 0.22, 0.24], cat: "science" },
+      "biologie": { sem: [0.27, 0.71, -0.02], sens: [0.14, 0.06, 0.06], temp: [0.36, 0.29, 0.25], cat: "science" },
+      "géologie": { sem: [0.20, 0.61, 0.02], sens: [0.01, 0.18, -0.07], temp: [0.24, 0.33, 0.17], cat: "science" },
+      "astronomie": { sem: [0.42, 0.68, 0.08], sens: [0.12, 0.10, -0.04], temp: [0.27, 0.37, 0.26], cat: "science" },
+      "génétique": { sem: [0.41, 0.65, 0.09], sens: [0.14, 0.18, -0.04], temp: [0.31, 0.28, 0.18], cat: "science" },
+      "écologie": { sem: [0.27, 0.64, -0.03], sens: [0.16, 0.05, -0.07], temp: [0.38, 0.29, 0.27], cat: "science" },
+      "psychologie": { sem: [0.22, 0.63, -0.10], sens: [0.14, 0.02, -0.09], temp: [0.29, 0.32, 0.20], cat: "science" },
+      "sociologie": { sem: [0.35, 0.60, 0.01], sens: [0.03, 0.04, 0.01], temp: [0.36, 0.30, 0.14], cat: "science" },
+      "anthropologie": { sem: [0.42, 0.57, -0.09], sens: [0.06, 0.17, -0.07], temp: [0.37, 0.30, 0.15], cat: "science" },
+      "linguistique": { sem: [0.41, 0.60, -0.04], sens: [0.16, 0.17, -0.10], temp: [0.31, 0.23, 0.19], cat: "science" },
+      "économie_sc": { sem: [0.27, 0.49, -0.09], sens: [0.16, 0.13, -0.04], temp: [0.26, 0.35, 0.23], cat: "science" },
+      "statistique": { sem: [0.30, 0.56, 0.07], sens: [0.05, 0.01, 0.02], temp: [0.32, 0.35, 0.25], cat: "science" },
+      "géométrie": { sem: [0.40, 0.55, -0.11], sens: [0.00, 0.05, 0.08], temp: [0.30, 0.36, 0.18], cat: "science" },
+      "algèbre": { sem: [0.20, 0.51, 0.04], sens: [0.11, 0.00, 0.07], temp: [0.38, 0.24, 0.16], cat: "science" },
+      "atome": { sem: [0.40, 0.65, -0.02], sens: [0.01, 0.07, -0.09], temp: [0.37, 0.25, 0.28], cat: "science" },
+      "molécule": { sem: [0.34, 0.67, 0.07], sens: [0.13, 0.12, 0.08], temp: [0.24, 0.24, 0.26], cat: "science" },
+      "cellule": { sem: [0.37, 0.71, -0.00], sens: [0.20, 0.06, -0.07], temp: [0.34, 0.22, 0.27], cat: "science" },
+      "gène": { sem: [0.22, 0.66, -0.01], sens: [0.16, 0.18, -0.04], temp: [0.30, 0.26, 0.14], cat: "science" },
+      "virus": { sem: [0.29, 0.52, -0.01], sens: [0.17, 0.10, -0.06], temp: [0.30, 0.36, 0.20], cat: "science" },
+      "bactérie": { sem: [0.35, 0.68, -0.10], sens: [0.05, 0.06, 0.04], temp: [0.30, 0.28, 0.19], cat: "science" },
+      "lundi": { sem: [0.44, 0.77, -0.03], sens: [0.07, -0.00, -0.03], temp: [0.06, 0.12, -0.08], cat: "temps_calendrier" },
+      "mardi": { sem: [0.35, 0.65, 0.00], sens: [0.01, 0.04, 0.03], temp: [0.02, 0.04, -0.01], cat: "temps_calendrier" },
+      "mercredi": { sem: [0.24, 0.80, 0.08], sens: [0.05, 0.03, -0.00], temp: [0.02, 0.17, 0.07], cat: "temps_calendrier" },
+      "jeudi": { sem: [0.44, 0.62, 0.06], sens: [-0.03, -0.01, 0.06], temp: [0.08, 0.17, 0.02], cat: "temps_calendrier" },
+      "vendredi": { sem: [0.27, 0.75, -0.11], sens: [-0.05, 0.01, 0.08], temp: [-0.03, 0.13, -0.07], cat: "temps_calendrier" },
+      "samedi": { sem: [0.35, 0.63, -0.02], sens: [0.06, 0.00, -0.08], temp: [-0.05, 0.12, -0.01], cat: "temps_calendrier" },
+      "dimanche": { sem: [0.26, 0.62, 0.12], sens: [0.02, -0.04, 0.06], temp: [-0.04, 0.13, 0.04], cat: "temps_calendrier" },
+      "janvier": { sem: [0.23, 0.59, -0.09], sens: [-0.02, -0.02, -0.03], temp: [0.06, 0.07, -0.00], cat: "temps_calendrier" },
+      "février": { sem: [0.26, 0.70, -0.04], sens: [-0.05, -0.03, 0.03], temp: [0.06, 0.08, 0.03], cat: "temps_calendrier" },
+      "mars_m": { sem: [0.36, 0.60, 0.06], sens: [0.03, -0.10, 0.10], temp: [0.02, 0.18, 0.08], cat: "temps_calendrier" },
+      "avril": { sem: [0.42, 0.70, 0.03], sens: [0.03, -0.07, 0.02], temp: [0.06, 0.06, -0.01], cat: "temps_calendrier" },
+      "mai": { sem: [0.46, 0.71, 0.04], sens: [0.01, -0.10, -0.04], temp: [0.02, 0.07, -0.02], cat: "temps_calendrier" },
+      "juin": { sem: [0.29, 0.75, 0.04], sens: [-0.05, 0.09, -0.09], temp: [0.07, 0.11, 0.04], cat: "temps_calendrier" },
+      "juillet": { sem: [0.24, 0.59, -0.08], sens: [-0.06, -0.06, 0.07], temp: [0.01, 0.16, -0.08], cat: "temps_calendrier" },
+      "août": { sem: [0.31, 0.69, -0.11], sens: [0.05, -0.01, -0.03], temp: [-0.02, 0.11, 0.02], cat: "temps_calendrier" },
+      "septembre": { sem: [0.27, 0.65, -0.01], sens: [-0.08, 0.02, 0.04], temp: [-0.04, 0.12, 0.00], cat: "temps_calendrier" },
+      "octobre": { sem: [0.43, 0.75, -0.08], sens: [-0.08, 0.04, -0.05], temp: [-0.06, 0.07, -0.07], cat: "temps_calendrier" },
+      "novembre": { sem: [0.35, 0.77, 0.10], sens: [0.04, 0.03, 0.01], temp: [-0.07, 0.05, 0.06], cat: "temps_calendrier" },
+      "décembre": { sem: [0.34, 0.66, 0.01], sens: [0.10, 0.03, -0.00], temp: [0.08, 0.11, -0.01], cat: "temps_calendrier" },
+      "printemps": { sem: [0.34, 0.60, 0.04], sens: [0.10, -0.03, 0.03], temp: [0.06, 0.04, -0.08], cat: "temps_calendrier" },
+      "été": { sem: [0.27, 0.66, 0.11], sens: [-0.04, -0.01, -0.05], temp: [-0.06, 0.14, 0.00], cat: "temps_calendrier" },
+      "automne": { sem: [0.41, 0.67, 0.07], sens: [-0.08, 0.06, -0.05], temp: [0.07, 0.09, -0.02], cat: "temps_calendrier" },
+      "hiver": { sem: [0.29, 0.58, -0.11], sens: [0.06, 0.10, -0.05], temp: [-0.01, 0.06, 0.07], cat: "temps_calendrier" },
+      "matin": { sem: [0.32, 0.71, -0.11], sens: [0.02, 0.03, -0.08], temp: [0.03, 0.02, -0.01], cat: "temps_calendrier" },
+      "midi": { sem: [0.33, 0.58, 0.03], sens: [-0.05, -0.03, -0.07], temp: [-0.08, 0.17, -0.04], cat: "temps_calendrier" },
+      "soir": { sem: [0.35, 0.82, 0.04], sens: [-0.06, -0.02, 0.06], temp: [0.02, 0.07, 0.05], cat: "temps_calendrier" },
+      "minuit": { sem: [0.40, 0.65, -0.11], sens: [-0.06, 0.05, -0.04], temp: [-0.04, 0.05, -0.01], cat: "temps_calendrier" },
+      "semaine": { sem: [0.36, 0.75, -0.07], sens: [-0.10, -0.08, -0.05], temp: [-0.05, 0.11, -0.08], cat: "temps_calendrier" },
+      "année": { sem: [0.25, 0.66, 0.04], sens: [0.06, -0.07, 0.03], temp: [0.04, 0.04, -0.04], cat: "temps_calendrier" },
+      "siècle": { sem: [0.39, 0.58, 0.06], sens: [0.07, -0.05, -0.03], temp: [0.04, 0.15, -0.05], cat: "temps_calendrier" },
+      "un": { sem: [0.38, 0.85, 0.05], sens: [-0.05, -0.07, 0.00], temp: [0.08, -0.08, 0.17], cat: "nombre" },
+      "deux": { sem: [0.33, 0.68, -0.09], sens: [-0.06, 0.06, -0.09], temp: [0.03, -0.07, 0.15], cat: "nombre" },
+      "trois": { sem: [0.52, 0.82, 0.01], sens: [-0.02, -0.06, 0.07], temp: [-0.02, 0.03, 0.14], cat: "nombre" },
+      "quatre": { sem: [0.36, 0.86, 0.02], sens: [-0.10, -0.02, 0.01], temp: [0.05, -0.00, 0.06], cat: "nombre" },
+      "cinq": { sem: [0.28, 0.86, 0.09], sens: [-0.06, 0.07, -0.08], temp: [0.00, -0.01, 0.08], cat: "nombre" },
+      "six": { sem: [0.45, 0.80, 0.08], sens: [0.01, 0.08, -0.00], temp: [0.00, 0.06, 0.16], cat: "nombre" },
+      "sept": { sem: [0.51, 0.63, -0.07], sens: [-0.08, -0.01, -0.09], temp: [0.01, 0.02, 0.05], cat: "nombre" },
+      "huit": { sem: [0.39, 0.64, 0.07], sens: [0.07, 0.01, -0.06], temp: [-0.03, -0.03, 0.05], cat: "nombre" },
+      "neuf": { sem: [0.29, 0.69, 0.06], sens: [-0.06, -0.00, -0.10], temp: [-0.04, 0.03, 0.13], cat: "nombre" },
+      "dix": { sem: [0.43, 0.78, 0.07], sens: [0.07, -0.06, 0.01], temp: [-0.02, 0.07, 0.04], cat: "nombre" },
+      "vingt": { sem: [0.41, 0.69, -0.09], sens: [0.04, 0.09, -0.02], temp: [-0.08, 0.08, 0.11], cat: "nombre" },
+      "cent": { sem: [0.39, 0.72, -0.12], sens: [-0.02, 0.05, 0.06], temp: [0.04, 0.07, 0.15], cat: "nombre" },
+      "mille": { sem: [0.29, 0.74, 0.05], sens: [-0.00, -0.00, 0.06], temp: [0.03, -0.01, 0.04], cat: "nombre" },
+      "million": { sem: [0.46, 0.73, -0.11], sens: [0.06, -0.07, -0.09], temp: [0.07, -0.02, 0.09], cat: "nombre" },
+      "zéro": { sem: [0.40, 0.67, 0.05], sens: [-0.05, -0.04, -0.05], temp: [-0.00, -0.00, 0.13], cat: "nombre" },
+      "premier": { sem: [0.51, 0.73, 0.08], sens: [-0.06, 0.01, -0.01], temp: [-0.05, -0.05, 0.13], cat: "nombre" },
+      "dernier": { sem: [0.37, 0.68, 0.05], sens: [-0.00, -0.02, -0.07], temp: [-0.02, 0.05, 0.17], cat: "nombre" },
+      "moitié": { sem: [0.37, 0.81, -0.01], sens: [0.09, 0.09, 0.01], temp: [-0.01, 0.07, 0.11], cat: "nombre" },
+      "double": { sem: [0.41, 0.78, -0.05], sens: [-0.01, -0.06, 0.05], temp: [-0.04, 0.08, 0.17], cat: "nombre" },
+      "triple": { sem: [0.28, 0.64, -0.01], sens: [-0.09, -0.03, 0.10], temp: [0.04, -0.03, 0.04], cat: "nombre" },
+      "nostalgie": { sem: [0.28, 0.70, 0.08], sens: [-0.04, 0.43, 0.03], temp: [-0.12, 0.32, -0.18], cat: "emotion2" },
+      "fierté": { sem: [0.10, 0.76, -0.02], sens: [-0.07, 0.32, 0.00], temp: [-0.04, 0.27, -0.20], cat: "emotion2" },
+      "honte": { sem: [0.29, 0.87, 0.03], sens: [0.02, 0.49, -0.01], temp: [-0.13, 0.29, -0.21], cat: "emotion2" },
+      "jalousie": { sem: [0.16, 0.89, -0.04], sens: [-0.07, 0.48, 0.09], temp: [-0.13, 0.29, -0.15], cat: "emotion2" },
+      "envie": { sem: [0.24, 0.72, -0.03], sens: [0.08, 0.32, 0.08], temp: [-0.16, 0.30, -0.22], cat: "emotion2" },
+      "gratitude": { sem: [0.24, 0.83, -0.01], sens: [0.00, 0.49, 0.09], temp: [-0.16, 0.33, -0.26], cat: "emotion2" },
+      "culpabilité": { sem: [0.17, 0.85, -0.09], sens: [0.06, 0.47, 0.01], temp: [-0.08, 0.32, -0.23], cat: "emotion2" },
+      "soulagement": { sem: [0.23, 0.68, -0.05], sens: [0.00, 0.47, 0.06], temp: [-0.17, 0.23, -0.22], cat: "emotion2" },
+      "ennui": { sem: [0.12, 0.82, -0.06], sens: [-0.00, 0.43, -0.08], temp: [-0.12, 0.26, -0.16], cat: "emotion2" },
+      "curiosité": { sem: [0.27, 0.73, -0.07], sens: [-0.09, 0.48, -0.05], temp: [-0.13, 0.30, -0.25], cat: "emotion2" },
+      "dégoût": { sem: [0.30, 0.84, 0.05], sens: [0.06, 0.37, -0.05], temp: [-0.16, 0.29, -0.23], cat: "emotion2" },
+      "admiration": { sem: [0.23, 0.89, -0.07], sens: [-0.07, 0.36, -0.09], temp: [-0.06, 0.35, -0.19], cat: "emotion2" },
+      "compassion": { sem: [0.25, 0.74, -0.07], sens: [-0.09, 0.31, -0.01], temp: [-0.15, 0.25, -0.16], cat: "emotion2" },
+      "enthousiasme": { sem: [0.17, 0.76, -0.11], sens: [0.10, 0.48, 0.06], temp: [-0.17, 0.26, -0.15], cat: "emotion2" },
+      "mélancolie": { sem: [0.31, 0.79, 0.11], sens: [-0.07, 0.38, -0.04], temp: [-0.14, 0.28, -0.19], cat: "emotion2" },
+      "angoisse": { sem: [0.20, 0.79, -0.05], sens: [-0.02, 0.39, 0.09], temp: [-0.12, 0.23, -0.16], cat: "emotion2" },
+      "sérénité": { sem: [0.11, 0.89, 0.09], sens: [-0.03, 0.37, -0.07], temp: [-0.05, 0.31, -0.17], cat: "emotion2" },
+      "frustration": { sem: [0.29, 0.86, -0.09], sens: [0.07, 0.31, -0.04], temp: [-0.18, 0.31, -0.25], cat: "emotion2" },
+      "impatience": { sem: [0.28, 0.81, 0.03], sens: [-0.07, 0.41, 0.09], temp: [-0.06, 0.35, -0.21], cat: "emotion2" },
+      "confiance": { sem: [0.32, 0.89, 0.09], sens: [-0.03, 0.37, -0.04], temp: [-0.03, 0.28, -0.23], cat: "emotion2" },
+      "respecte": { sem: [-0.08, 0.60, -0.17], sens: [-0.20, 0.10, -0.09], temp: [-0.17, 0.15, -0.32], cat: "sentiment2" },
+      "respecter": { sem: [-0.12, 0.45, -0.23], sens: [-0.22, 0.12, 0.03], temp: [-0.11, 0.21, -0.30], cat: "sentiment2" },
+      "admire": { sem: [-0.13, 0.58, -0.28], sens: [-0.12, 0.11, 0.04], temp: [-0.12, 0.20, -0.23], cat: "sentiment2" },
+      "admirer": { sem: [-0.05, 0.60, -0.23], sens: [-0.27, 0.17, -0.09], temp: [-0.04, 0.13, -0.22], cat: "sentiment2" },
+      "méprise": { sem: [-0.20, 0.48, -0.19], sens: [-0.23, 0.00, -0.01], temp: [-0.08, 0.19, -0.24], cat: "sentiment2" },
+      "mépriser": { sem: [-0.18, 0.47, -0.27], sens: [-0.10, 0.06, -0.02], temp: [-0.07, 0.15, -0.23], cat: "sentiment2" },
+      "espère": { sem: [-0.19, 0.54, -0.12], sens: [-0.29, 0.12, 0.02], temp: [-0.10, 0.19, -0.27], cat: "sentiment2" },
+      "espérer": { sem: [-0.02, 0.49, -0.31], sens: [-0.25, 0.08, 0.02], temp: [-0.07, 0.20, -0.27], cat: "sentiment2" },
+      "redoute": { sem: [-0.14, 0.54, -0.29], sens: [-0.27, 0.09, -0.06], temp: [-0.15, 0.23, -0.27], cat: "sentiment2" },
+      "redouter": { sem: [-0.15, 0.48, -0.10], sens: [-0.12, 0.00, -0.04], temp: [-0.08, 0.17, -0.28], cat: "sentiment2" },
+      "apprécie": { sem: [-0.01, 0.64, -0.28], sens: [-0.20, 0.01, 0.01], temp: [-0.10, 0.14, -0.23], cat: "sentiment2" },
+      "apprécier": { sem: [-0.14, 0.56, -0.25], sens: [-0.28, 0.19, -0.08], temp: [-0.17, 0.21, -0.31], cat: "sentiment2" },
+      "regrette": { sem: [-0.08, 0.57, -0.08], sens: [-0.27, 0.13, -0.10], temp: [-0.06, 0.19, -0.33], cat: "sentiment2" },
+      "regretter": { sem: [-0.17, 0.64, -0.08], sens: [-0.26, 0.03, -0.00], temp: [-0.18, 0.24, -0.36], cat: "sentiment2" },
+      "envie_v": { sem: [-0.11, 0.53, -0.29], sens: [-0.17, 0.03, 0.09], temp: [-0.12, 0.24, -0.27], cat: "sentiment2" },
+      "envier": { sem: [-0.13, 0.66, -0.24], sens: [-0.21, 0.15, -0.08], temp: [-0.15, 0.22, -0.27], cat: "sentiment2" },
+      "intelligent": { sem: [0.32, 0.64, 0.04], sens: [-0.10, 0.06, -0.01], temp: [0.08, 0.11, 0.07], cat: "adjectif_qualite" },
+      "stupide": { sem: [0.20, 0.61, 0.09], sens: [-0.04, 0.14, 0.10], temp: [-0.03, 0.17, 0.02], cat: "adjectif_qualite" },
+      "courageux": { sem: [0.42, 0.61, -0.01], sens: [0.02, 0.15, -0.07], temp: [-0.02, 0.06, -0.01], cat: "adjectif_qualite" },
+      "lâche": { sem: [0.23, 0.48, 0.06], sens: [-0.04, 0.05, -0.01], temp: [-0.08, 0.16, 0.00], cat: "adjectif_qualite" },
+      "honnête": { sem: [0.18, 0.61, 0.03], sens: [-0.09, 0.11, -0.07], temp: [0.04, 0.06, 0.01], cat: "adjectif_qualite" },
+      "malhonnête": { sem: [0.20, 0.57, -0.08], sens: [-0.06, 0.18, 0.08], temp: [-0.07, 0.05, 0.04], cat: "adjectif_qualite" },
+      "généreux": { sem: [0.19, 0.63, -0.02], sens: [-0.04, 0.08, -0.00], temp: [-0.05, 0.11, 0.06], cat: "adjectif_qualite" },
+      "avare": { sem: [0.41, 0.65, -0.04], sens: [0.07, 0.16, 0.01], temp: [0.03, 0.09, 0.03], cat: "adjectif_qualite" },
+      "patient": { sem: [0.34, 0.56, 0.03], sens: [0.01, 0.10, -0.07], temp: [0.00, 0.16, 0.03], cat: "adjectif_qualite" },
+      "impatient": { sem: [0.27, 0.46, -0.12], sens: [-0.01, 0.01, 0.02], temp: [-0.05, 0.11, -0.02], cat: "adjectif_qualite" },
+      "poli": { sem: [0.32, 0.48, 0.01], sens: [-0.05, 0.19, -0.08], temp: [-0.03, 0.11, -0.05], cat: "adjectif_qualite" },
+      "impoli": { sem: [0.36, 0.64, 0.00], sens: [-0.03, 0.08, 0.07], temp: [-0.07, 0.08, -0.01], cat: "adjectif_qualite" },
+      "curieux": { sem: [0.34, 0.58, -0.04], sens: [0.01, 0.17, -0.07], temp: [-0.06, 0.10, -0.00], cat: "adjectif_qualite" },
+      "travailleur": { sem: [0.31, 0.53, -0.08], sens: [0.09, 0.14, 0.09], temp: [-0.01, 0.16, 0.00], cat: "adjectif_qualite" },
+      "sincère": { sem: [0.23, 0.44, 0.00], sens: [0.10, 0.12, 0.03], temp: [0.00, 0.04, -0.04], cat: "adjectif_qualite" },
+      "fidèle": { sem: [0.20, 0.45, -0.06], sens: [0.05, 0.08, 0.09], temp: [0.01, 0.05, 0.02], cat: "adjectif_qualite" },
+      "loyal": { sem: [0.23, 0.63, 0.04], sens: [-0.03, 0.11, -0.01], temp: [-0.06, 0.08, -0.07], cat: "adjectif_qualite" },
+      "aimable": { sem: [0.39, 0.52, 0.09], sens: [-0.02, 0.17, 0.02], temp: [-0.05, 0.10, -0.05], cat: "adjectif_qualite" },
+      "arrogant": { sem: [0.19, 0.63, -0.03], sens: [0.02, 0.04, -0.00], temp: [-0.01, 0.03, -0.07], cat: "adjectif_qualite" },
+      "énorme": { sem: [0.41, 0.35, 0.09], sens: [-0.02, -0.09, -0.02], temp: [0.05, 0.00, -0.07], cat: "adjectif_taille" },
+      "minuscule": { sem: [0.24, 0.38, -0.06], sens: [-0.07, -0.10, 0.05], temp: [-0.04, -0.01, -0.04], cat: "adjectif_taille" },
+      "immense": { sem: [0.34, 0.47, 0.03], sens: [-0.10, 0.08, 0.03], temp: [0.02, 0.03, 0.01], cat: "adjectif_taille" },
+      "gigantesque": { sem: [0.42, 0.46, -0.10], sens: [-0.03, 0.06, 0.02], temp: [-0.07, -0.08, 0.00], cat: "adjectif_taille" },
+      "microscopique": { sem: [0.42, 0.51, 0.05], sens: [0.01, -0.05, 0.07], temp: [0.08, 0.05, 0.05], cat: "adjectif_taille" },
+      "large": { sem: [0.37, 0.55, 0.02], sens: [-0.08, 0.03, -0.09], temp: [-0.02, 0.05, -0.02], cat: "adjectif_taille" },
+      "étroit": { sem: [0.38, 0.43, -0.03], sens: [0.08, -0.09, 0.05], temp: [-0.07, 0.01, -0.05], cat: "adjectif_taille" },
+      "haut": { sem: [0.38, 0.47, 0.05], sens: [-0.03, 0.02, -0.05], temp: [0.08, 0.04, -0.06], cat: "adjectif_taille" },
+      "bas": { sem: [0.33, 0.48, 0.03], sens: [0.04, 0.08, -0.01], temp: [0.03, 0.05, -0.04], cat: "adjectif_taille" },
+      "long": { sem: [0.23, 0.49, -0.04], sens: [0.01, -0.06, 0.01], temp: [-0.04, 0.05, 0.01], cat: "adjectif_taille" },
+      "épais": { sem: [0.34, 0.34, 0.04], sens: [-0.02, 0.02, -0.03], temp: [-0.02, 0.06, 0.03], cat: "adjectif_taille" },
+      "fin": { sem: [0.19, 0.48, 0.10], sens: [0.08, 0.02, -0.07], temp: [-0.01, -0.05, 0.06], cat: "adjectif_taille" },
+      "lourd": { sem: [0.41, 0.52, -0.09], sens: [-0.08, -0.06, -0.09], temp: [-0.03, -0.03, -0.00], cat: "adjectif_taille" },
+      "léger": { sem: [0.41, 0.48, -0.12], sens: [-0.01, 0.04, 0.08], temp: [0.04, -0.00, 0.07], cat: "adjectif_taille" },
+      "doux": { sem: [0.35, -0.43, 0.12], sens: [0.05, 0.03, 0.03], temp: [0.04, -0.01, 0.02], cat: "adjectif_texture" },
+      "dur": { sem: [0.16, -0.43, -0.11], sens: [0.01, -0.04, 0.04], temp: [-0.01, 0.01, 0.04], cat: "adjectif_texture" },
+      "rugueux": { sem: [0.22, -0.43, 0.06], sens: [0.07, 0.08, -0.08], temp: [0.05, 0.05, 0.08], cat: "adjectif_texture" },
+      "lisse": { sem: [0.30, -0.44, -0.04], sens: [0.04, -0.06, -0.07], temp: [0.03, 0.02, 0.04], cat: "adjectif_texture" },
+      "mou": { sem: [0.34, -0.33, 0.01], sens: [0.01, 0.02, 0.02], temp: [-0.05, -0.02, 0.08], cat: "adjectif_texture" },
+      "souple": { sem: [0.17, -0.34, 0.09], sens: [-0.09, -0.09, -0.09], temp: [0.03, -0.03, -0.04], cat: "adjectif_texture" },
+      "rigide": { sem: [0.14, -0.43, 0.05], sens: [-0.04, 0.05, 0.07], temp: [-0.01, -0.06, 0.07], cat: "adjectif_texture" },
+      "élastique": { sem: [0.27, -0.49, -0.03], sens: [0.02, 0.01, -0.09], temp: [0.03, 0.03, 0.03], cat: "adjectif_texture" },
+      "gluant": { sem: [0.36, -0.33, 0.07], sens: [-0.06, -0.08, 0.09], temp: [0.03, 0.05, 0.02], cat: "adjectif_texture" },
+      "sec": { sem: [0.35, -0.49, 0.08], sens: [-0.07, -0.03, -0.01], temp: [0.04, 0.04, 0.05], cat: "adjectif_texture" },
+      "humide": { sem: [0.14, -0.46, -0.10], sens: [0.03, 0.09, -0.02], temp: [-0.05, 0.03, -0.02], cat: "adjectif_texture" },
+      "brillant": { sem: [0.18, -0.33, -0.04], sens: [0.02, -0.06, 0.05], temp: [0.04, -0.03, 0.05], cat: "adjectif_texture" },
+      "mat": { sem: [0.30, -0.46, 0.12], sens: [-0.01, 0.05, -0.01], temp: [-0.05, -0.05, 0.02], cat: "adjectif_texture" },
+      "transparent": { sem: [0.15, -0.30, 0.02], sens: [-0.03, -0.03, 0.02], temp: [0.04, -0.06, -0.07], cat: "adjectif_texture" },
+      "opaque": { sem: [0.13, -0.41, 0.11], sens: [-0.05, 0.01, 0.05], temp: [0.01, -0.02, 0.03], cat: "adjectif_texture" },
+      "monte": { sem: [-0.22, 0.09, -0.07], sens: [0.03, 0.13, 0.00], temp: [0.06, 0.05, 0.05], cat: "verbe_mouvement" },
+      "monter": { sem: [-0.09, 0.09, -0.08], sens: [0.06, 0.22, -0.03], temp: [-0.04, -0.06, -0.07], cat: "verbe_mouvement" },
+      "descend": { sem: [-0.07, 0.10, 0.01], sens: [-0.01, 0.19, -0.08], temp: [0.03, 0.01, -0.03], cat: "verbe_mouvement" },
+      "descendre": { sem: [-0.26, -0.01, 0.05], sens: [0.08, 0.24, -0.04], temp: [-0.06, -0.04, 0.08], cat: "verbe_mouvement" },
+      "avance": { sem: [-0.14, 0.12, -0.06], sens: [0.02, 0.30, 0.03], temp: [-0.06, -0.04, -0.05], cat: "verbe_mouvement" },
+      "avancer": { sem: [-0.24, 0.10, -0.10], sens: [0.02, 0.29, -0.07], temp: [-0.00, 0.06, 0.01], cat: "verbe_mouvement" },
+      "recule": { sem: [-0.19, 0.10, 0.03], sens: [0.03, 0.16, 0.06], temp: [0.06, -0.05, -0.06], cat: "verbe_mouvement" },
+      "reculer": { sem: [-0.17, 0.16, -0.01], sens: [0.04, 0.29, -0.04], temp: [-0.04, 0.03, -0.03], cat: "verbe_mouvement" },
+      "tourne": { sem: [-0.13, 0.06, -0.02], sens: [-0.03, 0.16, 0.02], temp: [0.07, 0.02, -0.02], cat: "verbe_mouvement" },
+      "tourner": { sem: [-0.15, 0.06, 0.08], sens: [-0.05, 0.18, 0.05], temp: [0.07, 0.06, -0.01], cat: "verbe_mouvement" },
+      "glisse": { sem: [-0.13, 0.13, 0.06], sens: [0.09, 0.19, -0.08], temp: [-0.06, 0.05, 0.05], cat: "verbe_mouvement" },
+      "glisser": { sem: [-0.09, 0.17, -0.12], sens: [-0.06, 0.25, 0.08], temp: [-0.07, 0.07, -0.05], cat: "verbe_mouvement" },
+      "grimpe": { sem: [-0.05, 0.19, 0.10], sens: [0.07, 0.12, -0.07], temp: [-0.06, 0.03, -0.01], cat: "verbe_mouvement" },
+      "grimper": { sem: [-0.06, 0.11, 0.03], sens: [0.05, 0.12, -0.10], temp: [-0.01, -0.02, -0.07], cat: "verbe_mouvement" },
+      "rampe": { sem: [-0.15, 0.07, 0.12], sens: [-0.03, 0.16, -0.02], temp: [-0.06, 0.01, -0.02], cat: "verbe_mouvement" },
+      "ramper": { sem: [-0.10, 0.11, -0.05], sens: [0.05, 0.16, 0.01], temp: [-0.00, -0.02, -0.07], cat: "verbe_mouvement" },
+      "bondit": { sem: [-0.07, 0.21, -0.11], sens: [0.01, 0.28, 0.08], temp: [-0.02, 0.05, -0.04], cat: "verbe_mouvement" },
+      "bondir": { sem: [-0.09, 0.10, 0.08], sens: [-0.09, 0.29, -0.09], temp: [0.02, 0.02, -0.02], cat: "verbe_mouvement" },
+      "tombe": { sem: [-0.07, 0.15, 0.10], sens: [0.03, 0.15, 0.10], temp: [-0.07, 0.02, -0.05], cat: "verbe_mouvement" },
+      "tomber": { sem: [-0.06, 0.16, -0.09], sens: [-0.04, 0.21, 0.01], temp: [-0.02, 0.08, 0.01], cat: "verbe_mouvement" },
+      "se lève": { sem: [-0.21, 0.07, -0.05], sens: [-0.09, 0.13, -0.02], temp: [0.00, -0.05, -0.06], cat: "verbe_mouvement" },
+      "lever": { sem: [-0.25, 0.03, 0.12], sens: [0.04, 0.23, -0.01], temp: [-0.08, 0.04, -0.05], cat: "verbe_mouvement" },
+      "s'assoit": { sem: [-0.09, 0.09, 0.06], sens: [0.09, 0.13, 0.07], temp: [0.01, -0.04, 0.07], cat: "verbe_mouvement" },
+      "asseoir": { sem: [-0.15, 0.00, -0.07], sens: [-0.01, 0.16, -0.01], temp: [0.00, -0.00, -0.02], cat: "verbe_mouvement" },
+      "dit": { sem: [-0.15, 0.20, -0.05], sens: [-0.09, 0.06, -0.01], temp: [0.02, 0.16, -0.05], cat: "verbe_communication" },
+      "dire": { sem: [-0.13, 0.28, 0.05], sens: [0.08, 0.05, 0.05], temp: [0.07, 0.04, -0.03], cat: "verbe_communication" },
+      "demande": { sem: [-0.14, 0.36, 0.08], sens: [0.03, 0.14, 0.09], temp: [-0.04, 0.18, -0.01], cat: "verbe_communication" },
+      "demander": { sem: [-0.17, 0.23, -0.07], sens: [-0.04, 0.11, 0.02], temp: [0.07, 0.16, 0.08], cat: "verbe_communication" },
+      "répond": { sem: [-0.25, 0.40, -0.02], sens: [-0.05, 0.16, 0.06], temp: [0.02, 0.16, -0.04], cat: "verbe_communication" },
+      "répondre": { sem: [-0.25, 0.18, -0.01], sens: [0.09, 0.08, -0.05], temp: [-0.06, 0.05, -0.04], cat: "verbe_communication" },
+      "raconte": { sem: [-0.07, 0.27, 0.08], sens: [0.07, 0.18, 0.09], temp: [0.04, 0.09, -0.01], cat: "verbe_communication" },
+      "raconter": { sem: [-0.04, 0.19, 0.09], sens: [0.01, 0.09, -0.03], temp: [-0.08, 0.12, -0.04], cat: "verbe_communication" },
+      "explique": { sem: [-0.10, 0.22, 0.07], sens: [-0.05, 0.15, 0.02], temp: [-0.08, 0.06, -0.03], cat: "verbe_communication" },
+      "expliquer": { sem: [-0.07, 0.42, 0.12], sens: [0.04, 0.09, 0.04], temp: [0.08, 0.15, 0.04], cat: "verbe_communication" },
+      "crie": { sem: [-0.17, 0.42, -0.02], sens: [-0.08, 0.03, -0.06], temp: [0.00, 0.08, -0.04], cat: "verbe_communication" },
+      "crier": { sem: [-0.04, 0.24, 0.11], sens: [-0.07, 0.20, -0.10], temp: [0.01, 0.09, -0.07], cat: "verbe_communication" },
+      "chuchote": { sem: [-0.16, 0.28, 0.09], sens: [0.06, 0.18, -0.07], temp: [0.06, 0.06, 0.06], cat: "verbe_communication" },
+      "chuchoter": { sem: [-0.23, 0.32, -0.02], sens: [-0.07, 0.02, 0.06], temp: [-0.04, 0.04, 0.07], cat: "verbe_communication" },
+      "annonce": { sem: [-0.24, 0.22, 0.05], sens: [-0.05, 0.09, 0.04], temp: [0.08, 0.12, -0.07], cat: "verbe_communication" },
+      "annoncer": { sem: [-0.15, 0.40, 0.07], sens: [0.01, 0.03, 0.08], temp: [-0.00, 0.17, 0.07], cat: "verbe_communication" },
+      "discute": { sem: [-0.04, 0.20, -0.12], sens: [0.03, 0.12, 0.06], temp: [-0.04, 0.04, -0.01], cat: "verbe_communication" },
+      "discuter": { sem: [-0.13, 0.24, 0.02], sens: [0.05, 0.14, -0.03], temp: [0.05, 0.14, -0.02], cat: "verbe_communication" },
+      "promet": { sem: [-0.05, 0.39, -0.03], sens: [-0.03, 0.03, 0.07], temp: [0.00, 0.17, 0.06], cat: "verbe_communication" },
+      "promettre": { sem: [-0.12, 0.37, 0.06], sens: [0.09, 0.09, -0.05], temp: [0.03, 0.10, -0.05], cat: "verbe_communication" },
+      "voit": { sem: [-0.17, 0.33, -0.11], sens: [0.03, -0.05, -0.09], temp: [0.06, -0.02, 0.07], cat: "verbe_perception" },
+      "voir": { sem: [-0.27, 0.20, 0.07], sens: [-0.04, -0.04, 0.08], temp: [0.01, 0.06, 0.04], cat: "verbe_perception" },
+      "regarde": { sem: [-0.29, 0.28, -0.12], sens: [-0.01, 0.10, -0.03], temp: [0.06, 0.05, 0.05], cat: "verbe_perception" },
+      "regarder": { sem: [-0.14, 0.20, -0.04], sens: [0.03, 0.05, 0.05], temp: [-0.07, -0.08, 0.04], cat: "verbe_perception" },
+      "entend": { sem: [-0.12, 0.16, -0.08], sens: [-0.07, 0.05, -0.06], temp: [-0.02, 0.05, -0.00], cat: "verbe_perception" },
+      "entendre": { sem: [-0.08, 0.30, -0.11], sens: [-0.04, -0.10, -0.01], temp: [-0.07, -0.07, -0.04], cat: "verbe_perception" },
+      "écoute": { sem: [-0.26, 0.35, -0.02], sens: [-0.09, 0.02, -0.09], temp: [0.02, -0.04, -0.03], cat: "verbe_perception" },
+      "écouter": { sem: [-0.31, 0.23, -0.08], sens: [-0.10, -0.04, 0.02], temp: [0.06, -0.01, -0.07], cat: "verbe_perception" },
+      "sent": { sem: [-0.12, 0.35, -0.03], sens: [0.09, 0.03, -0.04], temp: [0.06, 0.03, 0.06], cat: "verbe_perception" },
+      "sentir": { sem: [-0.22, 0.36, -0.08], sens: [0.00, -0.05, -0.03], temp: [-0.05, -0.05, 0.06], cat: "verbe_perception" },
+      "touche": { sem: [-0.08, 0.14, -0.02], sens: [0.02, -0.08, 0.04], temp: [-0.06, 0.08, -0.07], cat: "verbe_perception" },
+      "toucher": { sem: [-0.25, 0.23, 0.01], sens: [-0.08, 0.06, -0.04], temp: [0.07, 0.07, 0.00], cat: "verbe_perception" },
+      "goûte": { sem: [-0.19, 0.33, -0.05], sens: [-0.03, 0.10, 0.10], temp: [-0.03, -0.01, 0.00], cat: "verbe_perception" },
+      "goûter": { sem: [-0.27, 0.17, -0.09], sens: [-0.01, 0.04, -0.05], temp: [0.08, 0.06, 0.03], cat: "verbe_perception" },
+      "observe": { sem: [-0.31, 0.14, 0.00], sens: [0.07, -0.04, 0.03], temp: [0.03, -0.08, 0.07], cat: "verbe_perception" },
+      "observer": { sem: [-0.13, 0.18, 0.09], sens: [-0.06, 0.02, -0.07], temp: [-0.02, 0.07, -0.08], cat: "verbe_perception" },
+      "remarque": { sem: [-0.26, 0.15, 0.09], sens: [-0.05, 0.07, -0.05], temp: [-0.02, -0.02, 0.08], cat: "verbe_perception" },
+      "remarquer": { sem: [-0.28, 0.19, -0.04], sens: [-0.06, 0.03, -0.04], temp: [-0.07, 0.04, 0.01], cat: "verbe_perception" },
+      "perçoit": { sem: [-0.26, 0.33, 0.08], sens: [0.06, 0.04, -0.06], temp: [0.07, -0.01, -0.02], cat: "verbe_perception" },
+      "percevoir": { sem: [-0.26, 0.31, -0.08], sens: [0.02, -0.08, 0.06], temp: [-0.04, 0.06, 0.02], cat: "verbe_perception" },
+      "crée": { sem: [-0.17, 0.24, -0.03], sens: [-0.08, 0.18, 0.05], temp: [0.07, -0.06, 0.25], cat: "verbe_creation" },
+      "créer": { sem: [-0.21, 0.33, 0.01], sens: [-0.03, 0.18, -0.08], temp: [0.14, 0.02, 0.17], cat: "verbe_creation" },
+      "fabrique": { sem: [0.01, 0.26, -0.02], sens: [-0.09, 0.18, -0.03], temp: [0.08, 0.08, 0.27], cat: "verbe_creation" },
+      "fabriquer": { sem: [-0.13, 0.25, 0.01], sens: [-0.04, 0.10, -0.07], temp: [0.09, -0.02, 0.26], cat: "verbe_creation" },
+      "construit": { sem: [-0.09, 0.28, -0.02], sens: [0.04, 0.03, -0.00], temp: [0.16, 0.04, 0.19], cat: "verbe_creation" },
+      "construire": { sem: [-0.20, 0.38, 0.10], sens: [0.07, 0.04, -0.08], temp: [0.17, -0.00, 0.20], cat: "verbe_creation" },
+      "dessine": { sem: [-0.16, 0.31, 0.02], sens: [-0.02, 0.12, -0.08], temp: [0.03, -0.01, 0.26], cat: "verbe_creation" },
+      "dessiner": { sem: [-0.01, 0.44, 0.01], sens: [0.04, 0.19, -0.03], temp: [0.02, 0.03, 0.18], cat: "verbe_creation" },
+      "peint": { sem: [-0.10, 0.43, -0.09], sens: [0.08, 0.07, 0.07], temp: [0.16, 0.03, 0.12], cat: "verbe_creation" },
+      "peindre": { sem: [-0.06, 0.35, -0.03], sens: [0.05, 0.06, -0.04], temp: [0.07, -0.08, 0.26], cat: "verbe_creation" },
+      "sculpte": { sem: [-0.21, 0.31, 0.09], sens: [-0.07, 0.07, -0.08], temp: [0.05, 0.02, 0.19], cat: "verbe_creation" },
+      "sculpter": { sem: [-0.09, 0.26, -0.07], sens: [-0.03, 0.12, 0.07], temp: [0.03, 0.03, 0.27], cat: "verbe_creation" },
+      "invente": { sem: [-0.01, 0.45, -0.02], sens: [-0.01, 0.19, 0.08], temp: [0.08, -0.03, 0.15], cat: "verbe_creation" },
+      "inventer": { sem: [-0.12, 0.32, 0.09], sens: [-0.08, 0.05, 0.01], temp: [0.11, -0.03, 0.19], cat: "verbe_creation" },
+      "compose": { sem: [-0.01, 0.47, 0.01], sens: [-0.00, 0.16, 0.09], temp: [0.07, 0.07, 0.22], cat: "verbe_creation" },
+      "composer": { sem: [-0.02, 0.34, -0.09], sens: [-0.10, 0.10, 0.04], temp: [0.15, 0.04, 0.22], cat: "verbe_creation" },
+      "imagine": { sem: [0.02, 0.34, -0.03], sens: [-0.05, 0.04, -0.03], temp: [0.17, -0.07, 0.26], cat: "verbe_creation" },
+      "imaginer": { sem: [-0.20, 0.41, 0.12], sens: [0.08, 0.14, -0.05], temp: [0.10, -0.01, 0.22], cat: "verbe_creation" },
+      "conçoit": { sem: [-0.05, 0.35, 0.09], sens: [0.00, 0.16, 0.01], temp: [0.17, 0.08, 0.20], cat: "verbe_creation" },
+      "concevoir": { sem: [-0.06, 0.28, 0.04], sens: [-0.02, 0.05, 0.08], temp: [0.18, 0.02, 0.23], cat: "verbe_creation" },
+      "détruit": { sem: [-0.07, 0.30, 0.29], sens: [-0.09, 0.30, 0.07], temp: [0.03, 0.02, 0.10], cat: "verbe_destruction" },
+      "détruire": { sem: [-0.03, 0.37, 0.24], sens: [0.01, 0.21, 0.04], temp: [0.02, 0.02, 0.07], cat: "verbe_destruction" },
+      "casse": { sem: [-0.00, 0.19, 0.39], sens: [-0.05, 0.31, 0.07], temp: [0.04, 0.07, 0.04], cat: "verbe_destruction" },
+      "casser": { sem: [-0.17, 0.22, 0.39], sens: [0.02, 0.33, -0.06], temp: [-0.04, -0.01, 0.17], cat: "verbe_destruction" },
+      "brise": { sem: [0.00, 0.18, 0.33], sens: [-0.04, 0.36, -0.07], temp: [-0.04, -0.04, 0.03], cat: "verbe_destruction" },
+      "briser": { sem: [-0.06, 0.36, 0.28], sens: [-0.08, 0.36, 0.10], temp: [0.08, 0.04, 0.07], cat: "verbe_destruction" },
+      "déchire": { sem: [-0.19, 0.26, 0.35], sens: [-0.09, 0.39, 0.05], temp: [0.03, 0.05, 0.12], cat: "verbe_destruction" },
+      "déchirer": { sem: [-0.20, 0.36, 0.25], sens: [-0.03, 0.21, -0.06], temp: [0.02, -0.08, 0.16], cat: "verbe_destruction" },
+      "brûle": { sem: [-0.02, 0.29, 0.33], sens: [-0.06, 0.26, -0.04], temp: [-0.04, 0.05, 0.13], cat: "verbe_destruction" },
+      "brûler": { sem: [-0.02, 0.27, 0.32], sens: [-0.10, 0.34, -0.07], temp: [0.04, 0.00, 0.05], cat: "verbe_destruction" },
+      "démolit": { sem: [-0.11, 0.25, 0.39], sens: [0.03, 0.32, -0.01], temp: [0.07, -0.03, 0.02], cat: "verbe_destruction" },
+      "démolir": { sem: [-0.17, 0.21, 0.40], sens: [0.03, 0.28, 0.09], temp: [0.04, 0.04, 0.13], cat: "verbe_destruction" },
+      "abîme": { sem: [0.00, 0.25, 0.37], sens: [0.05, 0.27, 0.06], temp: [-0.00, -0.02, 0.12], cat: "verbe_destruction" },
+      "abîmer": { sem: [-0.14, 0.30, 0.37], sens: [0.03, 0.33, -0.10], temp: [0.06, 0.03, 0.04], cat: "verbe_destruction" },
+      "efface": { sem: [-0.12, 0.32, 0.38], sens: [-0.04, 0.35, 0.03], temp: [-0.07, 0.04, 0.09], cat: "verbe_destruction" },
+      "effacer": { sem: [-0.17, 0.24, 0.32], sens: [-0.04, 0.21, -0.00], temp: [0.02, 0.04, 0.12], cat: "verbe_destruction" },
+      "supprime": { sem: [0.01, 0.41, 0.36], sens: [-0.02, 0.24, 0.01], temp: [0.00, -0.01, 0.10], cat: "verbe_destruction" },
+      "supprimer": { sem: [-0.21, 0.26, 0.35], sens: [-0.05, 0.28, -0.02], temp: [0.04, -0.05, 0.07], cat: "verbe_destruction" },
+      "élimine": { sem: [-0.13, 0.41, 0.32], sens: [0.03, 0.21, -0.09], temp: [-0.04, -0.05, 0.02], cat: "verbe_destruction" },
+      "éliminer": { sem: [-0.16, 0.28, 0.24], sens: [0.08, 0.26, 0.08], temp: [0.05, 0.03, 0.15], cat: "verbe_destruction" },
+      "éternité": { sem: [0.26, 0.86, -0.22], sens: [0.05, 0.02, -0.05], temp: [0.14, 0.43, -0.02], cat: "concept2" },
+      "destin": { sem: [0.23, 0.92, -0.21], sens: [0.03, 0.01, -0.03], temp: [0.12, 0.46, -0.03], cat: "concept2" },
+      "hasard": { sem: [0.22, 0.91, 0.02], sens: [-0.07, 0.11, -0.09], temp: [0.12, 0.38, -0.08], cat: "concept2" },
+      "chaos": { sem: [0.36, 0.99, -0.17], sens: [-0.07, 0.11, -0.09], temp: [0.02, 0.34, 0.01], cat: "concept2" },
+      "ordre": { sem: [0.37, 0.78, -0.14], sens: [0.03, 0.16, 0.02], temp: [0.03, 0.36, -0.02], cat: "concept2" },
+      "équilibre": { sem: [0.26, 0.79, -0.02], sens: [-0.05, 0.07, -0.04], temp: [0.13, 0.47, 0.03], cat: "concept2" },
+      "harmonie": { sem: [0.41, 0.98, 0.00], sens: [-0.03, 0.05, 0.05], temp: [0.03, 0.46, 0.08], cat: "concept2" },
+      "identité": { sem: [0.41, 0.85, -0.02], sens: [-0.01, 0.00, -0.01], temp: [0.11, 0.48, 0.06], cat: "concept2" },
+      "conscience": { sem: [0.19, 0.83, -0.14], sens: [-0.09, 0.08, -0.07], temp: [0.10, 0.40, -0.06], cat: "concept2" },
+      "raison": { sem: [0.20, 0.86, -0.01], sens: [-0.03, 0.11, -0.07], temp: [0.14, 0.44, -0.03], cat: "concept2" },
+      "logique": { sem: [0.29, 0.80, -0.07], sens: [0.07, 0.11, 0.03], temp: [0.11, 0.36, 0.04], cat: "concept2" },
+      "intuition": { sem: [0.27, 0.82, 0.01], sens: [0.07, 0.17, 0.00], temp: [0.11, 0.47, -0.03], cat: "concept2" },
+      "imagination": { sem: [0.32, 0.98, -0.04], sens: [-0.06, 0.06, 0.05], temp: [0.13, 0.34, 0.02], cat: "concept2" },
+      "créativité": { sem: [0.19, 0.91, -0.03], sens: [0.02, 0.03, 0.07], temp: [0.08, 0.47, 0.00], cat: "concept2" },
+      "sagesse": { sem: [0.21, 0.93, -0.13], sens: [0.07, 0.04, 0.07], temp: [0.06, 0.40, 0.03], cat: "concept2" },
+      "ignorance": { sem: [0.22, 0.81, -0.18], sens: [0.01, 0.15, 0.05], temp: [0.08, 0.37, 0.01], cat: "concept2" },
+      "savoir": { sem: [0.24, 1.00, -0.10], sens: [0.04, 0.12, -0.02], temp: [0.11, 0.34, -0.01], cat: "concept2" },
+      "connaissance": { sem: [0.20, 1.00, -0.21], sens: [-0.06, 0.04, 0.06], temp: [0.04, 0.32, -0.04], cat: "concept2" },
+      "croyance": { sem: [0.40, 0.93, -0.20], sens: [-0.03, 0.13, -0.06], temp: [0.13, 0.32, -0.05], cat: "concept2" },
+      "doute": { sem: [0.30, 0.87, -0.20], sens: [0.00, 0.13, 0.08], temp: [0.14, 0.34, 0.06], cat: "concept2" },
+      "roman": { sem: [0.32, 0.84, -0.50], sens: [0.05, 0.17, 0.09], temp: [0.03, 0.13, 0.15], cat: "art_litterature" },
+      "poème": { sem: [0.21, 0.85, -0.50], sens: [-0.07, 0.02, 0.00], temp: [0.02, 0.27, 0.04], cat: "art_litterature" },
+      "nouvelle": { sem: [0.31, 0.86, -0.34], sens: [-0.08, 0.01, -0.04], temp: [-0.07, 0.19, 0.05], cat: "art_litterature" },
+      "théâtre_l": { sem: [0.19, 0.64, -0.48], sens: [0.05, 0.03, -0.01], temp: [0.05, 0.19, 0.18], cat: "art_litterature" },
+      "sculpture": { sem: [0.40, 0.81, -0.49], sens: [0.05, 0.19, -0.05], temp: [0.02, 0.25, 0.12], cat: "art_litterature" },
+      "peinture_a": { sem: [0.42, 0.78, -0.45], sens: [0.01, 0.17, 0.01], temp: [0.07, 0.15, 0.16], cat: "art_litterature" },
+      "dessin": { sem: [0.22, 0.72, -0.32], sens: [-0.05, 0.16, 0.10], temp: [-0.07, 0.24, 0.11], cat: "art_litterature" },
+      "photographie": { sem: [0.25, 0.86, -0.42], sens: [-0.05, 0.13, 0.04], temp: [-0.06, 0.28, 0.03], cat: "art_litterature" },
+      "cinéma_a": { sem: [0.35, 0.63, -0.39], sens: [0.10, 0.18, -0.03], temp: [-0.04, 0.15, 0.17], cat: "art_litterature" },
+      "danse_a": { sem: [0.25, 0.66, -0.46], sens: [0.02, 0.17, 0.03], temp: [0.01, 0.21, 0.06], cat: "art_litterature" },
+      "opéra": { sem: [0.30, 0.84, -0.49], sens: [0.03, 0.10, -0.08], temp: [0.05, 0.19, 0.07], cat: "art_litterature" },
+      "ballet": { sem: [0.28, 0.69, -0.51], sens: [0.05, 0.18, 0.08], temp: [0.01, 0.21, 0.03], cat: "art_litterature" },
+      "fresque": { sem: [0.33, 0.86, -0.40], sens: [0.06, 0.09, -0.10], temp: [-0.06, 0.23, 0.02], cat: "art_litterature" },
+      "gravure": { sem: [0.32, 0.66, -0.28], sens: [-0.02, 0.04, 0.02], temp: [-0.02, 0.24, 0.15], cat: "art_litterature" },
+      "calligraphie": { sem: [0.35, 0.73, -0.41], sens: [-0.05, 0.07, 0.08], temp: [0.07, 0.16, 0.11], cat: "art_litterature" },
+      "conte": { sem: [0.19, 0.67, -0.38], sens: [0.02, 0.10, -0.01], temp: [0.07, 0.13, 0.07], cat: "art_litterature" },
+      "fable": { sem: [0.37, 0.85, -0.52], sens: [0.05, 0.07, 0.08], temp: [0.00, 0.26, 0.13], cat: "art_litterature" },
+      "mythe": { sem: [0.20, 0.64, -0.36], sens: [0.01, 0.01, 0.07], temp: [-0.01, 0.27, 0.03], cat: "art_litterature" },
+      "légende": { sem: [0.31, 0.76, -0.33], sens: [0.02, 0.16, -0.01], temp: [0.04, 0.19, 0.14], cat: "art_litterature" },
+      "épopée": { sem: [0.31, 0.83, -0.29], sens: [0.03, 0.08, 0.06], temp: [-0.02, 0.25, 0.14], cat: "art_litterature" },
+      "dieu": { sem: [0.28, 0.87, 0.10], sens: [-0.01, 0.14, 0.00], temp: [-0.64, 0.58, -0.23], cat: "religion" },
+      "prière": { sem: [0.22, 0.76, -0.03], sens: [-0.07, 0.17, -0.07], temp: [-0.67, 0.55, -0.27], cat: "religion" },
+      "foi": { sem: [0.35, 0.90, 0.06], sens: [-0.00, 0.15, -0.07], temp: [-0.53, 0.56, -0.26], cat: "religion" },
+      "âme": { sem: [0.41, 0.82, -0.06], sens: [-0.09, 0.09, 0.01], temp: [-0.67, 0.60, -0.25], cat: "religion" },
+      "paradis": { sem: [0.31, 0.87, -0.09], sens: [-0.03, 0.07, 0.05], temp: [-0.56, 0.53, -0.21], cat: "religion" },
+      "enfer": { sem: [0.28, 0.86, -0.02], sens: [0.05, 0.09, 0.01], temp: [-0.61, 0.59, -0.27], cat: "religion" },
+      "ange": { sem: [0.35, 0.81, -0.06], sens: [0.04, 0.05, 0.02], temp: [-0.68, 0.62, -0.20], cat: "religion" },
+      "démon": { sem: [0.27, 0.82, -0.01], sens: [-0.04, 0.18, -0.09], temp: [-0.63, 0.63, -0.13], cat: "religion" },
+      "miracle": { sem: [0.39, 0.90, 0.02], sens: [-0.07, 0.11, 0.08], temp: [-0.57, 0.62, -0.20], cat: "religion" },
+      "sacré": { sem: [0.40, 0.75, -0.10], sens: [-0.05, 0.03, 0.09], temp: [-0.59, 0.65, -0.16], cat: "religion" },
+      "péché": { sem: [0.20, 0.83, -0.09], sens: [0.05, 0.10, -0.05], temp: [-0.55, 0.60, -0.13], cat: "religion" },
+      "salut_r": { sem: [0.38, 0.79, -0.01], sens: [-0.04, 0.20, -0.06], temp: [-0.60, 0.56, -0.13], cat: "religion" },
+      "méditation": { sem: [0.36, 0.86, 0.04], sens: [-0.09, 0.12, -0.06], temp: [-0.60, 0.62, -0.18], cat: "religion" },
+      "spiritualité": { sem: [0.28, 0.75, 0.04], sens: [0.05, 0.14, -0.07], temp: [-0.52, 0.61, -0.19], cat: "religion" },
+      "rituel": { sem: [0.40, 0.75, 0.08], sens: [-0.08, 0.13, 0.10], temp: [-0.59, 0.54, -0.13], cat: "religion" },
+      "sacrement": { sem: [0.22, 0.96, 0.03], sens: [-0.08, 0.10, -0.08], temp: [-0.54, 0.60, -0.18], cat: "religion" },
+      "prophète": { sem: [0.31, 0.91, 0.10], sens: [0.05, 0.01, 0.04], temp: [-0.60, 0.60, -0.16], cat: "religion" },
+      "saint": { sem: [0.29, 0.81, -0.04], sens: [0.03, 0.18, -0.02], temp: [-0.68, 0.60, -0.22], cat: "religion" },
+      "pèlerinage": { sem: [0.20, 0.80, 0.04], sens: [-0.06, 0.11, 0.09], temp: [-0.67, 0.65, -0.25], cat: "religion" },
+      "karma": { sem: [0.24, 0.93, -0.06], sens: [-0.07, 0.06, -0.09], temp: [-0.57, 0.67, -0.22], cat: "religion" },
+      "gouvernement": { sem: [0.22, 0.89, 0.03], sens: [0.08, 0.26, 0.07], temp: [0.04, 0.63, 0.01], cat: "politique" },
+      "démocratie": { sem: [0.20, 0.73, 0.03], sens: [0.01, 0.14, -0.07], temp: [0.17, 0.76, 0.04], cat: "politique" },
+      "élection": { sem: [0.38, 0.76, -0.09], sens: [-0.02, 0.17, -0.06], temp: [0.13, 0.70, -0.00], cat: "politique" },
+      "président": { sem: [0.23, 0.73, 0.02], sens: [-0.04, 0.24, 0.04], temp: [0.12, 0.63, 0.04], cat: "politique" },
+      "ministre": { sem: [0.39, 0.96, -0.11], sens: [-0.03, 0.20, 0.02], temp: [0.09, 0.63, -0.06], cat: "politique" },
+      "loi": { sem: [0.19, 0.82, 0.01], sens: [0.04, 0.20, 0.06], temp: [0.03, 0.63, -0.01], cat: "politique" },
+      "constitution": { sem: [0.19, 0.91, -0.06], sens: [-0.10, 0.22, -0.02], temp: [0.05, 0.69, -0.05], cat: "politique" },
+      "parlement": { sem: [0.20, 0.75, 0.02], sens: [0.03, 0.21, -0.05], temp: [0.15, 0.62, 0.02], cat: "politique" },
+      "citoyen": { sem: [0.23, 0.92, -0.10], sens: [-0.02, 0.30, -0.00], temp: [0.15, 0.69, -0.07], cat: "politique" },
+      "nation": { sem: [0.28, 0.88, -0.10], sens: [0.01, 0.14, 0.06], temp: [0.07, 0.78, 0.04], cat: "politique" },
+      "état": { sem: [0.41, 0.74, 0.10], sens: [-0.09, 0.24, 0.08], temp: [0.05, 0.74, -0.03], cat: "politique" },
+      "république": { sem: [0.37, 0.81, 0.01], sens: [0.08, 0.28, -0.08], temp: [0.10, 0.62, -0.04], cat: "politique" },
+      "dictature": { sem: [0.27, 0.74, -0.11], sens: [0.01, 0.28, -0.05], temp: [0.02, 0.73, -0.06], cat: "politique" },
+      "révolution": { sem: [0.38, 0.97, 0.11], sens: [0.02, 0.12, -0.04], temp: [0.10, 0.66, -0.01], cat: "politique" },
+      "réforme": { sem: [0.18, 0.76, 0.02], sens: [0.00, 0.16, 0.09], temp: [0.02, 0.64, 0.00], cat: "politique" },
+      "impôt": { sem: [0.32, 0.88, 0.03], sens: [0.09, 0.13, 0.09], temp: [0.13, 0.78, 0.00], cat: "politique" },
+      "frontière": { sem: [0.34, 0.76, -0.09], sens: [-0.09, 0.27, -0.07], temp: [0.17, 0.64, 0.07], cat: "politique" },
+      "diplomatie": { sem: [0.26, 0.79, 0.03], sens: [0.09, 0.13, -0.08], temp: [0.13, 0.63, 0.04], cat: "politique" },
+      "traité": { sem: [0.29, 0.86, -0.03], sens: [-0.06, 0.28, -0.04], temp: [0.11, 0.71, -0.02], cat: "politique" },
+      "référendum": { sem: [0.21, 0.93, 0.01], sens: [0.00, 0.27, -0.00], temp: [0.04, 0.70, 0.06], cat: "politique" },
+      "argent": { sem: [0.37, 0.81, -0.02], sens: [-0.06, 0.12, 0.02], temp: [0.26, 0.46, 0.14], cat: "economie" },
+      "monnaie": { sem: [0.30, 0.68, -0.09], sens: [-0.02, 0.19, 0.00], temp: [0.24, 0.52, 0.21], cat: "economie" },
+      "banque_e": { sem: [0.25, 0.75, 0.00], sens: [0.08, 0.24, -0.09], temp: [0.15, 0.43, 0.19], cat: "economie" },
+      "salaire": { sem: [0.18, 0.80, 0.11], sens: [-0.01, 0.21, 0.09], temp: [0.23, 0.56, 0.23], cat: "economie" },
+      "impôt_e": { sem: [0.34, 0.73, -0.10], sens: [0.10, 0.08, -0.08], temp: [0.27, 0.49, 0.25], cat: "economie" },
+      "dette": { sem: [0.18, 0.73, -0.05], sens: [-0.09, 0.24, 0.03], temp: [0.18, 0.50, 0.25], cat: "economie" },
+      "crédit": { sem: [0.41, 0.65, -0.06], sens: [-0.08, 0.16, 0.06], temp: [0.18, 0.46, 0.19], cat: "economie" },
+      "investissement": { sem: [0.29, 0.63, 0.11], sens: [0.03, 0.16, 0.03], temp: [0.27, 0.56, 0.23], cat: "economie" },
+      "commerce": { sem: [0.40, 0.72, -0.05], sens: [-0.09, 0.09, 0.02], temp: [0.15, 0.53, 0.16], cat: "economie" },
+      "marché": { sem: [0.24, 0.71, 0.09], sens: [-0.01, 0.07, -0.02], temp: [0.14, 0.48, 0.13], cat: "economie" },
+      "entreprise": { sem: [0.27, 0.81, -0.03], sens: [0.00, 0.15, 0.04], temp: [0.13, 0.57, 0.25], cat: "economie" },
+      "bourse": { sem: [0.29, 0.81, -0.09], sens: [-0.09, 0.11, 0.03], temp: [0.26, 0.53, 0.20], cat: "economie" },
+      "inflation": { sem: [0.23, 0.81, 0.08], sens: [0.05, 0.10, -0.09], temp: [0.16, 0.51, 0.26], cat: "economie" },
+      "budget": { sem: [0.21, 0.70, 0.06], sens: [-0.10, 0.21, -0.05], temp: [0.20, 0.53, 0.28], cat: "economie" },
+      "profit": { sem: [0.22, 0.72, -0.00], sens: [0.08, 0.16, -0.00], temp: [0.20, 0.52, 0.20], cat: "economie" },
+      "capital": { sem: [0.21, 0.83, 0.03], sens: [-0.01, 0.21, -0.05], temp: [0.18, 0.52, 0.25], cat: "economie" },
+      "salaire_e": { sem: [0.42, 0.81, -0.10], sens: [0.04, 0.07, -0.02], temp: [0.23, 0.52, 0.22], cat: "economie" },
+      "export": { sem: [0.30, 0.75, -0.08], sens: [-0.03, 0.22, 0.02], temp: [0.22, 0.47, 0.23], cat: "economie" },
+      "import": { sem: [0.29, 0.74, 0.02], sens: [-0.07, 0.06, -0.03], temp: [0.24, 0.48, 0.20], cat: "economie" },
+      "économie_e": { sem: [0.41, 0.76, 0.01], sens: [-0.08, 0.20, 0.08], temp: [0.16, 0.48, 0.26], cat: "economie" },
+      "maladie": { sem: [0.06, 0.28, 0.17], sens: [0.06, 0.08, 0.02], temp: [0.12, 0.13, 0.62], cat: "medecine" },
+      "fièvre": { sem: [0.11, 0.20, 0.13], sens: [-0.03, 0.09, 0.06], temp: [0.05, 0.13, 0.62], cat: "medecine" },
+      "douleur": { sem: [0.07, 0.12, 0.05], sens: [0.00, 0.01, -0.02], temp: [0.10, 0.17, 0.59], cat: "medecine" },
+      "blessure": { sem: [0.12, 0.12, 0.25], sens: [-0.05, 0.02, 0.09], temp: [0.18, 0.19, 0.61], cat: "medecine" },
+      "fracture": { sem: [0.02, 0.08, 0.14], sens: [-0.00, 0.19, 0.02], temp: [0.13, 0.20, 0.65], cat: "medecine" },
+      "virus_m": { sem: [0.19, 0.25, 0.06], sens: [0.09, 0.06, 0.08], temp: [0.03, 0.13, 0.56], cat: "medecine" },
+      "bactérie_m": { sem: [0.01, 0.20, 0.03], sens: [-0.01, 0.03, 0.10], temp: [0.14, 0.13, 0.64], cat: "medecine" },
+      "vaccin": { sem: [0.18, 0.27, 0.23], sens: [0.05, 0.08, -0.07], temp: [0.10, 0.13, 0.67], cat: "medecine" },
+      "médicament": { sem: [-0.00, 0.23, 0.17], sens: [-0.08, 0.07, -0.03], temp: [0.07, 0.19, 0.61], cat: "medecine" },
+      "traitement": { sem: [0.02, 0.16, 0.24], sens: [-0.03, 0.01, -0.01], temp: [0.11, 0.18, 0.55], cat: "medecine" },
+      "chirurgie": { sem: [0.20, 0.12, 0.21], sens: [-0.04, 0.03, 0.07], temp: [0.10, 0.16, 0.65], cat: "medecine" },
+      "diagnostic": { sem: [0.09, 0.11, 0.12], sens: [0.04, 0.12, 0.08], temp: [0.09, 0.21, 0.59], cat: "medecine" },
+      "symptôme": { sem: [0.14, 0.21, 0.07], sens: [-0.09, 0.11, -0.01], temp: [0.15, 0.17, 0.58], cat: "medecine" },
+      "guérison": { sem: [0.21, 0.21, 0.07], sens: [0.05, 0.16, 0.02], temp: [0.07, 0.20, 0.57], cat: "medecine" },
+      "infection": { sem: [0.15, 0.27, 0.20], sens: [0.02, 0.05, -0.08], temp: [0.18, 0.14, 0.67], cat: "medecine" },
+      "allergie": { sem: [0.15, 0.26, 0.08], sens: [-0.09, 0.17, 0.09], temp: [0.06, 0.25, 0.63], cat: "medecine" },
+      "antibiotique": { sem: [0.18, 0.24, 0.12], sens: [0.04, 0.05, 0.05], temp: [0.17, 0.23, 0.63], cat: "medecine" },
+      "radiographie": { sem: [-0.01, 0.13, 0.18], sens: [-0.00, 0.01, -0.01], temp: [0.06, 0.23, 0.67], cat: "medecine" },
+      "seringue": { sem: [0.19, 0.16, 0.14], sens: [0.04, 0.17, -0.02], temp: [0.07, 0.14, 0.66], cat: "medecine" },
+      "pansement": { sem: [0.12, 0.30, 0.25], sens: [-0.08, 0.14, 0.06], temp: [0.07, 0.15, 0.63], cat: "medecine" },
+      "planète": { sem: [0.44, 0.49, -0.09], sens: [0.81, 0.04, -0.24], temp: [-0.28, -0.07, -0.26], cat: "espace_astro" },
+      "galaxie": { sem: [0.51, 0.54, -0.05], sens: [0.81, 0.09, -0.32], temp: [-0.26, -0.03, -0.25], cat: "espace_astro" },
+      "étoile_a": { sem: [0.44, 0.65, -0.01], sens: [0.86, 0.14, -0.32], temp: [-0.25, -0.04, -0.33], cat: "espace_astro" },
+      "comète": { sem: [0.46, 0.56, 0.07], sens: [0.86, 0.14, -0.39], temp: [-0.34, 0.04, -0.34], cat: "espace_astro" },
+      "astéroïde": { sem: [0.47, 0.60, 0.00], sens: [0.92, 0.05, -0.32], temp: [-0.36, -0.04, -0.36], cat: "espace_astro" },
+      "trou noir": { sem: [0.37, 0.69, -0.01], sens: [0.85, 0.06, -0.30], temp: [-0.23, -0.00, -0.38], cat: "espace_astro" },
+      "univers": { sem: [0.36, 0.57, -0.11], sens: [0.91, 0.09, -0.26], temp: [-0.27, -0.03, -0.23], cat: "espace_astro" },
+      "orbite": { sem: [0.37, 0.66, 0.07], sens: [0.86, 0.06, -0.33], temp: [-0.22, 0.03, -0.34], cat: "espace_astro" },
+      "satellite_a": { sem: [0.28, 0.62, -0.03], sens: [0.80, 0.20, -0.21], temp: [-0.37, 0.06, -0.27], cat: "espace_astro" },
+      "constellation": { sem: [0.31, 0.52, -0.10], sens: [0.94, 0.18, -0.37], temp: [-0.24, 0.06, -0.34], cat: "espace_astro" },
+      "nébuleuse": { sem: [0.38, 0.52, -0.03], sens: [0.79, 0.02, -0.39], temp: [-0.23, -0.07, -0.31], cat: "espace_astro" },
+      "supernova": { sem: [0.43, 0.55, -0.10], sens: [0.83, 0.01, -0.28], temp: [-0.32, -0.03, -0.36], cat: "espace_astro" },
+      "météorite": { sem: [0.47, 0.67, 0.01], sens: [0.84, 0.01, -0.39], temp: [-0.37, 0.02, -0.33], cat: "espace_astro" },
+      "éclipse": { sem: [0.48, 0.51, -0.02], sens: [0.88, 0.08, -0.21], temp: [-0.25, -0.01, -0.24], cat: "espace_astro" },
+      "mars_p": { sem: [0.28, 0.59, 0.00], sens: [0.92, 0.04, -0.37], temp: [-0.23, -0.02, -0.32], cat: "espace_astro" },
+      "jupiter": { sem: [0.50, 0.48, 0.10], sens: [0.93, 0.06, -0.36], temp: [-0.33, -0.07, -0.34], cat: "espace_astro" },
+      "saturne": { sem: [0.50, 0.54, 0.02], sens: [0.80, 0.09, -0.22], temp: [-0.23, 0.04, -0.32], cat: "espace_astro" },
+      "vénus": { sem: [0.45, 0.56, -0.04], sens: [0.82, 0.03, -0.32], temp: [-0.34, 0.06, -0.26], cat: "espace_astro" },
+      "mercure": { sem: [0.35, 0.67, 0.07], sens: [0.82, 0.04, -0.31], temp: [-0.25, 0.01, -0.22], cat: "espace_astro" },
+      "pluton": { sem: [0.36, 0.67, -0.06], sens: [0.86, 0.14, -0.25], temp: [-0.29, 0.04, -0.30], cat: "espace_astro" },
     };
+
+    // ============================================
+    // JEUX D'AXES PERMUTABLES
+    // ============================================
+    const AXIS_SETS = {
+      sem: {
+        labels: ["vivant → inanimé", "concret → abstrait", "positif → négatif"],
+        short: ["inanimé →", "↑ abstrait", "↗ négatif"],
+        colors: ["#ff6b6b", "#4ecdc4", "#ffd93d"],
+        hex: [0xff6b6b, 0x4ecdc4, 0xffd93d]
+      },
+      sens: {
+        labels: ["petit → grand", "calme → intense", "froid → chaud"],
+        short: ["grand →", "↑ intense", "↗ chaud"],
+        colors: ["#9b8cff", "#6bc5ff", "#ff9d6b"],
+        hex: [0x9b8cff, 0x6bc5ff, 0xff9d6b]
+      },
+      temp: {
+        labels: ["ancien → moderne", "individuel → collectif", "naturel → artificiel"],
+        short: ["moderne →", "↑ collectif", "↗ artificiel"],
+        colors: ["#a8e063", "#f67280", "#c06c84"],
+        hex: [0xa8e063, 0xf67280, 0xc06c84]
+      }
+    };
+    let currentAxisSet = "sem";
 
     // Alias & lemmatisation simplifiée
     const ALIASES = {
@@ -2596,10 +3651,13 @@
     function lookupToken(raw) {
       const w = normalize(raw);
       if (!w || STOP_WORDS.has(w)) return null;
-      if (LEXICON[w]) return { word: w, vec: LEXICON[w].slice(0, 3), cat: LEXICON[w][3], known: true };
+      if (LEXICON[w]) {
+        const e = LEXICON[w];
+        return { word: w, vec: e[currentAxisSet].slice(0, 3), cat: e.cat, known: true };
+      }
       if (ALIASES[w] && LEXICON[ALIASES[w]]) {
-        const l = LEXICON[ALIASES[w]];
-        return { word: w, vec: l.slice(0, 3), cat: l[3], known: true };
+        const e = LEXICON[ALIASES[w]];
+        return { word: w, vec: e[currentAxisSet].slice(0, 3), cat: e.cat, known: true };
       }
       // Mot inconnu : projeté au centre + jitter déterministe basé sur hash
       let h = 0;
@@ -2644,18 +3702,18 @@
         new THREE.Vector3(0, 0, 0),
         new THREE.Vector3(dir[0] * AXIS_LEN, dir[1] * AXIS_LEN, dir[2] * AXIS_LEN),
       ]);
-      scene.add(new THREE.Line(geo, mat));
+      const line = new THREE.Line(geo, mat);
+      scene.add(line);
+      return line;
     }
-    makeAxis([1,0,0], 0xff6b6b);
-    makeAxis([0,1,0], 0x4ecdc4);
-    makeAxis([0,0,1], 0xffd93d);
+    let axisLines = [makeAxis([1,0,0], 0xff6b6b), makeAxis([0,1,0], 0x4ecdc4), makeAxis([0,0,1], 0xffd93d)];
 
     // Grille de référence
     const grid = new THREE.GridHelper(5.5, 11, 0x2f2856, 0x1e1938);
     grid.position.y = -AXIS_LEN;
     scene.add(grid);
 
-    // Étiquettes des axes
+    // Étiquettes des axes (dynamiques, mises à jour lors de la permutation)
     function makeAxisLabel(text, pos, color) {
       const label = makeLabel(text, {
         color, bg: "rgba(14,11,26,0.75)",
@@ -2664,10 +3722,13 @@
       });
       label.position.set(pos[0], pos[1], pos[2]);
       scene.add(label);
+      return label;
     }
-    makeAxisLabel("inanimé →", [AXIS_LEN + 0.35, 0, 0], "#ff9d9d");
-    makeAxisLabel("↑ abstrait", [0, AXIS_LEN + 0.35, 0], "#98efe7");
-    makeAxisLabel("↗ négatif", [0, 0, AXIS_LEN + 0.35], "#ffe680");
+    let axisLabelSprites = [
+      makeAxisLabel(AXIS_SETS[currentAxisSet].short[0], [AXIS_LEN + 0.35, 0, 0], AXIS_SETS[currentAxisSet].colors[0]),
+      makeAxisLabel(AXIS_SETS[currentAxisSet].short[1], [0, AXIS_LEN + 0.35, 0], AXIS_SETS[currentAxisSet].colors[1]),
+      makeAxisLabel(AXIS_SETS[currentAxisSet].short[2], [0, 0, AXIS_LEN + 0.35], AXIS_SETS[currentAxisSet].colors[2]),
+    ];
 
     // Sprites de texte via canvas 2D — taille contrôlée par worldHeight
     function makeLabel(text, opts = {}) {
@@ -2725,7 +3786,10 @@
       return sprite;
     }
 
-    // Groupe des points/labels du lexique de fond
+    // Groupe des points du lexique de fond
+    // Affiché en permanence, mais de façon très discrète (petits points, faible
+    // opacité) et sans aucune étiquette — seuls les tokens de la phrase saisie
+    // sont nommés et mis en avant.
     const bgGroup = new THREE.Group();
     scene.add(bgGroup);
     const activeGroup = new THREE.Group();
@@ -2741,15 +3805,16 @@
       bgGroup.clear();
       bgPoints.length = 0;
       const words = Object.keys(LEXICON).filter(w => !w.endsWith("_c") && !w.endsWith("_v") && !w.endsWith("_n"));
-      const geo = new THREE.SphereGeometry(0.025, 8, 8);
-      const mat = new THREE.MeshBasicMaterial({ color: 0x6e6b8a, transparent: true, opacity: 0.35 });
+      // Points très discrets : petits, peu opaques, sans étiquette.
+      const geo = new THREE.SphereGeometry(0.014, 6, 6);
+      const mat = new THREE.MeshBasicMaterial({ color: 0x4a4768, transparent: true, opacity: 0.16, depthWrite: false });
       words.forEach(w => {
-        const v = LEXICON[w];
+        const v = LEXICON[w][currentAxisSet];
         const m = new THREE.Mesh(geo, mat);
         const pos = new THREE.Vector3(v[0] * SCALE, v[1] * SCALE, v[2] * SCALE);
         m.position.copy(pos);
         bgGroup.add(m);
-        bgPoints.push({ word: w, pos });
+        bgPoints.push({ word: w, pos, mesh: m });
       });
     }
 
@@ -2845,11 +3910,86 @@
         activeGroup.add(line);
       }
 
-      // Afficher les voisins pour donner du contexte
-      renderNeighbors(positions);
+      // Le nuage de fond reste visible en permanence (discret, sans libellé) ;
+      // seuls les tokens de la phrase saisie sont nommés — aucune étiquette de voisin.
+      neighborGroup.clear();
     }
 
     buildBackground();
+
+    // ============================================
+    // PERMUTATION ANIMEE ENTRE JEUX D'AXES
+    // ============================================
+    function updateAxisVisuals(setKey) {
+      const def = AXIS_SETS[setKey];
+      axisLines.forEach((line, i) => {
+        line.material.color.setHex(def.hex[i]);
+      });
+      const positions = [
+        [AXIS_LEN + 0.35, 0, 0],
+        [0, AXIS_LEN + 0.35, 0],
+        [0, 0, AXIS_LEN + 0.35],
+      ];
+      axisLabelSprites.forEach((sprite) => {
+        scene.remove(sprite);
+        sprite.material.map.dispose();
+        sprite.material.dispose();
+      });
+      axisLabelSprites = [
+        makeAxisLabel(def.short[0], positions[0], def.colors[0]),
+        makeAxisLabel(def.short[1], positions[1], def.colors[1]),
+        makeAxisLabel(def.short[2], positions[2], def.colors[2]),
+      ];
+      const legendItems = document.querySelectorAll(".ts-axes-legend > div");
+      legendItems.forEach((item, i) => {
+        const dot = item.querySelector(".ts-axis-dot");
+        const em = item.querySelector("em");
+        if (dot) dot.style.background = def.colors[i];
+        if (em) em.textContent = def.labels[i];
+      });
+    }
+
+    function switchAxisSet(newSet) {
+      if (newSet === currentAxisSet || !AXIS_SETS[newSet]) return;
+      currentAxisSet = newSet;
+
+      const duration = 800;
+      const t0 = performance.now();
+      const startPositions = bgPoints.map(p => p.pos.clone());
+      const targetPositions = bgPoints.map(p => {
+        const v = LEXICON[p.word][newSet];
+        return new THREE.Vector3(v[0] * SCALE, v[1] * SCALE, v[2] * SCALE);
+      });
+
+      function animateFrame() {
+        const t = Math.min((performance.now() - t0) / duration, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        bgPoints.forEach((p, i) => {
+          const from = startPositions[i];
+          const to = targetPositions[i];
+          p.pos.set(
+            from.x + (to.x - from.x) * ease,
+            from.y + (to.y - from.y) * ease,
+            from.z + (to.z - from.z) * ease
+          );
+          if (p.mesh) p.mesh.position.copy(p.pos);
+        });
+        if (t < 1) requestAnimationFrame(animateFrame);
+      }
+      requestAnimationFrame(animateFrame);
+
+      updateAxisVisuals(newSet);
+
+      document.querySelectorAll(".ts-axis-btn").forEach(b => {
+        b.classList.toggle("active", b.dataset.axisset === newSet);
+      });
+
+      encode(input.value);
+    }
+
+    document.querySelectorAll(".ts-axis-btn").forEach(btn => {
+      btn.addEventListener("click", () => switchAxisSet(btn.dataset.axisset));
+    });
 
     // ============================================
     // CONTRÔLES ORBITAUX MANUELS (léger, pas d'import OrbitControls)
@@ -2944,10 +4084,9 @@
     // Initial
     encode(input.value);
   </script>
-
-
         </div>
       </section>
+
 
       <div class="divider"></div>
 
@@ -2956,7 +4095,7 @@
            ========================================== -->
       <section id="pipeline">
         <div class="container">
-          <span class="section-number">08 — VUE D'ENSEMBLE</span>
+          <span class="section-number">09 — VUE D'ENSEMBLE</span>
           <h2 class="section-title">
             Le pipeline complet, <em>bout à bout</em>
           </h2>
@@ -3159,7 +4298,7 @@
            ========================================== -->
       <section id="entrainement">
         <div class="container">
-          <span class="section-number">09 — ENTRAÎNEMENT</span>
+          <span class="section-number">10 — ENTRAÎNEMENT</span>
           <h2 class="section-title">
             Comment un tel modèle <em>apprend</em> ?
           </h2>
@@ -3294,7 +4433,7 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
            ========================================== -->
       <section id="controle">
         <div class="container">
-          <span class="section-number">10 — CONTRÔLE</span>
+          <span class="section-number">11 — CONTRÔLE</span>
           <h2 class="section-title">
             Le contrôle fin : <em>ControlNet, IP-Adapter, inpainting</em>
           </h2>
@@ -3371,7 +4510,7 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
            ==========================================  -->
       <section id="edition">
         <div class="container">
-          <span class="section-number">11 — ÉDITER, PAS DÉCRIRE</span>
+          <span class="section-number">12 — ÉDITER, PAS DÉCRIRE</span>
           <h2 class="section-title">
             Les modèles d'<em>édition d'images par instruction</em>
           </h2>
@@ -3744,7 +4883,7 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
            ========================================== -->
       <section id="modeles">
         <div class="container">
-          <span class="section-number">12 — PANORAMA</span>
+          <span class="section-number">13 — PANORAMA</span>
           <h2 class="section-title">
             Les grands modèles actuels, <em>comparés</em>
           </h2>
@@ -3868,7 +5007,7 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
            ==========================================  -->
       <section id="video">
         <div class="container">
-          <span class="section-number">13 — AU-DELÀ DE L'IMAGE</span>
+          <span class="section-number">14 — AU-DELÀ DE L'IMAGE</span>
           <h2 class="section-title">
             De l'image fixe à la <em>vidéo générative</em>
           </h2>
@@ -4420,7 +5559,7 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
            ==========================================  -->
       <section id="3d">
         <div class="container">
-          <span class="section-number">14 — LA TROISIÈME DIMENSION</span>
+          <span class="section-number">15 — LA TROISIÈME DIMENSION</span>
           <h2 class="section-title">
             De l'image à l'objet&nbsp;: la <em>génération 3D</em>
           </h2>
@@ -4732,7 +5871,7 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
            ==========================================  -->
       <section id="opensource">
         <div class="container">
-          <span class="section-number">15 — L'ÉCOSYSTÈME LIBRE</span>
+          <span class="section-number">16 — L'ÉCOSYSTÈME LIBRE</span>
           <h2 class="section-title">
             Le monde <em>open source</em> de la génération d'images
           </h2>
@@ -5083,7 +6222,7 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
            ==========================================  -->
       <section id="frontiere">
         <div class="container">
-          <span class="section-number">16 — DERNIÈRES AVANCÉES</span>
+          <span class="section-number">17 — DERNIÈRES AVANCÉES</span>
           <h2 class="section-title">
             La frontière actuelle&nbsp;: modèles <em>ouverts et fermés</em>
           </h2>
@@ -5366,7 +6505,7 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
            ========================================== -->
       <section id="limites">
         <div class="container">
-          <span class="section-number">17 — LIMITES &amp; ENJEUX</span>
+          <span class="section-number">18 — LIMITES &amp; ENJEUX</span>
           <h2 class="section-title">
             Ce que ces modèles font <em>mal</em>, et pourquoi
           </h2>
@@ -5489,7 +6628,7 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
            ========================================== -->
       <section id="conclusion">
         <div class="container">
-          <span class="section-number">18 — CONCLUSION</span>
+          <span class="section-number">19 — CONCLUSION</span>
           <h2 class="section-title">
             Récapitulatif en <em>huit points</em>
           </h2>
@@ -5739,6 +6878,30 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
         etaLabel.textContent = 'η fixe, 125 pas visuels';
 
         setTargetImage(0).then(() => render(currentT));
+      })();
+    </script>
+
+    <script>
+      (function () {
+        const toggle = document.getElementById("menu-toggle");
+        const menu = document.getElementById("toc-menu");
+        if (!toggle || !menu) return;
+        toggle.addEventListener("click", () => {
+          const isOpen = menu.classList.toggle("is-open");
+          toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        });
+        menu.querySelectorAll("a").forEach((link) => {
+          link.addEventListener("click", () => {
+            menu.classList.remove("is-open");
+            toggle.setAttribute("aria-expanded", "false");
+          });
+        });
+        window.addEventListener("resize", () => {
+          if (window.innerWidth > 900) {
+            menu.classList.remove("is-open");
+            toggle.setAttribute("aria-expanded", "false");
+          }
+        });
       })();
     </script>
 
