@@ -940,12 +940,14 @@
           <a href="#pipeline">Pipeline</a>
           <a href="#entrainement">Entraînement</a>
           <a href="#controle">Contrôle</a>
+          <a href="#lora">LoRA</a>
           <a href="#edition">Édition</a>
           <a href="#video">Vidéo</a>
           <a href="#3d">3D</a>
           <a href="#opensource">Open source</a>
           <a href="#frontiere">Frontière 2026</a>
           <a href="#limites">Limites</a>
+          <a href="#enjeux">Enjeux</a>
         </div>
       </div>
     </nav>
@@ -2193,13 +2195,12 @@
           <div class="formula">
             ε<sub>final</sub> = ε<sub>vide</sub> + w · (ε<sub>prompt</sub> − ε<sub>vide</sub>)
           </div>
-          <p>
-            Le paramètre <code>w</code> — appelé <em>guidance scale</em> ou CFG
+          <p> Le paramètre <code>w</code> — appelé <em>guidance scale</em> ou CFG
             — vaut typiquement entre 5 et 12. Plus il est élevé, plus le modèle
             «&nbsp;colle&nbsp;» au prompt (au risque de rendre l'image sur-saturée
             ou artificielle). Plus il est bas, plus le modèle prend de libertés
-            (avec plus de diversité mais parfois moins de fidélité).
-          </p>
+            (avec plus de diversité mais parfois moins de fidélité). </p>
+          <p><em>Note :</em> &nbsp; Le CFG ne fonctionne qu'avec les modèles de base, et non les modèles distillés, qui sont maintenant majoritaires.&nbsp;&nbsp;</p>
         </div>
       </section>
 
@@ -4692,6 +4693,230 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
         </div>
       </section>
 
+      <!-- ==========================================
+           SECTION 12bis — LES LORA
+           ========================================== -->
+      <section id="lora">
+        <div class="container">
+          <span class="section-number">12bis — LES LORA</span>
+          <h2 class="section-title">
+            LoRA&nbsp;: personnaliser un modèle géant avec <em>quelques mégaoctets</em>
+          </h2>
+          <p class="section-lede">
+            Comment apprendre à un modèle de plusieurs milliards de paramètres
+            un nouveau visage, un style graphique ou un produit précis, sans
+            jamais retoucher ses poids d'origine ni posséder un supercalculateur&nbsp;?
+            La réponse s'appelle <strong>LoRA</strong>, une technique de
+            fine-tuning devenue le pilier de toute personnalisation locale
+            des IA génératrices d'images.
+          </p>
+
+          <h3>Le problème&nbsp;: ré-entraîner un modèle est hors de portée</h3>
+          <p>
+            Un modèle comme Stable Diffusion XL ou FLUX.1 contient plusieurs
+            milliards de paramètres, répartis dans des centaines de couches de
+            son U-Net ou de son Diffusion Transformer. Ré-entraîner
+            l'intégralité de ces poids pour apprendre, par exemple, le visage
+            d'une personne précise ou le style graphique d'un illustrateur
+            demanderait&nbsp;: des dizaines de gigaoctets de VRAM, des jours de
+            calcul sur des clusters de GPU professionnels, et un risque élevé
+            d'<em>oubli catastrophique</em>&nbsp;— le modèle « désapprend » ses
+            capacités générales en se spécialisant trop sur les nouvelles
+            données. Ce chemin est réservé aux laboratoires qui entraînent les
+            modèles de base eux-mêmes.
+          </p>
+
+          <div class="callout">
+            <span class="callout-label">L'idée clé</span>
+            <p>
+              Plutôt que de modifier les poids géants du modèle, LoRA
+              <strong>gèle entièrement le modèle de base</strong> et
+              n'entraîne qu'un tout petit nombre de paramètres additionnels,
+              insérés à côté des couches existantes. Le modèle original reste
+              intact&nbsp;; on lui greffe une petite correction apprise.
+            </p>
+          </div>
+
+          <h3>Le principe mathématique&nbsp;: une décomposition de bas rang</h3>
+          <p>
+            LoRA signifie <em>Low-Rank Adaptation</em> (« adaptation de bas
+            rang »), une méthode publiée d'abord pour les grands modèles de
+            langage, puis adaptée avec succès aux modèles de diffusion. L'idée
+            repose sur une observation simple&nbsp;: la correction utile à
+            apporter à une grande matrice de poids peut souvent être approchée
+            par le produit de deux matrices beaucoup plus petites.
+          </p>
+
+          <div class="formula">
+            W&prime; = W + ΔW = W + B·A, avec B&nbsp;(d×r) et A&nbsp;(r×k), r ≪ d, k
+          </div>
+
+          <p>
+            Au lieu d'entraîner directement la matrice <code>W</code>, LoRA
+            entraîne seulement <code>A</code> et <code>B</code>. Le paramètre
+            <code>r</code>, le <strong>rang</strong>, fixe la capacité du LoRA&nbsp;:
+            plus il est élevé, plus le module peut apprendre un concept riche,
+            mais plus il devient lourd. En pratique, des rangs de 8 à 32
+            couvrent déjà beaucoup de LoRA de personnage, de style ou de
+            produit, pour un coût bien inférieur à celui d'un fine-tuning
+            complet.
+          </p>
+
+          <figure class="wide">
+            <div class="svg-wrap">
+              <svg
+                class="diagram-svg"
+                viewBox="0 0 1100 460"
+                xmlns="http://www.w3.org/2000/svg"
+                role="img"
+                aria-label="Schéma de l'insertion d'une matrice LoRA de bas rang dans une couche gelée du modèle"
+              >
+                <defs>
+                  <linearGradient id="grad-frozen" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#251f45" />
+                    <stop offset="1" stop-color="#1e1938" />
+                  </linearGradient>
+                  <linearGradient id="grad-lora" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#7b6bff" />
+                    <stop offset="1" stop-color="#c9a24a" />
+                  </linearGradient>
+                </defs>
+                <text x="550" y="30" text-anchor="middle" class="label-title" font-size="16">Une couche du modèle, gelée, augmentée d'un LoRA</text>
+                <g transform="translate(80, 80)">
+                  <rect x="0" y="0" width="220" height="220" rx="12" fill="url(#grad-frozen)" stroke="#2f2856" stroke-width="1.5" />
+                  <text x="110" y="30" text-anchor="middle" class="label-mono" font-size="13">Poids gelés</text>
+                  <text x="110" y="115" text-anchor="middle" class="label-title" font-size="28" fill="#a29fbf">W</text>
+                  <text x="110" y="140" text-anchor="middle" class="label-muted" font-size="11">d × k (verrouillé)</text>
+                  <g transform="translate(94, 175)">
+                    <rect x="0" y="8" width="32" height="22" rx="4" fill="none" stroke="#c9a24a" stroke-width="2"/>
+                    <path d="M6,8 V0 a10,10 0 0 1 20,0 V8" fill="none" stroke="#c9a24a" stroke-width="2"/>
+                  </g>
+                </g>
+                <text x="335" y="200" text-anchor="middle" class="label-title" font-size="30" fill="#c9a24a">+</text>
+                <g transform="translate(380, 110)">
+                  <rect x="0" y="0" width="90" height="160" rx="10" fill="#16122a" stroke="url(#grad-lora)" stroke-width="2" />
+                  <text x="45" y="26" text-anchor="middle" class="label-mono" font-size="13" fill="#f2d78a">B</text>
+                  <text x="45" y="90" text-anchor="middle" class="label-muted" font-size="10">d × r</text>
+                  <text x="120" y="90" text-anchor="middle" class="label-title" font-size="22" fill="#c9a24a">×</text>
+                  <rect x="150" y="55" width="90" height="50" rx="10" fill="#16122a" stroke="url(#grad-lora)" stroke-width="2" />
+                  <text x="195" y="76" text-anchor="middle" class="label-mono" font-size="13" fill="#f2d78a">A</text>
+                  <text x="195" y="94" text-anchor="middle" class="label-muted" font-size="10">r × k</text>
+                </g>
+                <text x="620" y="200" text-anchor="middle" class="label-title" font-size="30" fill="#7b6bff">=</text>
+                <g transform="translate(680, 80)">
+                  <rect x="0" y="0" width="220" height="220" rx="12" fill="#1e1938" stroke="#7b6bff" stroke-width="2" />
+                  <text x="110" y="30" text-anchor="middle" class="label-mono" font-size="13" fill="#b3a8ff">Modèle personnalisé</text>
+                  <text x="110" y="115" text-anchor="middle" class="label-title" font-size="22" fill="#ece9f5">W + B·A</text>
+                  <text x="110" y="145" text-anchor="middle" class="label-muted" font-size="11">même architecture,</text>
+                  <text x="110" y="160" text-anchor="middle" class="label-muted" font-size="11">nouveau comportement</text>
+                  <text x="110" y="185" text-anchor="middle" class="label-muted" font-size="11">fichier LoRA&nbsp;: 10-300&nbsp;Mo</text>
+                </g>
+                <text x="550" y="420" text-anchor="middle" class="label-muted" font-size="12">Seules les petites matrices A et B sont entraînées ; le modèle principal reste intact.</text>
+              </svg>
+            </div>
+            <figcaption>
+              <strong>Fig.</strong> Un LoRA ajoute une correction compacte à une couche existante, au lieu de réécrire le modèle complet.
+            </figcaption>
+          </figure>
+
+          <h3>Pourquoi faire des LoRA&nbsp;?</h3>
+          <div class="grid-3">
+            <div class="card"><div class="card-icon">1</div><h4>Légèreté</h4><p>Un LoRA pèse souvent quelques dizaines de mégaoctets seulement. Il se partage, s'archive et se combine très facilement.</p></div>
+            <div class="card"><div class="card-icon">2</div><h4>Coût réduit</h4><p>Il demande bien moins de VRAM et de temps d'entraînement qu'un fine-tuning intégral, ce qui rend la personnalisation locale réaliste.</p></div>
+            <div class="card"><div class="card-icon">3</div><h4>Réversibilité</h4><p>Le modèle de base n'est jamais altéré&nbsp;: désactiver le LoRA suffit à revenir au comportement d'origine.</p></div>
+            <div class="card"><div class="card-icon">4</div><h4>Spécialisation</h4><p>On peut apprendre un visage, un style, un produit, une matière, une pose ou un concept visuel récurrent avec peu d'images bien choisies.</p></div>
+            <div class="card"><div class="card-icon">5</div><h4>Composabilité</h4><p>Plusieurs LoRA peuvent être empilés dans la même génération avec des poids différents pour mélanger style, identité et effets visuels.</p></div>
+            <div class="card"><div class="card-icon">6</div><h4>Écosystème</h4><p>Les interfaces comme ComfyUI, AUTOMATIC1111 ou Forge savent charger des LoRA nativement, ce qui en a fait un standard de fait.</p></div>
+          </div>
+
+          <h3>Cas d'usage typiques</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Type de LoRA</th><th>But principal</th><th>Données typiques</th><th>Rang fréquent</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Personnage</td><td>Maintenir une identité reconnaissable dans des scènes variées</td><td>10 à 20 photos diverses</td><td>16-32</td></tr>
+                <tr><td>Style</td><td>Capturer une signature graphique ou picturale</td><td>15 à 30 images cohérentes</td><td>16-64</td></tr>
+                <tr><td>Produit</td><td>Rendre un objet spécifique dans des visuels marketing</td><td>15 à 25 photos multi-angles</td><td>16-32</td></tr>
+                <tr><td>Concept</td><td>Apprendre une pose, une tenue, une composition ou un effet visuel</td><td>20 à 40 images illustratives</td><td>8-32</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Outils locaux disponibles</h3>
+          <p>
+            L'entraînement local de LoRA se fait aujourd'hui avec plusieurs
+            familles d'outils. Certains privilégient le contrôle total par
+            scripts, d'autres misent sur une interface graphique plus simple.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Outil</th><th>Approche</th><th>Atout principal</th><th>Profil type</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>kohya-ss / sd-scripts</td><td>Scripts Python</td><td>Référence historique, réglages très fins</td><td>Utilisateurs avancés</td></tr>
+                <tr><td>bmaltais/kohya_ss</td><td>Interface Gradio</td><td>Version plus accessible de l'écosystème kohya</td><td>Débutants à intermédiaires</td></tr>
+                <tr><td>FluxGym</td><td>UI légère</td><td>Orientation FLUX et simplicité</td><td>Cartes 12-20 Go</td></tr>
+                <tr><td>ComfyUI-FluxTrainer</td><td>Nœuds ComfyUI</td><td>Intégration directe au workflow visuel</td><td>Utilisateurs ComfyUI</td></tr>
+                <tr><td><strong>Ostris AI-Toolkit</strong></td><td>CLI + UI web</td><td>Support multi-modèles et maintenance rapide</td><td>Intermédiaires à experts</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Focus sur Ostris AI-Toolkit</h3>
+          <p>
+            <strong>AI-Toolkit</strong> est l'un des environnements les plus
+            complets pour entraîner des LoRA localement sur des modèles récents.
+            Son intérêt majeur est de ne pas se limiter à un seul socle&nbsp;:
+            il suit les familles FLUX, SDXL, SD3 et d'autres architectures au
+            fur et à mesure de leur arrivée dans l'écosystème open source.
+          </p>
+          <div class="grid-2">
+            <div class="card"><h4>Deux modes d'usage</h4><p>On peut travailler en ligne de commande via des fichiers de configuration reproductibles, ou via une interface web locale qui facilite le lancement, le suivi et l'arrêt des jobs.</p></div>
+            <div class="card"><h4>Approche structurée</h4><p>Le projet s'appuie sur des exemples de configuration, la reprise d'entraînement, une gestion claire des datasets image + légende et un suivi plus moderne que beaucoup d'outils historiques.</p></div>
+          </div>
+
+
+          
+
+          <h4>Préparer le dataset</h4>
+          <p>
+            Le principe reste simple&nbsp;: un dossier d'images, et pour chaque
+            image un fichier texte de même nom contenant une légende. Cette
+            séparation image / caption permet de contrôler exactement ce que le
+            LoRA doit apprendre, et avec quel mot déclencheur il sera invoqué.
+          </p>
+          <pre><code>mon_dataset/
+├── photo01.jpg
+├── photo01.txt   → "[trigger] portrait, lumière douce"
+├── photo02.jpg
+├── photo02.txt   → "[trigger] extérieur, de profil"
+└── ...</code></pre>
+
+          <h4>Quand choisir AI-Toolkit</h4>
+          <ul>
+            <li><strong>Si vous suivez les modèles récents</strong>, surtout dans l'univers FLUX et ses dérivés.</li>
+            <li><strong>Si vous voulez une UI locale</strong> sans renoncer aux fichiers de config et à la reproductibilité.</li>
+            <li><strong>Si vous avez besoin de souplesse</strong> pour adapter le training à différents modèles et contraintes mémoire.</li>
+            <li><strong>Si vous travaillez à cheval entre local et cloud</strong>, car l'outil s'intègre bien à des usages hybrides.</li>
+          </ul>
+
+          <h3>Intérêt pratique des LoRA</h3>
+          <p>
+            Le vrai pouvoir des LoRA n'est pas seulement technique&nbsp;: il est
+            organisationnel. Ils transforment un grand modèle générique en une
+            bibliothèque modulaire de spécialisations, que l'on peut charger,
+            combiner, tester et désactiver à volonté selon le besoin créatif,
+            éditorial ou commercial du moment.
+          </p>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+
             <!-- ==========================================
            SECTION 11 — L'ÉDITION D'IMAGES PAR INSTRUCTION
            ==========================================  -->
@@ -4772,14 +4997,12 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
             <span class="callout-label">Repère</span>
             <p>
               On avait déjà croisé une forme d'édition en
-              section&nbsp;10&nbsp;: l'inpainting et ControlNet permettent
-              aussi de modifier une image existante. La différence est que ces
-              techniques exigent un <em>masque</em> ou une <em>carte de
-              conditionnement</em> explicite pour indiquer où agir. Les
+              section&nbsp;10&nbsp;: l'inpainting permet
+              aussi de modifier une image existante. La différence est que cette
+              technique exigent un <em>masque</em> &nbsp; explicite pour indiquer où agir. Les
               modèles d'édition par instruction, eux, comprennent directement
               une phrase en langage naturel et localisent seuls la zone
-              concernée&nbsp;: plus besoin de dessiner un masque à la main.
-            </p>
+              concernée&nbsp;: plus besoin de dessiner un masque à la main.</p>
           </div>
 
           <h3>Comment ces modèles fonctionnent</h3>
@@ -6692,30 +6915,22 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
            ========================================== -->
       <section id="limites">
         <div class="container">
-          <span class="section-number">19 — LIMITES &amp; ENJEUX</span>
+          <span class="section-number">19 — LIMITES</span>
           <h2 class="section-title">
             Ce que ces modèles font <em>mal</em>, et pourquoi
           </h2>
-          <p class="section-lede">
-            Comprendre les limitations éclaire souvent le fonctionnement mieux
-            que les succès. Voici les défauts structurels des modèles actuels et
-            leurs causes profondes.
+           </p>
+
+
+
+
+<div class="grid-2">
+        <div class="card">
+          <h4>Le cas emblématique des mains</h4>
+          <p>
+            Les mains restent l'exemple le plus cité des limites visuelles de l'IA générative. Cause : elles sont très articulées, souvent partiellement visibles, et statistiquement moins « stables » que les visages dans les données d'entraînement. Les modèles apprennent la texture d'une main mais pas sa contrainte anatomique rigide (toujours 5 doigts, jamais fusionnés). Ce défaut s'est considérablement amélioré depuis SDXL et Flux, mais reste visible dès qu'on s'attarde sur le détail.
           </p>
-
-          <h3>Défauts techniques</h3>
-
-          <div class="grid-2">
-            <div class="card">
-              <h4>Mains, doigts, dents</h4>
-              <p>
-                Célèbre trope des mains à six doigts. Cause&nbsp;: les mains
-                sont très articulées, souvent partiellement visibles, et
-                statistiquement moins «&nbsp;stables&nbsp;» que les visages
-                dans les données d'entraînement. Les modèles apprennent la
-                texture d'une main mais pas sa contrainte anatomique (5 doigts).
-                Considérablement amélioré depuis SDXL/Flux.
-              </p>
-            </div>
+          </div>
             <div class="card">
               <h4>Texte dans l'image</h4>
               <p>
@@ -6765,48 +6980,408 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
             </div>
           </div>
 
-          <h3>Enjeux éthiques et sociétaux</h3>
 
+
+          <h3>Deux limites plus profondes, au-delà des artefacts visuels</h3>
           <p>
-            Au-delà du technique, ces modèles soulèvent des questions
-            fondamentales que la technique seule ne résoudra pas&nbsp;:
+            Les défauts ci-dessus sont des symptômes visibles. Deux
+            limitations plus fondamentales, elles, ne se voient pas
+            directement dans une image ratée&nbsp;— elles concernent la
+            nature même de ce que ces modèles font, et de ce qu'ils ne
+            font pas.
           </p>
 
-          <ul>
-            <li>
-              <strong>Droit d'auteur des données d'entraînement.</strong> Les
-              images du web ont été aspirées sans consentement des artistes.
-              Plusieurs procès (notamment Getty Images c. Stability AI) sont en
-              cours. La régulation européenne (AI Act) et américaine évolue.
-            </li>
-            <li>
-              <strong>Deepfakes et désinformation.</strong> Générer un visage
-              réel dans un contexte trompeur est trivial. Watermarking (SynthID
-              de Google, C2PA) et détection sont des sujets actifs mais
-              contournables.
-            </li>
-            <li>
-              <strong>Biais.</strong> Un modèle entraîné sur LAION reflète les
-              biais du web&nbsp;: sur-représentation occidentale, stéréotypes
-              de genre dans les métiers («&nbsp;infirmière&nbsp;» → femme,
-              «&nbsp;PDG&nbsp;» → homme blanc). Des efforts existent (safety
-              tuning, filtrage) mais restent imparfaits.
-            </li>
-            <li>
-              <strong>Impact sur les métiers créatifs.</strong> Illustration
-              commerciale, stock photo, concept art&nbsp;: la profession est en
-              recomposition rapide. Les outils deviennent des accélérateurs pour
-              certains, des menaces pour d'autres.
-            </li>
-            <li>
-              <strong>Consommation énergétique.</strong> Chaque génération coûte
-              de l'ordre de 3 Wh (soit 0,05 s de four électrique). Multiplié par
-              des milliards de générations mondiales, l'impact carbone devient
-              non négligeable.
-            </li>
-          </ul>
+          <div class="grid-2">
+            <div class="card">
+              <h4>Aucune compréhension « réelle » de l'image</h4>
+              <p>
+                Un modèle de diffusion ne « sait » pas ce qu'est un chat, une
+                main ou une ombre au sens où un humain le comprend. Il n'a
+                jamais touché de fourrure, jamais ressenti la gravité,
+                jamais vu le monde en trois dimensions&nbsp;: il a seulement
+                observé des corrélations statistiques entre des pixels et des
+                mots, répétées des milliards de fois. Ce qui ressemble à de
+                la « compréhension » est en réalité une <strong>approximation
+                statistique</strong> extrêmement fine de ce que devrait
+                contenir une image plausible, étant donné un texte.
+              </p>
+            </div>
+            <div class="card">
+              <h4>Pourquoi ça compte concrètement</h4>
+              <p>
+                Cette absence de compréhension explique directement plusieurs
+                limites déjà vues&nbsp;: le modèle ne compte pas vraiment les
+                objets, ne raisonne pas sur la physique d'une articulation, et
+                ne vérifie jamais la cohérence logique de ce qu'il produit. Il
+                génère ce qui est <em>statistiquement probable</em>, pas ce
+                qui est <em>logiquement correct</em>&nbsp;— deux choses qui se
+                recoupent souvent, mais pas toujours.
+              </p>
+            </div>
+          </div>
+
+          <div class="callout callout-warn">
+            <span class="callout-label">Une image de synthèse, pas une pensée</span>
+            <p>
+              Demander à un modèle « pourquoi cette main a-t-elle six
+              doigts&nbsp;? » n'a pas de sens à proprement parler&nbsp;: il n'y
+              a pas eu de raisonnement en amont sur l'anatomie, seulement un
+              débruitage guidé par des probabilités apprises. Le modèle ne
+              peut ni s'auto-corriger par introspection, ni expliquer ses
+              propres erreurs&nbsp;— il n'a tout simplement pas de
+              représentation explicite des règles qu'il enfreint.
+            </p>
+          </div>
+
+          <h3>Pas de créativité au sens propre&nbsp;: organiser plutôt qu'inventer</h3>
+          <p>
+            Un modèle génératif ne part jamais de rien. Même son point de
+            départ « bruit pur » n'est qu'une graine statistique qui sera
+            sculptée selon des motifs déjà observés dans son entraînement.
+            Concrètement, une IA d'image <strong>recombine et réorganise</strong>
+            des motifs visuels existants&nbsp;— compositions, styles,
+            textures, poses&nbsp;— plutôt que d'inventer une forme, une
+            technique ou une intention radicalement nouvelle, comme peut le
+            faire un mouvement artistique humain.
+          </p>
+
+          <div class="grid-3">
+            <div class="card">
+              <div class="card-icon">◆</div>
+              <h4>Recombinaison, pas invention</h4>
+              <p>
+                Un prompt inédit produit une image inédite au niveau des
+                pixels, mais rarement au niveau des idées&nbsp;: le modèle
+                mélange des éléments déjà vus dans des proportions nouvelles,
+                sans intention artistique propre.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">◆</div>
+              <h4>Aucun vécu, aucune intention</h4>
+              <p>
+                Un artiste crée en réaction à une émotion, une époque, une
+                expérience vécue. Le modèle, lui, ne « vit » rien&nbsp;: il
+                optimise une fonction de vraisemblance statistique, sans
+                intention ni message à transmettre.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">◆</div>
+              <h4>Un avantage paradoxal</h4>
+              <p>
+                Cette limite reste, pour l'instant, un rempart&nbsp;: la
+                créativité au sens fort — rupture, invention de nouveaux
+                langages visuels — demeure une prérogative humaine que ces
+                outils ne remplacent pas, seulement démultiplient.
+              </p>
+            </div>
+          </div>
+
+          <div class="callout">
+            <span class="callout-label">Question ouverte</span>
+            <p>
+              Cette frontière entre « recombiner » et « créer » est-elle
+              stable dans le temps, ou seulement provisoire&nbsp;? Les
+              modèles progressent vite sur la cohérence, le raisonnement
+              visuel et la composition&nbsp;— rien ne garantit qu'une
+              distinction aussi nette entre statistique et créativité restera
+              valable indéfiniment. Pour l'instant, la vraie rupture
+              artistique reste l'apanage de l'humain&nbsp;; la question de
+              <strong>pour combien de temps</strong> encore reste, elle,
+              largement ouverte.
+            </p>
+          </div>
+
         </div>
       </section>
+
+      <div class="divider"></div>
+
+      <!-- ==========================================
+           SECTION 20 — ENJEUX ÉTHIQUES & SOCIÉTAUX
+           ========================================== -->
+      <section id="enjeux">
+        <div class="container">
+          <span class="section-number">20 — ENJEUX ÉTHIQUES &amp; SOCIÉTAUX</span>
+          <h2 class="section-title">
+            Ce que ces modèles <em>bousculent</em>, au-delà de la technique
+          </h2>
+          <p class="section-lede">
+            Droit d'auteur, régulation, désinformation, biais, emploi,
+            environnement&nbsp;: la génération d'image par IA ne pose pas
+            seulement des problèmes de rendu, elle percute de plein fouet des
+            équilibres juridiques, économiques et sociaux déjà fragiles.
+          
+            </figcaption>
+          </figure>
+
+          <!-- Bloc 1 : Droit d'auteur -->
+          <h3>Droit d'auteur et données d'entraînement</h3>
+          <div class="grid-2">
+            <div class="card">
+              <h4>L'affaire Getty c. Stability AI</h4>
+              <p>
+                Jugée par la High Court britannique en novembre 2025, cette
+                affaire fait référence. La juge a reconnu une contrefaçon de
+                <strong>marque</strong> dans des cas isolés liés à des
+                filigranes iStock reconnaissables, mais a rejeté la
+                contrefaçon de <strong>droit d'auteur direct</strong>.
+              </p>
+            </div>
+            <div class="card">
+              <h4>Une bataille loin d'être close</h4>
+              <p>
+                La Cour estime que les poids du modèle n'enregistrent ni ne
+                reproduisent les œuvres, mais résultent d'un apprentissage
+                statistique. Getty conteste cette lecture et a demandé
+                l'autorisation de faire appel début 2026.
+              </p>
+            </div>
+          </div>
+          <div class="callout">
+            <span class="callout-label">Tension de fond</span>
+            <p>
+              Les modèles ont été entraînés sur des milliards d'images
+              aspirées du web sans consentement explicite des artistes. Le
+              flou juridique persiste sur ce qui constitue un usage loyal
+              (<em>fair use</em>) à l'échelle mondiale.
+            </p>
+          </div>
+
+          <!-- Bloc 2 : Régulation -->
+          <h3>Cadre réglementaire européen</h3>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-year">2025</div>
+              <h4>Entrée en vigueur graduelle</h4>
+              <p>
+                L'<strong>AI Act</strong> européen commence à s'appliquer par
+                paliers, laissant aux entreprises le temps de se mettre en
+                conformité selon le niveau de risque de leurs systèmes.
+              </p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-year">Août 2026</div>
+              <h4>Phase la plus contraignante</h4>
+              <p>
+                Le règlement s'applique pleinement aux systèmes d'IA à
+                <strong>haut risque</strong>&nbsp;: marquage CE, gestion
+                documentée des risques, contrôle humain avant mise en service.
+                Sanctions possibles jusqu'à <strong>35&nbsp;M€</strong> ou un
+                pourcentage du chiffre d'affaires mondial.
+              </p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-year">2027</div>
+              <h4>Questions encore ouvertes</h4>
+              <p>
+                Le calendrier graduel (2025-2027) reflète une volonté
+                d'encadrer sans étouffer l'innovation, mais la transparence
+                des données d'entraînement pour les modèles à usage général
+                reste largement à préciser.
+              </p>
+            </div>
+          </div>
+
+          <!-- Bloc 3 : Désinformation -->
+          <h3>Deepfakes et désinformation</h3>
+          <div class="callout callout-warn">
+            <span class="callout-label">Un déséquilibre préoccupant</span>
+            <p>
+              Générer un visage réel dans un contexte trompeur est devenu
+              trivial techniquement. Des dispositifs de traçabilité comme
+              <strong>SynthID</strong> (Google) ou le standard
+              <strong>C2PA</strong> tentent d'apposer un filigrane numérique
+              invisible, mais restent contournables par recompression, capture
+              d'écran ou retouche mineure. Le déséquilibre entre facilité de
+              génération et difficulté de détection fiable reste l'un des
+              risques sociétaux les plus urgents, notamment en contexte
+              électoral.
+            </p>
+          </div>
+
+          <!-- Bloc 4 : Biais -->
+          <h3>Biais algorithmiques et représentation</h3>
+          <p>
+            Les modèles entraînés sur des corpus comme LAION reproduisent
+            fidèlement les biais statistiques du web dont ils sont issus.
+          </p>
+          <div class="grid-3">
+            <div class="card">
+              <div class="card-icon">⚑</div>
+              <h4>Sur-représentation occidentale</h4>
+              <p>Contextes, visages et esthétiques occidentaux dominent largement les jeux de données d'entraînement.</p>
+            </div>
+            <div class="card">
+              <div class="card-icon">⚑</div>
+              <h4>Stéréotypes de genre</h4>
+              <p>Une infirmière est presque systématiquement générée comme féminine, un PDG comme un homme blanc.</p>
+            </div>
+            <div class="card">
+              <div class="card-icon">⚑</div>
+              <h4>Corrections partielles</h4>
+              <p>Filtrage, <em>safety tuning</em> et rééquilibrage atténuent le problème sans l'éliminer, car ils interviennent en aval.</p>
+            </div>
+          </div>
+          <div class="callout">
+            <p>
+              Ce biais n'est pas un simple défaut technique&nbsp;: il a un
+              pouvoir <strong>performatif</strong>, en normalisant et en
+              diffusant à très grande échelle des représentations sociales
+              datées.
+            </p>
+          </div>
+
+          <!-- Bloc 5 : Métiers créatifs -->
+          <h3>Impact sur les métiers créatifs</h3>
+          <div class="grid-2">
+            <div class="card">
+              <h4>Des pertes économiques projetées</h4>
+              <p>
+                Un rapport de l'UNESCO (février 2026) estime que l'IA
+                générative pourrait entraîner, d'ici 2028, des pertes de
+                revenus mondiales de <strong>24&nbsp;%</strong> pour la
+                musique et <strong>21&nbsp;%</strong> pour l'audiovisuel, soit
+                près de <strong>8,5&nbsp;Md€</strong> cumulés par an.
+              </p>
+            </div>
+            <div class="card">
+              <h4>Une profession en recomposition</h4>
+              <p>
+                Une enquête auprès de 6&nbsp;500 créateurs dans 140 pays
+                montre que <strong>87&nbsp;%</strong> des professionnels
+                utilisent déjà l'IA chaque semaine&nbsp;: la valeur se déplace
+                de l'exécution technique vers la vision stratégique et la
+                direction artistique.
+              </p>
+            </div>
+          </div>
+
+          <!-- Bloc 6 : Environnement -->
+          <h3>Consommation énergétique et empreinte carbone</h3>
+          <div class="callout">
+            <span class="callout-label">Un coût individuellement faible, collectivement massif</span>
+            <p>
+              Chaque génération d'image consomme de l'ordre de
+              <strong>3&nbsp;Wh</strong>, l'équivalent d'environ 5 centièmes de
+              seconde de fonctionnement d'un four électrique. Multiplié par
+              les milliards de générations quotidiennes à l'échelle mondiale,
+              l'impact carbone cumulé — entraînement des modèles compris,
+              phase bien plus coûteuse encore que l'inférence — devient un
+              sujet de préoccupation environnementale à part entière, largement
+              sous-documenté par les fournisseurs de modèles.
+            </p>
+          </div>
+
+          <!-- Bloc 7 : Model collapse -->
+          <h3>Contamination des données et effondrement du modèle</h3>
+          <p>
+            Le web se remplit désormais massivement de contenus eux-mêmes
+            générés par IA, si bien que les modèles de nouvelle génération
+            risquent d'apprendre de plus en plus à partir de données
+            synthétiques plutôt que de données réelles.
+          </p>
+          <div class="callout callout-warn">
+            <span class="callout-label">Model collapse</span>
+            <p>
+              Chaque génération de modèle entraînée sur un web progressivement
+              pollué par ses propres productions tend à amplifier les
+              artefacts, les biais et les approximations déjà présents, tout
+              en s'éloignant graduellement de la diversité des données
+              originelles&nbsp;— un cercle vicieux qui s'auto-alimente sans
+              intervention corrective. Le rapport de l'UNESCO souligne
+              explicitement ce risque de dégradation cumulative.
+            </p>
+          </div>
+
+          <!-- Bloc 8 : Confidentialité -->
+          <h3>Confidentialité et réutilisation des données utilisateurs</h3>
+          <div class="grid-2">
+            <div class="card">
+              <h4>Une réutilisation peu visible</h4>
+              <p>
+                Prompts saisis, images générées et parfois images uploadées
+                pour des tâches d'édition sont fréquemment réutilisés pour
+                continuer d'entraîner les modèles&nbsp;— une pratique le plus
+                souvent mentionnée dans des conditions d'utilisation peu lues.
+              </p>
+            </div>
+            <div class="card">
+              <h4>Une asymétrie entre utilisateurs</h4>
+              <p>
+                Les options de retrait (<em>opt-out</em>) existent chez
+                certains fournisseurs, mais restent peu visibles, désactivées
+                par défaut, ou réservées aux offres payantes&nbsp;— au
+                détriment du grand public.
+              </p>
+            </div>
+          </div>
+
+          <!-- Bloc 9 : Gouvernance -->
+          <h3>Gouvernance et pistes de réponse</h3>
+          <p>
+            Face à ces tensions, les recommandations qui émergent convergent
+            vers plusieurs axes&nbsp;: cadres de gouvernance clairs pour la
+            culture numérique, protection effective des droits de propriété
+            intellectuelle des créateurs, transparence renforcée sur les
+            données d'entraînement, et soutien à l'innovation responsable
+            plutôt qu'à une course non régulée. Le durcissement progressif de
+            l'AI Act européen, conjugué aux suites judiciaires attendues de
+            l'affaire Getty (appel en cours d'instruction en 2026), dessine un
+            cadre encore mouvant mais de plus en plus structurant pour
+            l'ensemble de l'industrie.
+          </p>
+
+          <!-- Tableau récapitulatif -->
+          <h3>Panorama synthétique</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Enjeu</th>
+                  <th>Nature du risque</th>
+                  <th>État en 2026</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Droit d'auteur</td>
+                  <td>Entraînement sans consentement des artistes</td>
+                  <td>Getty c. Stability AI&nbsp;: contrefaçon de marque reconnue, pas de droit d'auteur direct</td>
+                </tr>
+                <tr>
+                  <td>Régulation</td>
+                  <td>Absence de cadre contraignant</td>
+                  <td>AI Act pleinement applicable aux systèmes à haut risque depuis août 2026, amendes jusqu'à 35&nbsp;M€</td>
+                </tr>
+                <tr>
+                  <td>Désinformation</td>
+                  <td>Deepfakes indétectables</td>
+                  <td>Watermarking (SynthID, C2PA) actif mais contournable</td>
+                </tr>
+                <tr>
+                  <td>Biais</td>
+                  <td>Stéréotypes reproduits à grande échelle</td>
+                  <td>Safety tuning et filtrage, imparfaits</td>
+                </tr>
+                <tr>
+                  <td>Économie créative</td>
+                  <td>Perte de revenus, saturation par contenu synthétique</td>
+                  <td>-24&nbsp;% musique, -21&nbsp;% audiovisuel projetés d'ici 2028</td>
+                </tr>
+                <tr>
+                  <td>Environnement</td>
+                  <td>Coût énergétique cumulé</td>
+                  <td>Environ 3&nbsp;Wh par génération, effet d'échelle massif à l'usage mondial</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
 
       <div class="divider"></div>
 
@@ -6815,7 +7390,7 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
            ========================================== -->
       <section id="conclusion">
         <div class="container">
-          <span class="section-number">20 — CONCLUSION</span>
+          <span class="section-number">21 — CONCLUSION</span>
           <h2 class="section-title">
             Récapitulatif en <em>huit points</em>
           </h2>
@@ -6889,8 +7464,7 @@ texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
       <footer>
         <p><strong>Diffusion &amp; Pixels</strong> — Une présentation didactique.</p>
         <p style="color: var(--color-text-faint); font-size: var(--text-xs); margin-top: var(--space-4)">
-          Illustrations générées par IA · Schémas SVG originaux · Composé en juillet 2026.
-        </p>
+        Auteur : Lionel Vicidomini · Illustrations générées par IA · Schémas SVG originaux · Composé en juillet 2026. </p>
       </footer>
     </main>
 
