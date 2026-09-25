@@ -8,13 +8,15 @@
             La frontière actuelle&nbsp;: modèles <em>ouverts et fermés</em>
           </h2>
           <p class="section-lede">
-            Le rythme des sorties s'est encore accéléré en 2026. Cinq modèles
+            Le rythme des sorties s'est encore accéléré en 2026. Neuf modèles
             illustrent bien les deux tendances qui traversent tout ce document
-            — l'ouverture croissante côté recherche (Z-Image Turbo, Krea&nbsp;2)
-            et la course à l'intelligence multimodale côté grands laboratoires
-            fermés (Ideogram&nbsp;4, Nano Banana&nbsp;2, Seedream). Tous
-            reposent sur les briques déjà vues&nbsp;: diffusion, DiT,
-            encodeurs de texte puissants — mais chacun pousse un curseur
+            — l'ouverture croissante côté recherche (Z-Image Turbo, Krea&nbsp;2,
+            FLUX.2, Qwen-Image&nbsp;2.1, MiniMax&nbsp;H3) et la course à
+            l'intelligence multimodale côté grands laboratoires fermés
+            (Ideogram&nbsp;4, Nano Banana&nbsp;2, Seedream, GPT Image&nbsp;2.5).
+            Presque tous reposent sur les briques déjà vues&nbsp;: diffusion,
+            DiT, encodeurs de texte puissants — OpenAI ne détaille pas
+            l'architecture du sien — mais chacun pousse un curseur
             différent.
           </p>
 
@@ -28,7 +30,8 @@
             classé 8ᵉ toutes catégories sur le classement Artificial Analysis
             dès sa sortie, en faisant le modèle ouvert le mieux classé de sa
             génération. Il illustre l'aboutissement des techniques de
-            distillation évoquées en section&nbsp;09&nbsp;: on entraîne un
+            <em>distillation</em>, qui raccourcissent la boucle
+            d'échantillonnage décrite en section&nbsp;10&nbsp;: on entraîne un
             modèle «&nbsp;élève&nbsp;» à reproduire en très peu d'étapes ce
             qu'un modèle «&nbsp;professeur&nbsp;» plus lent obtient en
             50&nbsp;étapes classiques.
@@ -52,11 +55,11 @@
             exactement le schéma base/distillé déjà vu pour Z-Image.
           </p>
 
-                    <h3>FLUX.2&nbsp;: la nouvelle génération de Black Forest Labs</h3>
+          <h3>FLUX.2&nbsp;: la nouvelle génération de Black Forest Labs</h3>
           <p>
             Aux côtés des modèles ci-dessus, <strong>FLUX.2</strong> constitue
             la mise à jour la plus récente de Black Forest Labs, déjà
-            présentée en détail en section&nbsp;11 sous l'angle de l'édition
+            présentée en détail en section&nbsp;13 sous l'angle de l'édition
             par instruction. Contrairement aux autres modèles de ce panorama,
             FLUX.2 n'est pas un modèle unique mais une <strong>famille</strong>
             déclinée en plusieurs tailles pour couvrir des besoins très
@@ -71,14 +74,14 @@
             restriction. Fait notable partagé avec Ideogram&nbsp;4&nbsp;: tous
             les modèles de la famille FLUX.2 unifient nativement
             texte-vers-image et édition d'image dans une seule architecture,
-            comme détaillé en section&nbsp;11.
+            comme détaillé en section&nbsp;13.
           </p>
 
           <h3>Ideogram&nbsp;4&nbsp;: la précision typographique, désormais ouverte</h3>
           <p>
             <strong>Ideogram&nbsp;4</strong> poursuit la spécialité historique
             de son éditeur&nbsp;: le rendu fiable de <strong>texte dans
-            l'image</strong>, ce défaut structurel décrit en section&nbsp;13
+            l'image</strong>, ce défaut structurel décrit en section&nbsp;19
             («&nbsp;texte illisible&nbsp;»). Le modèle supporte des rapports
             d'aspect flexibles (toute résolution multiple de 16, de 256 à
             2048&nbsp;px par côté), ce qui en fait un choix privilégié pour les
@@ -90,7 +93,7 @@
             de paramètres, dont les poids sont librement téléchargeables et
             réentraînables, unifiant lui aussi texte-vers-image et édition
             d'image dans une seule architecture — rejoignant ainsi la
-            dynamique d'ouverture décrite en section&nbsp;14.
+            dynamique d'ouverture décrite en section&nbsp;17.
           </p>
 
           <h3>Nano Banana&nbsp;2&nbsp;: l'image raisonnée par un LLM</h3>
@@ -115,7 +118,7 @@
             seule architecture les tâches de <em>génération</em> et
             d'<em>édition</em> d'image, habituellement traitées par des
             pipelines séparés (voir l'inpainting/ControlNet en
-            section&nbsp;10). Le modèle atteint une résolution native de 4K
+            section&nbsp;12). Le modèle atteint une résolution native de 4K
             avec une vitesse d'inférence nettement supérieure à sa génération
             précédente, et se distingue par sa gestion de tâches complexes
             combinant plusieurs images de référence, raisonnement visuel et
@@ -123,8 +126,70 @@
             «&nbsp;créer&nbsp;» et «&nbsp;modifier&nbsp;» une image.
           </p>
 
+          <h3>Qwen-Image&nbsp;2.1&nbsp;: la transparence native, en format compact</h3>
+          <p>
+            Publié le 20&nbsp;septembre 2026 par l'équipe Qwen d'Alibaba,
+            <strong>Qwen-Image&nbsp;2.1</strong> montre qu'un modèle compact
+            peut rivaliser avec de bien plus gros&nbsp;: son générateur ne
+            compte que <strong>7&nbsp;milliards de paramètres</strong>
+            (32&nbsp;couches DiT «&nbsp;single-stream&nbsp;»), guidés par un
+            encodeur de texte Qwen3-VL de 8&nbsp;milliards de paramètres. Sa
+            nouveauté la plus visible est la <strong>transparence
+            native</strong>&nbsp;: son autoencodeur (le VAE de la
+            section&nbsp;08) encode directement la couche alpha, si bien que le
+            modèle produit des images RGBA à fond transparent — logos,
+            autocollants, éléments d'interface — sans détourage après coup. Il
+            génère nativement en 2K (de 2048&nbsp;×&nbsp;2048 à
+            1536&nbsp;×&nbsp;2752&nbsp;px) et accepte jusqu'à <strong>10 images
+            de référence</strong> en édition, par exemple pour réunir plusieurs
+            portraits en une seule photo de groupe (voir l'édition par
+            instruction, section&nbsp;13). Alibaba le présente comme le
+            meilleur modèle à poids ouverts de son propre classement&nbsp;;
+            nuance importante toutefois&nbsp;: ces poids sont publiés sous une
+            licence de <em>recherche</em>, et un usage commercial exige un
+            accord séparé.
+          </p>
+
+          <h3>MiniMax&nbsp;H3&nbsp;: la vidéo et le son dans un même modèle</h3>
+          <p>
+            Présenté par MiniMax le 31&nbsp;juillet 2026,
+            <strong>MiniMax&nbsp;H3</strong> sort du cadre de l'image
+            fixe&nbsp;: c'est un modèle «&nbsp;omni-modal&nbsp;» qui comprend
+            dans un même contexte du texte, des images, des vidéos et du son,
+            et qui génère de la <strong>vidéo avec un son stéréo
+            natif</strong>, jusqu'à 15&nbsp;secondes en 2K. On peut lui fournir
+            en une seule requête plusieurs images, extraits vidéo et clips
+            audio de référence — un visage, un mouvement, une voix — que le
+            modèle maintient d'un plan à l'autre. Sous le capot, on retrouve
+            les briques de ce document poussées à l'échelle&nbsp;: un VAE
+            dédié qui compresse ces contenus en tokens, et un Transformer dense
+            «&nbsp;single-stream&nbsp;» de 33&nbsp;milliards de paramètres qui
+            les reçoit dans un même contexte. Ses poids sont publiés sous une
+            licence communautaire propre à MiniMax. Il prolonge directement la
+            génération vidéo décrite en section&nbsp;15.
+          </p>
+
+          <h3>GPT Image&nbsp;2.5 Flare&nbsp;: la vitesse chez OpenAI</h3>
+          <p>
+            Le 8&nbsp;septembre 2026, OpenAI a mis à jour le générateur
+            d'images de ChatGPT avec la série <strong>GPT Image&nbsp;2.5</strong>,
+            déclinée en deux modèles&nbsp;: <strong>Sunburst</strong>, plus lent
+            et plus détaillé, et <strong>Flare</strong>, que l'éditeur présente
+            comme son modèle le plus rapide pour la génération d'images
+            «&nbsp;du quotidien&nbsp;» de haute qualité. Flare accepte du texte
+            et des images en entrée, et gère aussi bien la création que la
+            retouche, y compris l'inpainting vu en section&nbsp;12. Un réglage
+            de qualité, de <em>low</em> à <em>max</em>, arbitre entre vitesse et
+            finesse — un compromis qui rappelle le choix du nombre d'étapes en
+            diffusion, même si OpenAI ne publie pas l'architecture de ses
+            modèles. On retrouve la stratégie de gamme de FLUX.2&nbsp;[klein] ou
+            de Krea&nbsp;2 Turbo&nbsp;: un modèle léger pour le volume, un
+            modèle lourd pour l'exigence — mais ici sans poids publiés,
+            uniquement via ChatGPT et l'API.
+          </p>
+
           <figure class="wide">
-            <img src="{{inline:assets/frontiere.jpg}}" alt="Grille comparative de six images illustrant le style distinctif de Z-Image Turbo, Krea 2, FLUX.2, Ideogram 4, Nano Banana 2 et Seedream 4.0" style="border-radius: var(--radius-lg); border: 1px solid var(--color-border);">
+            <img src="{{inline:assets/frontiere.jpg}}" alt="Grille comparative de six images illustrant le style distinctif de Z-Image Turbo, Krea 2, FLUX.2, Ideogram 4, Nano Banana 2 et Seedream 5.0" style="border-radius: var(--radius-lg); border: 1px solid var(--color-border);">
             <figcaption>
               <strong>Six styles, six spécialités.</strong> Illustration
               conceptuelle du positionnement de chaque modèle&nbsp;: portrait
@@ -133,7 +198,7 @@
               instantanée avec préservation du sujet (FLUX.2), typographie
               nette en contexte (Ideogram&nbsp;4), cohérence d'un même
               personnage entre deux générations (Nano&nbsp;Banana&nbsp;2), et
-              rendu produit 4K de qualité commerciale (Seedream&nbsp;4.0).
+              rendu produit 4K de qualité commerciale (Seedream&nbsp;5.0).
             </figcaption>
           </figure>
 
@@ -192,15 +257,50 @@
                 LLM Gemini.
               </p>
             </div>
-		    <div class="card">
-              <h4>Seedream 5.0&nbsp;</h4>
+            <div class="card">
+              <h4>Seedream 5.0</h4>
               <p>
-                <em>Prompt&nbsp;:</em> «« Photo produit d'un flacon de parfum haut de gamme, surface réfléchissante, éclairage studio dramatique, rendu 4K ». En fournissant en plus une photo du flacon réel comme référence, Seedream 4.0 peut soit générer une variante inédite soit éditer directement la photo fournie (changer l'éclairage, le fond, l'angle) dans le même appel — sans changer d'outil entre génération et retouche.
+                <em>Prompt&nbsp;:</em> «&nbsp;Photo produit d'un flacon de
+                parfum haut de gamme, surface réfléchissante, éclairage studio
+                dramatique, rendu 4K&nbsp;». En fournissant en plus une photo
+                du flacon réel comme référence, Seedream&nbsp;5.0 peut soit
+                générer une variante inédite, soit éditer directement la photo
+                fournie (changer l'éclairage, le fond, l'angle) dans le même
+                appel — sans changer d'outil entre génération et retouche.
+              </p>
+            </div>
+            <div class="card">
+              <h4>Qwen-Image 2.1</h4>
+              <p>
+                <em>Prompt&nbsp;:</em> «&nbsp;Logo rond pour une boulangerie
+                artisanale, épi de blé doré, fond transparent&nbsp;». Résultat&nbsp;:
+                une image PNG avec sa couche alpha, posable telle quelle sur
+                n'importe quel fond, sans détourage manuel.
+              </p>
+            </div>
+            <div class="card">
+              <h4>MiniMax H3</h4>
+              <p>
+                <em>Prompt&nbsp;:</em> «&nbsp;La même danseuse, en trois plans
+                enchaînés, sur la musique fournie&nbsp;» + une photo du
+                personnage, une vidéo de référence pour le mouvement et un
+                extrait audio. Résultat&nbsp;: un clip 2K avec son stéréo, où le
+                visage, la tenue et le rythme restent cohérents d'un plan à
+                l'autre.
+              </p>
+            </div>
+            <div class="card">
+              <h4>GPT Image 2.5 Flare</h4>
+              <p>
+                <em>Prompt&nbsp;:</em> «&nbsp;Retire les passants à l'arrière-plan
+                de cette photo de vacances&nbsp;», appliqué à une photo existante
+                en qualité <em>medium</em>. Résultat&nbsp;: une retouche rapide,
+                adaptée à un usage courant&nbsp;; on monte en qualité
+                <em>high</em> ou <em>max</em> quand la finesse prime sur la
+                vitesse.
               </p>
             </div>
           </div>
-          
-        </div>
 
           <h3>Vue d'ensemble</h3>
           <div class="table-wrap">
@@ -257,6 +357,27 @@
                   <td>Génération et édition unifiées dans une seule architecture</td>
                   <td>jusqu'à 4K</td>
                 </tr>
+                <tr>
+                  <td>Qwen-Image 2.1</td>
+                  <td>Alibaba (Qwen)</td>
+                  <td>Poids ouverts (licence de recherche&nbsp;; usage commercial sur accord)</td>
+                  <td>Transparence native (RGBA), 7 Md de paramètres, édition jusqu'à 10 références</td>
+                  <td>2K natif (jusqu'à 2752 px)</td>
+                </tr>
+                <tr>
+                  <td>MiniMax H3</td>
+                  <td>MiniMax</td>
+                  <td>Ouvert (licence communautaire, 33 Md de paramètres)</td>
+                  <td>Omni-modal&nbsp;: vidéo avec son stéréo, références image, vidéo et audio</td>
+                  <td>Vidéo 2K, jusqu'à 15 s</td>
+                </tr>
+                <tr>
+                  <td>GPT Image 2.5 Flare</td>
+                  <td>OpenAI</td>
+                  <td>Fermé (ChatGPT, API)</td>
+                  <td>Vitesse, génération et retouche, qualité réglable (low → max)</td>
+                  <td>Non communiquée</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -264,17 +385,23 @@
           <div class="callout">
             <span class="callout-label">À retenir</span>
             <p>
-              Ces six modèles ne réinventent pas la diffusion&nbsp;: ils en
-              raffinent des aspects précis déjà expliqués dans ce document —
-              distillation pour la vitesse (Z-Image, Krea&nbsp;2 Turbo,
-              FLUX.2&nbsp;[klein]), encodeurs de texte et conditionnement pour
-              la fidélité au style ou à la typographie (Krea&nbsp;2,
-              Ideogram&nbsp;4), et fusion avec un LLM pour le raisonnement et
-              l'édition unifiée (Nano&nbsp;Banana&nbsp;2, Seedream). La ligne
-              de fracture entre ouvert et fermé s'estompe d'ailleurs&nbsp;:
-              Ideogram, historiquement fermé, a lui aussi publié les poids
-              d'Ideogram&nbsp;4 en 2026, rejoignant Z-Image, Krea et la famille
-              FLUX.2 dans le camp de l'ouverture décrit en section&nbsp;14.</p>
+              Ces neuf modèles ne réinventent pas la génération d'images&nbsp;:
+              ils en raffinent des aspects précis déjà expliqués dans ce
+              document — distillation et gammes «&nbsp;rapide / détaillé&nbsp;»
+              pour la vitesse (Z-Image, Krea&nbsp;2 Turbo, FLUX.2&nbsp;[klein],
+              GPT Image&nbsp;2.5 Flare), encodeurs de texte et conditionnement
+              pour la fidélité au style ou à la typographie (Krea&nbsp;2,
+              Ideogram&nbsp;4), autoencodeur enrichi pour la transparence
+              (Qwen-Image&nbsp;2.1), et fusion avec un LLM pour le raisonnement
+              et l'édition unifiée (Nano&nbsp;Banana&nbsp;2, Seedream).
+              MiniMax&nbsp;H3 montre l'étape suivante&nbsp;: les mêmes briques,
+              étendues à la vidéo et au son. La ligne de fracture entre ouvert
+              et fermé s'estompe d'ailleurs&nbsp;: Ideogram, historiquement
+              fermé, a lui aussi publié les poids d'Ideogram&nbsp;4 en 2026,
+              rejoignant Z-Image, Krea, la famille FLUX.2, Qwen-Image et
+              MiniMax dans le camp de l'ouverture décrit en section&nbsp;17 —
+              même si «&nbsp;ouvert&nbsp;» recouvre des licences très
+              différentes, d'Apache&nbsp;2.0 à l'usage de recherche seul.</p>
           </div>
         </div>
       </section>
