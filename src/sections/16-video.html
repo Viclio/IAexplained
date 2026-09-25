@@ -1,0 +1,552 @@
+            <!-- ==========================================
+           SECTION 13 — LA GÉNÉRATION VIDÉO
+           ==========================================  -->
+      <section id="video">
+        <div class="container">
+          <span class="section-number">15 — AU-DELÀ DE L'IMAGE</span>
+          <h2 class="section-title">
+            De l'image fixe à la <em>vidéo générative</em>
+          </h2>
+          <p class="section-lede">
+            Générer une vidéo revient à générer une <em>séquence</em> d'images
+            cohérentes entre elles. Le principe de diffusion reste identique,
+            mais une dimension supplémentaire — le temps — impose des
+            contraintes radicalement nouvelles. Voici comment les modèles comme
+            Sora, LTX, Wan, Kling ou Veo étendent la diffusion à la
+            quatrième dimension.
+          </p>
+
+          <h3>Le problème fondamental&nbsp;: la cohérence temporelle</h3>
+          <p>
+            Un modèle de diffusion d'image comme Stable Diffusion produit une
+            image indépendamment de toute autre. Si on lui demande de générer
+            24 images d'un chat qui court, image par image, chaque frame sera
+            plausible individuellement — mais la couleur du pelage, la forme
+            des oreilles ou la position du soleil changeront de façon
+            incohérente d'une frame à l'autre. C'est le <em>scintillement</em>
+            (<em>flickering</em>), le défaut caractéristique des premières
+            tentatives de vidéo par IA.
+          </p>
+          <p>
+            La vidéo générative doit donc résoudre un problème que l'image
+            fixe ignore complètement&nbsp;: <strong>faire en sorte que chaque
+            pixel évolue de façon plausible dans le temps</strong>, tout en
+            respectant la physique apparente (gravité, inertie, continuité des
+            objets) et la cohérence de l'identité (le même chat, la même pièce,
+            le même éclairage).
+          </p>
+
+          <div class="callout">
+            <span class="callout-label">Repère</span>
+            <p>
+              Une vidéo de 5 secondes à 24 images par seconde, c'est 120 images
+              à générer de façon cohérente entre elles — soit l'équivalent de
+              120 problèmes de diffusion d'image couplés les uns aux autres.
+              C'est ce couplage qui constitue toute la difficulté technique.
+            </p>
+          </div>
+
+          <h3>Deux stratégies historiques</h3>
+          <p>
+            Face à ce problème, deux grandes familles d'approches ont émergé
+            avant la génération native que l'on connaît aujourd'hui&nbsp;:
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Approche</th>
+                  <th>Principe</th>
+                  <th>Limite principale</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Image-par-image guidée</td>
+                  <td>
+                    Générer chaque frame séparément en la conditionnant sur la
+                    frame précédente (ou un flux optique estimé).
+                  </td>
+                  <td>
+                    Dérive cumulative&nbsp;: les erreurs s'accumulent, l'identité
+                    des objets se dégrade sur la durée.
+                  </td>
+                </tr>
+                <tr>
+                  <td>U-Net gonflé (<em>inflated</em>)</td>
+                  <td>
+                    Reprendre un U-Net 2D pré-entraîné sur images et y insérer
+                    des couches de convolution/attention temporelles entre les
+                    couches spatiales existantes.
+                  </td>
+                  <td>
+                    Fenêtre temporelle courte (8 à 16 frames), coûteux à
+                    étendre à des vidéos longues.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Diffusion vidéo native (actuelle)</td>
+                  <td>
+                    Le modèle est entraîné directement sur des clips vidéo, avec
+                    une architecture pensée dès le départ pour l'espace-temps.
+                  </td>
+                  <td>
+                    Coût d'entraînement massif&nbsp;; nécessite des jeux de
+                    données vidéo annotées à grande échelle.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>L'architecture actuelle&nbsp;: diffusion transformer spatio-temporel</h3>
+          <p>
+            Les modèles de pointe (Sora, Kling, Veo 2, Runway Gen-3) abandonnent
+            le U-Net au profit d'un <strong>Diffusion Transformer (DiT)</strong>,
+            la même famille d'architecture que nous avons vue pour les
+            meilleurs générateurs d'image récents. Le principe&nbsp;: la vidéo
+            est d'abord compressée par un VAE spatio-temporel en un
+            <em>tenseur latent</em> à trois dimensions (largeur, hauteur, temps),
+            puis découpée en <em>patches spatio-temporels</em> — de petits
+            cubes de pixels latents couvrant plusieurs frames à la fois.
+          </p>
+          <p>
+            Ces patches sont traités comme des <em>tokens</em>, exactement comme
+            des mots dans un texte, et un transformer leur applique de
+            l'attention. La différence cruciale avec un DiT d'image&nbsp;: les
+            tokens s'étendent aussi sur l'axe temporel, si bien que
+            l'attention peut relier un patch de la frame 1 à un patch de la
+            frame 80 directement, sans passer par toutes les frames
+            intermédiaires.
+          </p>
+
+          <figure class="wide">
+            <div class="svg-wrap">
+              <svg class="diagram-svg" viewBox="0 0 1100 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Schéma de la tokenisation spatio-temporelle d'une vidéo pour un Diffusion Transformer">
+                <defs>
+                  <linearGradient id="grad-video" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#7b6bff"/>
+                    <stop offset="1" stop-color="#4ec9c1"/>
+                  </linearGradient>
+                  <marker id="arrow-teal-video" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#4ec9c1"/>
+                  </marker>
+                </defs>
+                <text x="250" y="30" text-anchor="middle" class="label-title" font-size="16">Compression vidéo en patches spatio-temporels</text>
+
+                <!-- Frames empilées (vidéo brute) -->
+                <g transform="translate(60, 70)">
+                  <rect x="30" y="30" width="120" height="80" rx="6" fill="#251f45" stroke="#2f2856"/>
+                  <rect x="20" y="20" width="120" height="80" rx="6" fill="#251f45" stroke="#2f2856"/>
+                  <rect x="10" y="10" width="120" height="80" rx="6" fill="#251f45" stroke="#c9a24a" stroke-width="1.5"/>
+                  <ellipse cx="70" cy="55" rx="18" ry="16" fill="#c9a24a" opacity="0.85"/>
+                  <text x="70" y="115" text-anchor="middle" class="label-mono">frames brutes</text>
+                  <text x="70" y="130" text-anchor="middle" class="label-muted">(T × H × W × 3)</text>
+                </g>
+
+                <line x1="220" y1="120" x2="300" y2="120" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-teal-video)"/>
+                <text x="260" y="105" text-anchor="middle" class="label-mono" fill="#4ec9c1" font-size="10">VAE 3D</text>
+
+                <!-- Tenseur latent spatio-temporel -->
+                <g transform="translate(320, 60)">
+                  <rect x="30" y="30" width="90" height="60" rx="4" fill="#7b6bff" opacity="0.55"/>
+                  <rect x="20" y="20" width="90" height="60" rx="4" fill="#7b6bff" opacity="0.7"/>
+                  <rect x="10" y="10" width="90" height="60" rx="4" fill="#7b6bff" opacity="0.9"/>
+                  <text x="55" y="105" text-anchor="middle" class="label-mono">latent 3D</text>
+                  <text x="55" y="120" text-anchor="middle" class="label-muted">(t × h × w × c)</text>
+                </g>
+
+                <line x1="460" y1="120" x2="540" y2="120" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-teal-video)"/>
+                <text x="500" y="105" text-anchor="middle" class="label-mono" fill="#4ec9c1" font-size="10">découpe</text>
+
+                <!-- Grille de patches spatio-temporels -->
+                <g transform="translate(560, 40)">
+                  <text x="130" y="-8" text-anchor="middle" class="label-mono">patches spatio-temporels (tokens)</text>
+                  <g fill="url(#grad-video)" stroke="#0e0b1a" stroke-width="1">
+                    <rect x="0" y="0" width="34" height="34" rx="3"/>
+                    <rect x="40" y="0" width="34" height="34" rx="3"/>
+                    <rect x="80" y="0" width="34" height="34" rx="3"/>
+                    <rect x="120" y="0" width="34" height="34" rx="3"/>
+                    <rect x="160" y="0" width="34" height="34" rx="3"/>
+                    <rect x="200" y="0" width="34" height="34" rx="3"/>
+                    <rect x="240" y="0" width="34" height="34" rx="3"/>
+                    <rect x="0" y="40" width="34" height="34" rx="3"/>
+                    <rect x="40" y="40" width="34" height="34" rx="3"/>
+                    <rect x="80" y="40" width="34" height="34" rx="3"/>
+                    <rect x="120" y="40" width="34" height="34" rx="3"/>
+                    <rect x="160" y="40" width="34" height="34" rx="3"/>
+                    <rect x="200" y="40" width="34" height="34" rx="3"/>
+                    <rect x="240" y="40" width="34" height="34" rx="3"/>
+                    <rect x="0" y="80" width="34" height="34" rx="3"/>
+                    <rect x="40" y="80" width="34" height="34" rx="3"/>
+                    <rect x="80" y="80" width="34" height="34" rx="3"/>
+                    <rect x="120" y="80" width="34" height="34" rx="3"/>
+                    <rect x="160" y="80" width="34" height="34" rx="3"/>
+                    <rect x="200" y="80" width="34" height="34" rx="3"/>
+                    <rect x="240" y="80" width="34" height="34" rx="3"/>
+                  </g>
+                  <text x="130" y="150" text-anchor="middle" class="label-muted">une séquence de tokens, comme un texte</text>
+                </g>
+
+                <!-- Attention longue distance -->
+                <g transform="translate(560, 220)">
+                  <path d="M 17 17 Q 140 90 260 17" stroke="#f2d78a" stroke-width="1.5" fill="none" stroke-dasharray="3,3" opacity="0.8"/>
+                  <circle cx="17" cy="17" r="5" fill="#c9a24a"/>
+                  <circle cx="260" cy="17" r="5" fill="#c9a24a"/>
+                  <text x="130" y="75" text-anchor="middle" class="label-mono" fill="#f2d78a" font-size="10">
+                    attention directe frame 1 ↔ frame 80
+                  </text>
+                </g>
+
+                <text x="550" y="380" text-anchor="middle" class="label-muted">
+                  Le transformer applique l'attention sur tous les patches, quelle que soit leur position temporelle.
+                </text>
+              </svg>
+            </div>
+            <figcaption>
+              <strong>Tokenisation spatio-temporelle.</strong> La vidéo est
+              compressée en un tenseur latent 3D par un VAE spatio-temporel,
+              puis découpée en patches qui mélangent espace et temps. Le
+              transformer peut alors relier n'importe quelle paire de patches,
+              même très éloignés dans le temps, ce qui aide à maintenir la
+              cohérence sur toute la durée du clip.
+            </figcaption>
+          </figure>
+
+          <h3>Comment le bruit s'applique dans le temps</h3>
+          <p>
+            La boucle de diffusion reste conceptuellement identique à celle vue
+            en section 04&nbsp;: on ajoute du bruit gaussien au clip vidéo
+            complet lors de l'entraînement, et le modèle apprend à le retirer.
+            La différence est que le <em>bruit est appliqué au tenseur 3D dans
+            son ensemble</em>, pas frame par frame indépendamment. Le modèle ne
+            prédit donc pas «&nbsp;le bruit de cette image&nbsp;», mais
+            «&nbsp;le bruit de ce petit film&nbsp;», ce qui l'oblige à apprendre
+            des régularités temporelles (mouvement, physique, continuité) en
+            plus des régularités spatiales.
+          </p>
+          <p>
+            Certains modèles (Stable Video Diffusion, AnimateDiff) utilisent une
+            variante&nbsp;: ils partent d'une image fixe déjà nette (générée ou
+            fournie par l'utilisateur) et n'appliquent la diffusion que sur les
+            frames suivantes, un peu comme un <em>inpainting temporel</em> où la
+            première frame sert d'ancrage.
+          </p>
+
+          <h3>Les défis spécifiques à la vidéo</h3>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-icon">1</div>
+              <h4>Coût de calcul</h4>
+              <p>
+                Une vidéo de quelques secondes contient des dizaines à des
+                centaines de frames&nbsp;: le volume de données à traiter est
+                100 à 1000 fois supérieur à une image unique, ce qui explique
+                les temps de génération de plusieurs minutes et les coûts de
+                calcul très élevés.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">2</div>
+              <h4>Cohérence des objets</h4>
+              <p>
+                Un visage, un logo ou un vêtement doivent rester identiques
+                à eux-mêmes sur toute la durée. Les modèles récents utilisent
+                des mécanismes d'attention croisée entre frames pour «&nbsp;ancrer&nbsp;»
+                l'identité des objets détectés au début du clip.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">3</div>
+              <h4>Cohérence physique</h4>
+              <p>
+                Une balle qui rebondit, un liquide qui coule, une ombre qui se
+                déplace avec le soleil&nbsp;: ces comportements ne sont pas
+                programmés, ils émergent statistiquement de l'exposition à des
+                millions d'heures de vidéo. D'où les erreurs de physique
+                encore fréquentes (objets qui traversent d'autres objets,
+                membres surnuméraires en mouvement).
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">4</div>
+              <h4>Durée limitée</h4>
+              <p>
+                Plus le clip est long, plus la dérive s'accumule et plus le
+                coût explose. La plupart des modèles grand public génèrent
+                entre 4 et 20 secondes ; les vidéos plus longues sont souvent
+                assemblées par extension successive (<em>autoregressive
+                rollout</em>) à partir de la dernière frame générée.
+              </p>
+            </div>
+          </div>
+
+          <h3>Le guidage&nbsp;: texte, image et mouvement</h3>
+          <p>
+            Comme pour l'image, le conditionnement se fait via un encodeur
+            texte (souvent T5, comme évoqué en section 06) injecté par
+            attention croisée à chaque bloc du transformer. Mais la vidéo
+            ajoute des formes de guidage supplémentaires&nbsp;:
+          </p>
+          <ul>
+            <li>
+              <strong>Image-to-video&nbsp;:</strong> une image de départ fixe
+              le premier ou le dernier plan, et le modèle génère le mouvement
+              qui y mène ou en découle.
+            </li>
+            <li>
+              <strong>Contrôle de caméra&nbsp;:</strong> certains modèles
+              (Runway Gen-3, Kling) acceptent des paramètres explicites de
+              travelling, panoramique ou zoom, injectés comme conditionnement
+              supplémentaire.
+            </li>
+            <li>
+              <strong>Squelettes et flux de mouvement&nbsp;:</strong> à la
+              manière de ControlNet pour l'image (section 10), on peut guider
+              la vidéo avec une pose de squelette animée ou une carte de
+              mouvement approximative.
+            </li>
+          </ul>
+
+          <h3>Panorama des modèles vidéo actuels</h3>
+          <p>
+            Le paysage des générateurs vidéo évolue vite&nbsp;: modèles fermés
+            accessibles par API (Sora, Veo, Kling) et modèles ouverts
+            téléchargeables et exécutables localement (Wan, LTX). Voici un
+            comparatif des principaux acteurs en 2026.
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Modèle</th>
+                  <th>Éditeur</th>
+                  <th>Architecture</th>
+                  <th>Durée max</th>
+                  <th>Résolution</th>
+                  <th>Particularité</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Sora 2</td>
+                  <td>OpenAI</td>
+                  <td>Diffusion Transformer</td>
+                  <td>jusqu'à 20&nbsp;s</td>
+                  <td>720p&nbsp;–&nbsp;1080p (Pro)</td>
+                  <td>
+                    Audio synchronisé natif (dialogues, bruitages), physique
+                    très réaliste, extension de clip en Pro
+                  </td>
+                </tr>
+                <tr>
+                  <td>Google Veo 3.1</td>
+                  <td>Google DeepMind</td>
+                  <td>Diffusion Transformer</td>
+                  <td>~8&nbsp;s</td>
+                  <td>jusqu'à 1080p</td>
+                  <td>
+                    Bon respect des images de référence, cohérence visuelle
+                    soignée, itération rapide en mode «&nbsp;Fast&nbsp;»
+                  </td>
+                </tr>
+                <tr>
+                  <td>Kling 2.5</td>
+                  <td>Kuaishou</td>
+                  <td>Diffusion Transformer</td>
+                  <td>5&nbsp;–&nbsp;10&nbsp;s par plan</td>
+                  <td>jusqu'à 1080p, 30&nbsp;fps</td>
+                  <td>
+                    Choréographie de caméra cinématographique (travelling,
+                    grue, orbite), forte consistance des visages
+                  </td>
+                </tr>
+                <tr>
+                  <td>Runway Gen-3/4</td>
+                  <td>Runway</td>
+                  <td>Diffusion Transformer</td>
+                  <td>~10&nbsp;s</td>
+                  <td>jusqu'à 1080p</td>
+                  <td>
+                    Orienté outils de production créative (motion brush,
+                    contrôle de caméra structuré)
+                  </td>
+                </tr>
+                <tr>
+                  <td>Wan 2.2</td>
+                  <td>Alibaba (open source)</td>
+                  <td>
+                    Transformer à mélange d'experts (MoE), 27&nbsp;Md de
+                    paramètres, 14&nbsp;Md actifs
+                  </td>
+                  <td>~5&nbsp;s</td>
+                  <td>jusqu'à 1280×720, variante 5B pour GPU grand public</td>
+                  <td>
+                    Premier modèle vidéo en MoE&nbsp;: un expert dédié au bruit
+                    fort (composition/mouvement), un autre au bruit faible
+                    (détails/visages) ; poids ouverts sous licence Apache&nbsp;2.0
+                  </td>
+                </tr>
+                <tr>
+                  <td>LTX 2.3</td>
+                  <td>Lightricks (open source)</td>
+                  <td>
+                    Diffusion Transformer audio-vidéo, 22&nbsp;Md de paramètres
+                  </td>
+                  <td>jusqu'à 20&nbsp;s</td>
+                  <td>jusqu'à 4K, natif vertical, 50&nbsp;fps</td>
+                  <td>
+                    Génère vidéo <em>et</em> audio en un seul passage
+                    (dialogues, ambiance synchronisés), fonctions Extend et
+                    Retake pour prolonger ou corriger un clip, exécutable en
+                    local
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <figure class="wide">
+            <div class="svg-wrap">
+              <svg
+                class="diagram-svg"
+                viewBox="0 0 1100 520"
+                xmlns="http://www.w3.org/2000/svg"
+                role="img"
+                aria-label="Architecture Mixture-of-Experts de Wan 2.2 : un expert pour le bruit fort, un expert pour le bruit faible"
+              >
+                <defs>
+                  <linearGradient id="moe-high" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#7b6bff"/>
+                    <stop offset="1" stop-color="#5a4fd6"/>
+                  </linearGradient>
+                  <linearGradient id="moe-low" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#c9a24a"/>
+                    <stop offset="1" stop-color="#f2d78a"/>
+                  </linearGradient>
+                  <marker id="arrow-moe" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#4ec9c1"/>
+                  </marker>
+                  <marker id="arrow-moe-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#6e6b8a"/>
+                  </marker>
+                </defs>
+
+                <text x="550" y="10" text-anchor="middle" class="label-title" font-size="16">
+                  Wan 2.2 — routage Mixture-of-Experts selon le niveau de bruit
+                </text>
+
+                <!-- Entrée : latent bruité à l'étape t -->
+                <g transform="translate(60, 70)">
+                  <rect x="0" y="0" width="140" height="80" rx="8" fill="#251f45" stroke="#2f2856" stroke-width="1.5"/>
+                  <text x="70" y="35" text-anchor="middle" fill="#fff" font-weight="600" font-size="13">Latent vidéo</text>
+                  <text x="70" y="53" text-anchor="middle" class="label-mono" font-size="11">bruité à l'étape t</text>
+                  <text x="70" y="70" text-anchor="middle" class="label-muted" font-size="10">x_t (t × h × w × c)</text>
+                </g>
+
+                <!-- Répartiteur / gate -->
+                <g transform="translate(280, 90)">
+                  <polygon points="0,0 60,20 0,40" fill="#4ec9c1" opacity="0.9"/>
+                  <text x="30" y="-10" text-anchor="middle" class="label-mono" fill="#4ec9c1" font-size="10">routage selon t</text>
+                </g>
+
+                <line x1="200" y1="110" x2="280" y2="110" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-moe)"/>
+
+                <!-- Branche 1 : expert bruit fort -->
+                <line x1="340" y1="105" x2="420" y2="60" stroke="#7b6bff" stroke-width="2" marker-end="url(#arrow-moe)"/>
+                <g transform="translate(420, 20)">
+                  <rect x="0" y="0" width="220" height="110" rx="8" fill="url(#moe-high)"/>
+                  <text x="110" y="30" text-anchor="middle" fill="#fff" font-weight="700" font-size="14">Expert « bruit fort »</text>
+                  <text x="110" y="52" text-anchor="middle" fill="#fff" font-size="11" opacity="0.9">t proche de T (≈ 1000)</text>
+                  <text x="110" y="72" text-anchor="middle" fill="#fff" font-size="10" opacity="0.85">spécialisé composition</text>
+                  <text x="110" y="88" text-anchor="middle" fill="#fff" font-size="10" opacity="0.85">globale &amp; mouvement d'ensemble</text>
+                </g>
+
+                <!-- Branche 2 : expert bruit faible -->
+                <line x1="340" y1="115" x2="420" y2="170" stroke="#c9a24a" stroke-width="2" marker-end="url(#arrow-moe)"/>
+                <g transform="translate(420, 150)">
+                  <rect x="0" y="0" width="220" height="110" rx="8" fill="url(#moe-low)"/>
+                  <text x="110" y="30" text-anchor="middle" fill="#0e0b1a" font-weight="700" font-size="14">Expert « bruit faible »</text>
+                  <text x="110" y="52" text-anchor="middle" fill="#0e0b1a" font-size="11" opacity="0.9">t proche de 0</text>
+                  <text x="110" y="72" text-anchor="middle" fill="#0e0b1a" font-size="10" opacity="0.85">spécialisé détails fins,</text>
+                  <text x="110" y="88" text-anchor="middle" fill="#0e0b1a" font-size="10" opacity="0.85">textures &amp; visages</text>
+                </g>
+
+                <!-- Paramètres actifs -->
+                <g transform="translate(420, 285)">
+                  <text x="110" y="0" text-anchor="middle" class="label-muted" font-size="11">
+                    27 Md de paramètres au total — 14 Md actifs par passe
+                  </text>
+                </g>
+
+                <!-- Fusion vers sortie -->
+                <line x1="640" y1="75" x2="740" y2="150" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-moe)"/>
+                <line x1="640" y1="205" x2="740" y2="160" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-moe)"/>
+
+                <g transform="translate(760, 110)">
+                  <rect x="0" y="0" width="150" height="90" rx="8" fill="#16122a" stroke="#c9a24a" stroke-width="1.5"/>
+                  <text x="75" y="35" text-anchor="middle" fill="#fff" font-weight="600" font-size="13">Bruit prédit</text>
+                  <text x="75" y="55" text-anchor="middle" class="label-mono" font-size="11">ε̂(x_t, t)</text>
+                  <text x="75" y="75" text-anchor="middle" class="label-muted" font-size="10">à soustraire à x_t</text>
+                </g>
+
+                <!-- Ligne du temps t=T à t=0 -->
+                <g transform="translate(60, 330)">
+                  <line x1="0" y1="30" x2="960" y2="30" stroke="#2f2856" stroke-width="2"/>
+                  <circle cx="0" cy="30" r="6" fill="#7b6bff"/>
+                  <circle cx="960" cy="30" r="6" fill="#c9a24a"/>
+                  <text x="0" y="55" text-anchor="middle" class="label-mono" fill="#7b6bff" font-size="11">t = T (bruit pur)</text>
+                  <text x="960" y="55" text-anchor="middle" class="label-mono" fill="#c9a24a" font-size="11">t = 0 (vidéo nette)</text>
+                  <text x="480" y="10" text-anchor="middle" class="label-muted" font-size="11">
+                    seuil de bascule entre experts (au milieu du calendrier de bruit)
+                  </text>
+                  <line x1="480" y1="20" x2="480" y2="40" stroke="#4ec9c1" stroke-width="2" stroke-dasharray="4,3"/>
+                  <path d="M 0 30 L 470 30" stroke="#7b6bff" stroke-width="4" opacity="0.6"/>
+                  <path d="M 490 30 L 960 30" stroke="#c9a24a" stroke-width="4" opacity="0.6"/>
+                </g>
+
+                <text x="550" y="420" text-anchor="middle" class="label-muted" font-size="11">
+                  Comme dans les LLM à mélange d'experts, un seul expert (≈ 14 Md de paramètres) est activé par étape de débruitage,
+                </text>
+                <text x="550" y="438" text-anchor="middle" class="label-muted" font-size="11">
+                  ce qui garde le coût de calcul proche d'un modèle plus petit tout en offrant la capacité d'un modèle deux fois plus grand.
+                </text>
+              </svg>
+            </div>
+            <figcaption>
+              <strong>Mixture-of-Experts dans Wan 2.2.</strong> Contrairement à
+              un U-Net ou un DiT classique qui utilise le même réseau à chaque
+              étape de débruitage, Wan 2.2 route chaque étape vers l'un de deux
+              experts selon le niveau de bruit&nbsp;: un expert dédié aux
+              étapes bruitées (composition, mouvement global) et un expert
+              dédié aux étapes peu bruitées (détails, textures, visages). Un
+              seul expert est actif à la fois, ce qui limite le coût de calcul
+              malgré un nombre total de paramètres élevé.
+            </figcaption>
+          </figure>
+
+          <p>
+            Deux tendances de fond se dégagent de ce panorama&nbsp;: la montée
+            en puissance de l'<strong>audio natif synchronisé</strong> (Sora 2,
+            LTX 2.3) qui traite le son comme une modalité générée conjointement
+            plutôt qu'ajoutée après coup, et la démocratisation par les
+            <strong>modèles ouverts</strong> (Wan, LTX 2.3) qui rapprochent les
+            capacités des laboratoires fermés de ce qu'un particulier peut
+            exécuter sur son propre matériel.
+          </p>
+
+          <div class="callout">
+            <span class="callout-label">À retenir</span>
+            <p>
+              La génération vidéo n'est pas une technologie fondamentalement
+              différente de la génération d'image&nbsp;: c'est la <em>même
+              diffusion</em>, appliquée à un espace latent qui inclut désormais
+              le temps comme dimension à part entière, avec un Diffusion
+              Transformer capable de faire dialoguer des instants très éloignés
+              du clip entre eux.
+            </p>
+          </div>
+        </div>
+      </section>
+

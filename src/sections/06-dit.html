@@ -1,0 +1,198 @@
+      <!-- ==========================================
+           SECTION 6 — DIFFUSION TRANSFORMERS (DiT)
+           ========================================== -->
+      <section id="dit">
+        <div class="container">
+          <span class="section-number">06 — ARCHITECTURE</span>
+          <h2 class="section-title">
+            Les <em>Diffusion Transformers</em>, la nouvelle génération
+          </h2>
+          <p class="section-lede">
+            Depuis 2023, les modèles les plus performants (Stable Diffusion 3,
+            Flux, PixArt, Sora) abandonnent progressivement l'U-Net au profit
+            d'une architecture purement <em>Transformer</em>&nbsp;: le
+            <strong>Diffusion Transformer</strong>, ou <strong>DiT</strong>.
+            Le principe fondamental — prédire le bruit à retirer — reste
+            identique à celui vu au chapitre précédent, mais la façon de
+            traiter l'image change radicalement.
+          </p>
+
+          <h3>Découper l'image en patches, comme un texte en mots</h3>
+          <p>
+            Un DiT ne fait plus glisser des filtres convolutionnels sur
+            l'image comme le ferait un U-Net. Il commence par découper le
+            tenseur latent en petits carrés appelés <strong>patches</strong>
+            (typiquement <code>2×2</code> pixels latents), exactement comme un
+            <em>Vision Transformer</em> (ViT) découpe une image en régions. Chaque
+            patch est ensuite aplati et projeté en un vecteur — un
+            <strong>token</strong> — au sens où l'entend un Transformer de
+            langage. Un latent <code>64×64×4</code> découpé en patches
+            <code>2×2</code> donne ainsi une séquence de 1024 tokens, que le
+            modèle traite exactement comme une phrase.
+          </p>
+          <p>
+            Cette astuce change tout&nbsp;: on peut réutiliser directement les
+            mêmes briques que celles qui ont fait le succès des grands modèles
+            de langage — couches d'<strong>auto-attention</strong>, blocs
+            <em>feed-forward</em>, normalisation — au lieu de concevoir une
+            architecture spécifique à l'image.
+          </p>
+
+          <h3>L'attention remplace la convolution</h3>
+          <p>
+            Là où l'U-Net capture le contexte progressivement, couche après
+            couche, en élargissant son champ de vision par la descente
+            encodeur-décodeur, un DiT donne à <strong>chaque patch un accès
+            direct à tous les autres patches</strong>, dès la première couche,
+            via l'auto-attention. Un patch situé en haut à gauche de l'image
+            peut ainsi «&nbsp;consulter&nbsp;» directement un patch situé en bas
+            à droite, sans passer par des dizaines de couches intermédiaires.
+          </p>
+          <p>
+            Le conditionnement par le texte (autrefois assuré par l'attention
+            croisée insérée dans les blocs convolutionnels de l'U-Net) et par le
+            numéro d'étape <code>t</code> sont ici injectés directement dans le
+            flux du Transformer&nbsp;: c'est l'architecture <strong>MM-DiT</strong>
+            (<em>Multimodal Diffusion Transformer</em>), introduite par Stable
+            Diffusion 3, qui fait circuler dans les mêmes couches d'attention
+            les tokens d'image <strong>et</strong> les tokens de texte, leur
+            permettant de s'influencer mutuellement à chaque étape plutôt
+            qu'à des points d'injection ponctuels.
+          </p>
+
+          <div class="callout">
+            <span class="callout-label">En bref</span>
+            <p>
+              U-Net&nbsp;: contexte construit progressivement par convolutions
+              successives et connexions de contournement. DiT&nbsp;: contexte
+              global disponible immédiatement grâce à l'attention, avec texte et
+              image traités dans un espace commun.
+            </p>
+          </div>
+
+          <h3>Pourquoi les DiT surpassent les U-Net</h3>
+          <p>
+            Plusieurs propriétés expliquent pourquoi l'industrie a massivement
+            migré vers les DiT depuis 2023&nbsp;:
+          </p>
+          <ul>
+            <li>
+              <strong>Meilleur passage à l'échelle (scaling).</strong> Les
+              Transformers suivent des lois de mise à l'échelle bien connues
+              depuis les grands modèles de langage&nbsp;: plus on ajoute de
+              paramètres et de données, plus la qualité s'améliore de façon
+              prévisible. Les U-Net convolutionnels atteignent un plateau de
+              qualité bien plus tôt, quel que soit le nombre de paramètres
+              ajoutés.
+            </li>
+            <li>
+              <strong>Compréhension du prompt nettement supérieure.</strong>
+              Comme le texte et l'image partagent le même espace d'attention,
+              le modèle peut relier précisément un mot du prompt à la région
+              exacte de l'image qu'il doit affecter, même pour des scènes
+              complexes à plusieurs sujets (« un chat à gauche et un chien à
+              droite qui se regardent »).
+            </li>
+            <li>
+              <strong>Rendu du texte dans l'image quasiment fiable.</strong>
+              Écrire du texte lisible dans une image générée (une enseigne, un
+              panneau) exige une cohérence caractère par caractère sur toute
+              la largeur de l'image — une tâche où l'attention globale des DiT
+              excelle, alors que le champ de vision limité des convolutions de
+              l'U-Net produit des lettres déformées ou incohérentes.
+            </li>
+            <li>
+              <strong>Cohérence multi-sujet.</strong> Générer plusieurs
+              personnages ou objets distincts sans que leurs attributs se
+              mélangent (couleurs, vêtements, postures) demande de maintenir
+              des relations à longue distance dans l'image — précisément ce que
+              l'attention fait mieux que la convolution locale.
+            </li>
+            <li>
+              <strong>Architecture unifiée et réutilisable.</strong> Les
+              mêmes blocs Transformer servent aussi bien à l'image fixe qu'à la
+              vidéo (Sora, section 14) ou à l'édition par instruction (section
+              12) — un seul socle architectural pour plusieurs modalités, plutôt
+              qu'une conception ad hoc par tâche.
+            </li>
+          </ul>
+
+          <div class="callout callout-warn">
+            <span class="callout-label">Un compromis, pas une victoire totale</span>
+            <p>
+              Les DiT ne sont pas gratuitement supérieurs&nbsp;: l'auto-attention
+              a un coût de calcul qui croît de façon <strong>quadratique</strong>
+              avec le nombre de patches (donc avec la résolution), contre un
+              coût quasi linéaire pour les convolutions de l'U-Net. C'est
+              pourquoi les DiT ne deviennent réellement avantageux qu'à partir
+              d'une certaine échelle de données et de calcul d'entraînement —
+              un luxe réservé aux laboratoires disposant de moyens massifs
+              (Stability AI, Black Forest Labs, OpenAI, Google).
+            </p>
+          </div>
+
+          <h3>U-Net et DiT, côte à côte</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Aspect</th>
+                  <th>U-Net</th>
+                  <th>Diffusion Transformer (DiT)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Brique de base</td>
+                  <td>Convolutions + skip connections</td>
+                  <td>Auto-attention + blocs feed-forward</td>
+                </tr>
+                <tr>
+                  <td>Contexte spatial</td>
+                  <td>Construit progressivement (local → global)</td>
+                  <td>Global dès la première couche</td>
+                </tr>
+                <tr>
+                  <td>Conditionnement texte</td>
+                  <td>Attention croisée à des points ponctuels</td>
+                  <td>Fusionné dans le même flux d'attention (MM-DiT)</td>
+                </tr>
+                <tr>
+                  <td>Passage à l'échelle</td>
+                  <td>Plateau de qualité relativement précoce</td>
+                  <td>Lois de scaling favorables, prévisibles</td>
+                </tr>
+                <tr>
+                  <td>Coût de calcul</td>
+                  <td>Quasi linéaire avec la résolution</td>
+                  <td>Quadratique avec le nombre de patches</td>
+                </tr>
+                <tr>
+                  <td>Rendu de texte dans l'image</td>
+                  <td>Peu fiable</td>
+                  <td>Fiable à partir d'une certaine échelle</td>
+                </tr>
+                <tr>
+                  <td>Exemples</td>
+                  <td>Stable Diffusion 1.5, SDXL</td>
+                  <td>Stable Diffusion 3, Flux, PixArt, Sora</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            En résumé&nbsp;: le passage du U-Net au DiT reproduit, pour la
+            génération d'image, la même transition qui a déjà transformé le
+            traitement du langage — remplacer une architecture spécialisée et
+            locale par une architecture générale et globale, capable
+            d'exploiter des quantités de données et de calcul toujours plus
+            grandes. C'est cette architecture qui équipe aujourd'hui la quasi-totalité
+            des modèles de pointe évoqués au chapitre 13.
+          </p>
+        </div>
+      </section>
+
+
+      <div class="divider"></div>
+

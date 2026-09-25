@@ -1,0 +1,61 @@
+             <!-- ==========================================
+           SECTION 4bis — SIMULATEUR DE DENOISING
+           ========================================== -->
+      <section id="simulateur">
+        <div class="container">
+          <span class="section-number">04bis — DÉMONSTRATION INTERACTIVE</span>
+          <h2 class="section-title">
+            Simulez vous-même le <em>débruitage</em>
+          </h2>
+          <p class="section-lede">
+            L'animation ci-dessous reproduit visuellement la boucle de
+            débruitage sur de vraies photographies&nbsp;: à l'étape
+            <code>t&nbsp;=&nbsp;1000</code>, l'image n'est que du bruit gaussien
+            pur. En faisant glisser le curseur (ou en cliquant sur
+            «&nbsp;Lancer&nbsp;»), vous simulez le modèle qui retire
+            progressivement le bruit, étape par étape, jusqu'à révéler la photo
+            finale à <code>t&nbsp;=&nbsp;0</code>. Il ne s'agit pas d'un vrai
+            réseau de neurones, mais d'une reconstitution fidèle du principe
+            visuel&nbsp;: à chaque pas, un peu moins de bruit, un peu plus de
+            structure.
+          </p>
+
+          <div class="denoise-sim">
+            <div class="denoise-canvas-wrap">
+              <canvas id="denoise-canvas" width="320" height="320" role="img" aria-label="Simulation visuelle du débruitage progressif"></canvas>
+              <span class="denoise-badge" id="denoise-phase-label">Bruit pur</span>
+            </div>
+
+            <div class="denoise-controls">
+              <div class="denoise-row">
+                <label for="denoise-slider" class="label-mono">
+                  Étape t&nbsp;=&nbsp;<strong id="denoise-step-label">1000</strong>&nbsp;/&nbsp;1000
+                </label>
+                <input type="range" id="denoise-slider" min="0" max="1000" step="10" value="1000" aria-label="Curseur d'étape de débruitage">
+              </div>
+
+              <div class="denoise-buttons">
+                <button type="button" id="denoise-play" class="denoise-btn denoise-btn-primary">▶ Lancer le débruitage</button>
+                <button type="button" id="denoise-reset" class="denoise-btn">↺ Repartir du bruit pur</button>
+                <button type="button" id="denoise-shape" class="denoise-btn">⟳ Changer d'image cible</button>
+              </div>
+
+              <div class="denoise-meta">
+                <span class="label-mono">Bruit résiduel&nbsp;: <strong id="denoise-noise-pct">100%</strong></span>
+                <span class="label-mono">Modèle simulé&nbsp;: <strong id="denoise-eta">η fixe, 100 pas</strong></span>
+              </div>
+            </div>
+          </div>
+          <figcaption>
+            <strong>Simulateur pédagogique de débruitage.</strong> Le curseur
+            contrôle l'étape <code>t</code>&nbsp;: à <code>t&nbsp;=&nbsp;1000</code>,
+            bruit gaussien pur ; à <code>t&nbsp;=&nbsp;0</code>, la photographie
+            réelle (chat, maison ou paysage) apparaît intégralement. Le bouton
+            «&nbsp;Lancer&nbsp;» anime automatiquement la boucle inverse, comme
+            le ferait un modèle de diffusion réel sur ~125 étapes.
+          </figcaption>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+

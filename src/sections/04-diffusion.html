@@ -1,0 +1,239 @@
+      <!-- ==========================================
+           SECTION 4 — LE PROCESSUS DE DIFFUSION
+           ========================================== -->
+      <section id="diffusion">
+        <div class="container">
+          <span class="section-number">04 — LE CŒUR MATHÉMATIQUE</span>
+          <h2 class="section-title">
+            Le processus de diffusion, <em>expliqué visuellement</em>
+          </h2>
+          <p class="section-lede">
+            Le nom «&nbsp;diffusion&nbsp;» vient de la physique — plus précisément
+            de la description mathématique de la façon dont une goutte d'encre se
+            disperse dans l'eau. C'est le même principe.</p>
+
+          <h3>Phase 1 — Le processus «&nbsp;avant&nbsp;» : détruire l'image</h3>
+          <p>
+            On prend une image du jeu d'entraînement — disons, une photo de chat.
+            On lui ajoute, à chaque étape <code>t</code>, une petite quantité de
+            bruit gaussien (statistiquement pur, sans structure). Après quelques
+            étapes, l'image est un peu granuleuse. Après des centaines d'étapes,
+            elle est indistinguable d'un bruit aléatoire complet.
+          </p>
+
+          <div class="formula">
+            x<sub>t</sub> = √(1 − β<sub>t</sub>) · x<sub>t−1</sub> + √β<sub>t</sub> · ε &nbsp;&nbsp;·&nbsp;&nbsp; ε ∼ 𝒩(0, I)
+          </div>
+          <p style="text-align: center; color: var(--color-text-muted); font-size: var(--text-sm); margin-top: -8px;">
+            L'équation de la diffusion directe. À chaque étape, on ajoute un peu de bruit gaussien selon un calendrier β<sub>t</sub> pré-défini.
+          </p>
+
+          <p>
+            Ce processus est <strong>déterministe</strong> (le calendrier de
+            bruitage est fixé à l'avance) et <strong>ne nécessite aucun
+            apprentissage</strong>. C'est purement du calcul. Il produit
+            simplement des paires <code>(image_bruitée_à_l'étape_t,
+            bruit_ajouté)</code> qui serviront de jeu d'entraînement.
+          </p>
+
+          <h3>Phase 2 — Le processus «&nbsp;arrière&nbsp;» : apprendre à restaurer</h3>
+          <p>
+            L'idée cruciale&nbsp;: si on connaît la version bruitée à l'étape
+            <code>t</code> et la quantité exacte de bruit qui a été ajoutée à
+            l'étape précédente, on peut inverser l'opération. Autrement dit, on
+            peut <strong>prédire le bruit à retirer</strong>.
+          </p>
+          <p>
+            C'est très exactement ce que le modèle apprend à faire. Sa tâche est
+            d'une simplicité déconcertante&nbsp;: <em>«&nbsp;étant donné cette
+            image bruitée et le numéro d'étape t, dis-moi combien de bruit y a-t-il
+            dedans&nbsp;?&nbsp;»</em>. Une fois qu'il sait faire cela, on peut
+            l'utiliser en boucle&nbsp;:
+          </p>
+          <ol>
+            <li>Partir de bruit pur <code>x<sub>T</sub></code> (typiquement <code>T = 1000</code>)</li>
+            <li>Demander au modèle&nbsp;: «&nbsp;quel bruit vois-tu&nbsp;?&nbsp;»</li>
+            <li>Le retirer partiellement pour obtenir <code>x<sub>T−1</sub></code></li>
+            <li>Recommencer jusqu'à <code>x<sub>0</sub></code></li>
+          </ol>
+
+          <figure class="wide">
+            <div class="svg-wrap">
+              <svg
+                class="diagram-svg"
+                viewBox="0 0 1100 400"
+                xmlns="http://www.w3.org/2000/svg"
+                role="img"
+                aria-label="Schéma du processus de diffusion avant et arrière"
+              >
+                <defs>
+                  <linearGradient id="grad-noise" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#c9a24a" />
+                    <stop offset="1" stop-color="#7b6bff" />
+                  </linearGradient>
+                  <linearGradient id="grad-restore" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#7b6bff" />
+                    <stop offset="1" stop-color="#c9a24a" />
+                  </linearGradient>
+                  <pattern id="noise-pattern" width="4" height="4" patternUnits="userSpaceOnUse">
+                    <rect width="4" height="4" fill="#251f45" />
+                    <circle cx="1" cy="1" r="0.6" fill="#7b6bff" opacity="0.7" />
+                    <circle cx="3" cy="2" r="0.5" fill="#c9a24a" opacity="0.6" />
+                    <circle cx="2" cy="3" r="0.4" fill="#ece9f5" opacity="0.5" />
+                  </pattern>
+                  <marker id="arrow-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#c9a24a" />
+                  </marker>
+                  <marker id="arrow-violet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#7b6bff" />
+                  </marker>
+                </defs>
+
+                <!-- Titre -->
+                <text x="550" y="30" text-anchor="middle" class="label-title" font-size="16">
+                  Diffusion avant et arrière
+                </text>
+
+                <!-- Rangée d'images -->
+                <g transform="translate(50, 140)">
+                  <!-- x0 - image nette -->
+                  <g>
+                    <rect x="0" y="0" width="90" height="90" rx="8" fill="#16122a" stroke="#c9a24a" stroke-width="1.5" />
+                    <!-- petit chat stylisé -->
+                    <ellipse cx="45" cy="55" rx="22" ry="20" fill="#c9a24a" opacity="0.7"/>
+                    <polygon points="30,38 34,25 42,36" fill="#c9a24a" opacity="0.7"/>
+                    <polygon points="60,38 56,25 48,36" fill="#c9a24a" opacity="0.7"/>
+                    <circle cx="38" cy="52" r="2" fill="#0e0b1a"/>
+                    <circle cx="52" cy="52" r="2" fill="#0e0b1a"/>
+                    <path d="M40 62 Q45 66 50 62" stroke="#0e0b1a" fill="none" stroke-width="1.5"/>
+                    <text x="45" y="112" text-anchor="middle" class="label-mono">x₀</text>
+                    <text x="45" y="126" text-anchor="middle" class="label-muted">image nette</text>
+                  </g>
+
+                  <!-- x1 - un peu de bruit -->
+                  <g transform="translate(180,0)">
+                    <rect x="0" y="0" width="90" height="90" rx="8" fill="url(#noise-pattern)" opacity="0.3" />
+                    <rect x="0" y="0" width="90" height="90" rx="8" fill="#16122a" opacity="0.7" />
+                    <ellipse cx="45" cy="55" rx="22" ry="20" fill="#c9a24a" opacity="0.55"/>
+                    <polygon points="30,38 34,25 42,36" fill="#c9a24a" opacity="0.55"/>
+                    <polygon points="60,38 56,25 48,36" fill="#c9a24a" opacity="0.55"/>
+                    <circle cx="38" cy="52" r="2" fill="#0e0b1a" opacity="0.7"/>
+                    <circle cx="52" cy="52" r="2" fill="#0e0b1a" opacity="0.7"/>
+                    <rect x="0" y="0" width="90" height="90" rx="8" fill="url(#noise-pattern)" opacity="0.35" />
+                    <rect x="0" y="0" width="90" height="90" rx="8" fill="none" stroke="#4ec9c1" stroke-width="1.5"/>
+                    <text x="45" y="112" text-anchor="middle" class="label-mono">xₜ</text>
+                    <text x="45" y="126" text-anchor="middle" class="label-muted">bruitée</text>
+                  </g>
+
+                  <!-- xN/2 - beaucoup de bruit -->
+                  <g transform="translate(360,0)">
+                    <rect x="0" y="0" width="90" height="90" rx="8" fill="url(#noise-pattern)" opacity="0.7"/>
+                    <ellipse cx="45" cy="55" rx="22" ry="20" fill="#c9a24a" opacity="0.2"/>
+                    <rect x="0" y="0" width="90" height="90" rx="8" fill="url(#noise-pattern)" opacity="0.4"/>
+                    <rect x="0" y="0" width="90" height="90" rx="8" fill="none" stroke="#7b6bff" stroke-width="1.5"/>
+                    <text x="45" y="112" text-anchor="middle" class="label-mono">xₜ₊ₖ</text>
+                    <text x="45" y="126" text-anchor="middle" class="label-muted">forte diffusion</text>
+                  </g>
+
+                  <!-- xT - bruit pur -->
+                  <g transform="translate(540,0)">
+                    <rect x="0" y="0" width="90" height="90" rx="8" fill="url(#noise-pattern)"/>
+                    <rect x="0" y="0" width="90" height="90" rx="8" fill="none" stroke="#7b6bff" stroke-width="1.5"/>
+                    <text x="45" y="112" text-anchor="middle" class="label-mono">xₜ</text>
+                    <text x="45" y="126" text-anchor="middle" class="label-muted">bruit pur</text>
+                  </g>
+
+                  <!-- Points de suspension et retour -->
+                  <text x="720" y="55" font-size="24" fill="#a29fbf" text-anchor="middle">···</text>
+
+                  <!-- retour intermédiaire -->
+                  <g transform="translate(760,0)">
+                    <rect x="0" y="0" width="90" height="90" rx="8" fill="url(#noise-pattern)" opacity="0.6"/>
+                    <ellipse cx="45" cy="55" rx="22" ry="20" fill="#c9a24a" opacity="0.35"/>
+                    <polygon points="30,38 34,25 42,36" fill="#c9a24a" opacity="0.35"/>
+                    <polygon points="60,38 56,25 48,36" fill="#c9a24a" opacity="0.35"/>
+                    <rect x="0" y="0" width="90" height="90" rx="8" fill="none" stroke="#4ec9c1" stroke-width="1.5"/>
+                    <text x="45" y="112" text-anchor="middle" class="label-mono">x̂ₜ</text>
+                    <text x="45" y="126" text-anchor="middle" class="label-muted">reconstruite</text>
+                  </g>
+
+                  <!-- x̂0 -->
+                  <g transform="translate(920,0)">
+                    <rect x="0" y="0" width="90" height="90" rx="8" fill="#16122a" stroke="#c9a24a" stroke-width="1.5"/>
+                    <ellipse cx="45" cy="55" rx="22" ry="20" fill="#c9a24a" opacity="0.9"/>
+                    <polygon points="30,38 34,25 42,36" fill="#c9a24a" opacity="0.9"/>
+                    <polygon points="60,38 56,25 48,36" fill="#c9a24a" opacity="0.9"/>
+                    <circle cx="38" cy="52" r="2" fill="#0e0b1a"/>
+                    <circle cx="52" cy="52" r="2" fill="#0e0b1a"/>
+                    <path d="M40 62 Q45 66 50 62" stroke="#0e0b1a" fill="none" stroke-width="1.5"/>
+                    <text x="45" y="112" text-anchor="middle" class="label-mono">x̂₀</text>
+                    <text x="45" y="126" text-anchor="middle" class="label-muted">image générée</text>
+                  </g>
+                </g>
+
+                <!-- Flèches diffusion avant -->
+                <g>
+                  <line x1="145" y1="80" x2="225" y2="80" stroke="#c9a24a" stroke-width="2" marker-end="url(#arrow-gold)"/>
+                  <line x1="325" y1="80" x2="405" y2="80" stroke="#c9a24a" stroke-width="2" marker-end="url(#arrow-gold)"/>
+                  <line x1="505" y1="80" x2="585" y2="80" stroke="#c9a24a" stroke-width="2" marker-end="url(#arrow-gold)"/>
+                  <text x="365" y="70" text-anchor="middle" class="label-mono" fill="#c9a24a">
+                    + bruit
+                  </text>
+                  <text x="365" y="55" text-anchor="middle" class="label-title" fill="#c9a24a" font-size="12">
+                    processus AVANT (fixe)
+                  </text>
+                </g>
+
+                <!-- Flèches diffusion arrière -->
+                <g>
+                  <line x1="765" y1="290" x2="685" y2="290" stroke="#7b6bff" stroke-width="2" marker-end="url(#arrow-violet)"/>
+                  <line x1="945" y1="290" x2="865" y2="290" stroke="#7b6bff" stroke-width="2" marker-end="url(#arrow-violet)"/>
+                  <line x1="1005" y1="230" x2="1005" y2="270" stroke="#7b6bff" stroke-width="2" marker-end="url(#arrow-violet)"/>
+                  <text x="825" y="308" text-anchor="middle" class="label-mono" fill="#7b6bff">
+                    − bruit (appris)
+                  </text>
+                  <text x="825" y="325" text-anchor="middle" class="label-title" fill="#7b6bff" font-size="12">
+                    processus ARRIÈRE (le modèle)
+                  </text>
+                </g>
+
+                <!-- U-turn -->
+                <path d="M 685 185 Q 700 240 685 290" stroke="#7b6bff" stroke-width="2" fill="none" stroke-dasharray="4,4" opacity="0.5"/>
+              </svg>
+            </div>
+            <figcaption>
+              <strong>Schéma central de la diffusion.</strong> En haut, le processus
+              avant applique du bruit gaussien progressivement (déterministe, non
+              appris). En bas, le processus arrière — celui que le modèle apprend —
+              retire ce bruit pas à pas. Une fois entraîné, on peut échantillonner
+              du bruit pur et le laisser se transformer en une image nouvelle.
+            </figcaption>
+          </figure>
+
+          <h3>Pourquoi ça marche ? L'intuition physique</h3>
+          <p>
+            Reprenons l'analogie de la goutte d'encre. Si on filme sa dispersion
+            dans l'eau, la vidéo lue à l'endroit montre l'encre s'étaler. Lue à
+            l'envers, elle montre l'encre se rassembler — ce qui viole les lois
+            de la thermodynamique dans le monde macroscopique, mais reste
+            parfaitement défini au niveau microscopique. C'est cette réversibilité
+            microscopique que le modèle apprend&nbsp;: à chaque étape, quelle est
+            la <em>direction</em> statistiquement la plus probable pour «&nbsp;remonter
+            le temps&nbsp;» d'un cran ?
+          </p>
+
+          <p>
+            Cette perspective est formalisée par le <em>score matching</em> (Song
+            &amp; Ermon, 2019) et par les <em>équations différentielles
+            stochastiques</em> (SDE), qui unifient tous les modèles de diffusion
+            sous un même cadre mathématique. Nous n'entrerons pas plus loin dans
+            les détails ici, mais retenez la formulation intuitive&nbsp;: <strong>le
+            modèle apprend, pour chaque niveau de bruit, la direction dans laquelle
+            «&nbsp;pointe&nbsp;» l'image plausible la plus proche</strong>.
+<!-- @include sections/04b-simulateur.html -->
+   </p>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+

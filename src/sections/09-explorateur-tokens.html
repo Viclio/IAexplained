@@ -1,0 +1,111 @@
+      <!-- ==========================================
+           SECTION 7bis — EXPLORATEUR DE TOKENS
+           ========================================== -->
+      <section id="explorateur-tokens">
+        <div class="container">
+          <span class="section-number">09 — DÉMONSTRATION INTERACTIVE</span>
+          <h2 class="section-title">
+            Explorateur de <em>tokens</em>
+          </h2>
+          <p class="section-lede">
+            Chaque mot d'une phrase est encodé en un point dans un espace de très
+            grande dimension (768 chez CLIP, 1&nbsp;280 chez CLIP-L). Cette
+            démonstration projette un lexique de plus de 1&nbsp;100&nbsp;mots dans
+            un espace <strong>tridimensionnel simplifié</strong>, selon trois jeux
+            d'axes permutables&nbsp;: sémantique, sensoriel, et temporel &amp;
+            social. Tape une phrase&nbsp;: les mots reconnus s'illuminent, et tu
+            peux observer leur position relative dans le nuage.
+          </p>
+
+          <div class="app-embed" id="token-space-app">
+
+
+    <div class="app-controls">
+      <input
+        type="text"
+        id="ts-input"
+        class="ts-input"
+        placeholder="Ex. : un chat noir dort sur un canapé rouge"
+        value="un chat noir dort sur un canapé rouge"
+        maxlength="200"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button type="button" id="ts-submit" class="ts-btn">Encoder</button>
+    </div>
+
+    <div class="ts-axis-switcher">
+      <span class="ts-axis-switcher-label">Axes&nbsp;:</span>
+      <button type="button" class="ts-axis-btn active" data-axisset="sem">Sémantique</button>
+      <button type="button" class="ts-axis-btn" data-axisset="sens">Sensoriel</button>
+      <button type="button" class="ts-axis-btn" data-axisset="temp">Temporel &amp; social</button>
+    </div>
+
+    <div class="app-suggestions">
+      <span class="ts-sugg-label">Essaie&nbsp;:</span>
+      <button type="button" class="ts-chip" data-phrase="un chien joyeux court dans la forêt">chien joyeux forêt</button>
+      <button type="button" class="ts-chip" data-phrase="la liberté est un rêve puissant">liberté rêve</button>
+      <button type="button" class="ts-chip" data-phrase="une pomme rouge sur une table en bois">pomme table bois</button>
+      <button type="button" class="ts-chip" data-phrase="la guerre apporte tristesse et peur">guerre tristesse peur</button>
+      <button type="button" class="ts-chip" data-phrase="un océan bleu profond et calme">océan bleu calme</button>
+    </div>
+
+    <div class="app-canvas-wrap">
+      <div id="ts-canvas" class="ts-canvas" aria-label="Espace vectoriel 3D interactif"></div>
+      <div class="ts-axes-legend">
+        <div><span class="ts-axis-dot" style="background:#ff6b6b"></span> Axe X — <em>vivant → inanimé</em></div>
+        <div><span class="ts-axis-dot" style="background:#4ecdc4"></span> Axe Y — <em>concret → abstrait</em></div>
+        <div><span class="ts-axis-dot" style="background:#ffd93d"></span> Axe Z — <em>positif → négatif</em></div>
+      </div>
+      <div id="ts-status" class="ts-status"></div>
+    </div>
+
+    <div class="app-explainer">
+      <div class="app-explainer-item">
+        <span class="app-explainer-num">1</span>
+        <div>
+          <strong>Tokenisation</strong>
+          <p>Chaque mot est découpé en «&nbsp;tokens&nbsp;» — ici on simplifie
+          à un token par mot connu.</p>
+        </div>
+      </div>
+      <div class="app-explainer-item">
+        <span class="app-explainer-num">2</span>
+        <div>
+          <strong>Embedding</strong>
+          <p>Le token est transformé en vecteur numérique. Les vrais modèles
+          apprennent ces vecteurs&nbsp;; ici on utilise une projection manuelle.</p>
+        </div>
+      </div>
+      <div class="app-explainer-item">
+        <span class="app-explainer-num">3</span>
+        <div>
+          <strong>Géométrie sémantique</strong>
+          <p>Les mots proches par le sens («&nbsp;chien&nbsp;» et «&nbsp;chat&nbsp;»)
+          finissent proches dans l'espace. C'est ce qui permet à l'IA de
+          «&nbsp;comprendre&nbsp;».</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-warn">
+      <span class="callout-label">Attention !</span>
+      <p>
+        Un vrai encodeur textuel travaille en <strong>plusieurs centaines de
+        dimensions</strong>, apprises automatiquement sur des milliards de
+        phrases. La projection 3D ci-dessus est une <em>simplification</em>
+        conçue pour l'apprentissage — mais le principe fondamental (les mots
+        proches par le sens sont proches dans l'espace vectoriel) est bien réel.
+      </p>
+    </div>
+  </div>
+
+  <link rel="stylesheet" href="styles/token-explorer.css" data-inline />
+
+  <script type="module" src="scripts/token-explorer.js" data-inline></script>
+        </div>
+      </section>
+
+
+      <div class="divider"></div>
+

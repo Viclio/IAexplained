@@ -1,0 +1,82 @@
+      <!-- ==========================================
+           SECTION 3 — PRINCIPES FONDAMENTAUX
+           ========================================== -->
+      <section id="principes">
+        <div class="container">
+          <span class="section-number">03 — PRINCIPES</span>
+          <h2 class="section-title">
+            Deux idées à la base de <em>tout</em>
+          </h2>
+          <p class="section-lede">
+            Avant de plonger dans les architectures, deux concepts doivent être
+            solidement établis. Sans eux, rien ne fait sens.
+          </p>
+
+          <h3>Idée n°1 — Modéliser une distribution de probabilité</h3>
+          <p>
+            Une image n'est mathématiquement rien de plus qu'un point dans un
+            espace de très grande dimension. Pour une image couleur de 1024 × 1024
+            pixels, chaque image est un vecteur de <code>1024 × 1024 × 3 ≈ 3,1
+            millions</code> de nombres, chacun entre 0 et 255. Cet espace est
+            gigantesque — mais toutes les configurations possibles ne sont pas
+            des images «&nbsp;réelles&nbsp;». La grande majorité (une écrasante
+            majorité) ne sont que du bruit sans structure. Les vraies images
+            forment un <strong>sous-ensemble minuscule</strong>, une sorte de
+            fine «&nbsp;variété&nbsp;» qui serpente à travers cet espace immense.
+          </p>
+          <p>
+            Une IA générative apprend à estimer la <em>distribution de
+            probabilité</em> qui décrit ce sous-ensemble&nbsp;: <em>quels points
+            de cet espace sont des images plausibles&nbsp;?</em> &nbsp; Une fois cette
+            distribution correctement apprise, on peut y <strong>échantillonner</strong>
+            — c'est-à-dire tirer au sort un point selon cette probabilité — pour
+            obtenir une image plausible mais totalement nouvelle.
+          </p>
+
+          <div class="callout">
+            <span class="callout-label">Analogie</span>
+            <p>
+              Imaginez un dictionnaire qui listerait, pour chaque phrase possible
+              de la langue française, sa probabilité d'être prononcée par un
+              locuteur natif. Cette table gigantesque est un modèle génératif de
+              texte. Une IA d'image apprend l'équivalent pour les images — mais
+              en 3 millions de dimensions plutôt qu'en dimension «&nbsp;mots&nbsp;».</p>
+          </div>
+
+          <h3>Idée n°2 — Apprendre à débruiter</h3>
+          <p>
+            Estimer directement cette distribution de probabilité est
+            mathématiquement impossible à l'échelle utile. Les modèles de
+            diffusion contournent ce mur avec une astuce élégante&nbsp;: au lieu
+            de modéliser la distribution en une fois, on apprend une opération
+            beaucoup plus simple — <strong>enlever un petit peu de bruit</strong>.
+            Répétée assez de fois, cette opération transforme du bruit pur en une
+            image cohérente.
+          </p>
+
+          <figure>
+            <img
+              src="{{inline:assets/principes.jpg}}"
+              alt="Séquence de huit panneaux montrant la transformation progressive d'un bruit visuel en photographie détaillée d'un chat roux, illustrant le processus de débruitage."
+            />
+            <figcaption>
+              <strong>Le processus de débruitage inverse.</strong> Chaque panneau
+              représente une étape (ou <em>timestep</em>). Le modèle part de bruit
+              pur (à gauche) et retire progressivement le bruit pour révéler une
+              image finale (à droite). Un modèle standard réalise entre 20 et 50
+              étapes de ce type pour une image.
+            </figcaption>
+          </figure>
+
+          <p>
+            Cette idée — «&nbsp;débruiter petit à petit&nbsp;» — a une propriété
+            magique&nbsp;: elle est équivalente, mathématiquement, à échantillonner
+            selon la distribution des images réelles. C'est le théorème central
+            des modèles de diffusion, démontré dans les travaux de Sohl-Dickstein
+            (2015) puis Ho et al. (2020). Nous verrons pourquoi dans la section
+            suivante.</p>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+

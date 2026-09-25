@@ -1,0 +1,77 @@
+      <!-- ==========================================
+           SECTION 10 — CONTRÔLE
+           ========================================== -->
+      <section id="controle">
+        <div class="container">
+          <span class="section-number">12 — CONTRÔLE</span>
+          <h2 class="section-title">
+            Le contrôle fin : <em>ControlNet, IP-Adapter, inpainting</em>
+          </h2>
+          <p class="section-lede">
+            Un prompt textuel est puissant mais imprécis. Comment imposer une
+            pose exacte, une composition, une identité de visage ? L'écosystème
+            a développé des outils spécifiques.
+          </p>
+
+          <div class="grid-2">
+            <div class="card">
+              <h4>ControlNet</h4>
+              <p>
+                Publié par Zhang et al. (2023). Duplique une partie du U-Net et
+                lui fait ingérer une <strong>carte de contrôle</strong>&nbsp;:
+                contour Canny, carte de profondeur, squelette OpenPose,
+                segmentation, esquisse humaine. Le modèle est alors forcé à
+                respecter cette contrainte tout en générant selon le prompt.
+                C'est la révolution 2023 du contrôle spatial précis.
+              </p>
+            </div>
+            <div class="card">
+              <h4>IP-Adapter</h4>
+              <p>
+                Permet de donner une <strong>image de référence</strong> pour le
+                style ou le sujet, en plus du prompt textuel. Concrètement, il
+                encode l'image via CLIP (encodeur d'image, cette fois) et
+                injecte ces embeddings dans le U-Net. Excellent pour transférer
+                une identité visuelle ou un style précis.
+              </p>
+            </div>
+            <div class="card">
+              <h4>Inpainting / Outpainting</h4>
+              <p>
+                On masque une région d'une image existante et on demande au
+                modèle de la re-générer selon un prompt (inpainting), ou on
+                étend l'image au-delà de son cadre (outpainting). Techniquement,
+                on encode l'image en latent, on ne rebruite que la région
+                masquée, et on laisse la diffusion reconstruire.
+              </p>
+            </div>
+            <div class="card">
+              <h4>img2img</h4>
+              <p>
+                Partir d'une image existante plutôt que de bruit pur. On l'encode
+                dans l'espace latent, on lui applique un peu de bruit (contrôlé
+                par le paramètre <em>denoising strength</em>), puis on lance la
+                diffusion. Résultat : une variation stylistique de l'image
+                d'origine. Fondamental pour l'itération artistique.
+              </p>
+            </div>
+          </div>
+
+          <figure>
+            <img
+              src="{{inline:assets/lora.jpg}}"
+              alt="Grille de 9 portraits du même personnage rendus dans 9 styles artistiques radicalement différents, illustrant la flexibilité des modèles génératifs."
+            />
+            <figcaption>
+              <strong>Un même sujet, neuf styles.</strong> Toutes ces images ont
+              été générées à partir de descriptions textuelles proches, en variant
+              simplement les mots-clés stylistiques du prompt. La séparation
+              nette entre «&nbsp;contenu&nbsp;» (le sujet) et «&nbsp;style&nbsp;»
+              (le rendu) est une propriété émergente des modèles de diffusion
+              modernes, particulièrement forte quand ils sont couplés à des LoRAs
+              ou à IP-Adapter.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+

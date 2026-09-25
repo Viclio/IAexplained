@@ -1,0 +1,371 @@
+            <!-- ==========================================
+           SECTION 11 — L'ÉDITION D'IMAGES PAR INSTRUCTION
+           ==========================================  -->
+      <section id="edition">
+        <div class="container">
+          <span class="section-number">13 — ÉDITER, PAS DÉCRIRE</span>
+          <h2 class="section-title">
+            Les modèles d'<em>édition d'images par instruction</em>
+          </h2>
+          <p class="section-lede">
+            Depuis 2024-2025, une nouvelle famille de modèles a émergé&nbsp;:
+            au lieu de décrire l'image que l'on veut obtenir, on fournit une
+            image existante et une instruction en langage naturel décrivant la
+            modification à apporter — «&nbsp;change la couleur de la
+            voiture en rouge&nbsp;», «&nbsp;fais-la sourire&nbsp;»,
+            «&nbsp;ajoute de la neige&nbsp;». FLUX.2, Qwen-Image-Edit
+          ou Nano Banana en sont les représentants les plus aboutis. </p>
+
+          <h3>Décrire versus modifier&nbsp;: une différence fondamentale</h3>
+          <p>
+            Le texte-vers-image, présenté dès la section&nbsp;03, part d'un
+            bruit pur et le sculpte vers une image qui correspond à un
+            prompt&nbsp;: le point de départ ne contient aucune information
+            utile, tout vient du texte. L'édition par instruction inverse la
+            logique&nbsp;: le point de départ est une image
+            <strong>riche en information</strong> (une photo précise, avec sa
+            composition, ses couleurs, son sujet), et le texte ne décrit plus
+            le contenu final mais seulement la <strong>transformation</strong>
+            à appliquer. Le modèle doit donc résoudre un problème différent&nbsp;:
+            identifier quelles parties de l'image conserver à l'identique et
+            lesquelles modifier, sans qu'on le lui indique explicitement au
+            pixel près.
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Aspect</th>
+                  <th>Texte-vers-image</th>
+                  <th>Édition par instruction</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Entrée</td>
+                  <td>Un texte seul</td>
+                  <td>Une image existante&nbsp;+ un texte d'instruction</td>
+                </tr>
+                <tr>
+                  <td>Point de départ du débruitage</td>
+                  <td>Bruit pur, aucune information</td>
+                  <td>Latent de l'image source, très informatif</td>
+                </tr>
+                <tr>
+                  <td>Rôle du texte</td>
+                  <td>Décrit tout le contenu voulu</td>
+                  <td>Décrit uniquement le changement à apporter</td>
+                </tr>
+                <tr>
+                  <td>Contrainte principale</td>
+                  <td>Fidélité globale au prompt</td>
+                  <td>
+                    Préserver l'identité du sujet et le reste de la
+                    composition
+                  </td>
+                </tr>
+                <tr>
+                  <td>Exemple de tâche</td>
+                  <td>« Un renard roux dans une forêt enneigée »</td>
+                  <td>« Change le pelage du renard en blanc »</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout">
+            <span class="callout-label">Repère</span>
+            <p>
+              On avait déjà croisé une forme d'édition en
+              section&nbsp;10&nbsp;: l'inpainting permet
+              aussi de modifier une image existante. La différence est que cette
+              technique exigent un <em>masque</em> &nbsp; explicite pour indiquer où agir. Les
+              modèles d'édition par instruction, eux, comprennent directement
+              une phrase en langage naturel et localisent seuls la zone
+              concernée&nbsp;: plus besoin de dessiner un masque à la main.</p>
+          </div>
+
+          <h3>Comment ces modèles fonctionnent</h3>
+          <p>
+            Le principe technique central s'appelle la <strong>génération en
+            contexte</strong> (<em>in-context generation</em>). Plutôt que
+            d'entraîner un modèle séparé pour l'édition, des systèmes comme
+            FLUX.1 Kontext réutilisent l'architecture Diffusion Transformer
+            vue en section&nbsp;05, en modifiant simplement ce qu'on lui donne
+            à «&nbsp;lire&nbsp;» au début.
+          </p>
+          <ol>
+            <li>
+              <strong>Encodage de l'image source&nbsp;:</strong> l'image
+              fournie est encodée par le VAE (section&nbsp;07) en un latent
+              compact, exactement comme le serait une image en cours de
+              génération.
+            </li>
+            <li>
+              <strong>Concaténation en séquence&nbsp;:</strong> ce latent
+              «&nbsp;image de référence&nbsp;» est concaténé, comme des jetons
+              supplémentaires, à la séquence de jetons de bruit qui sera
+              débruitée — le Transformer reçoit donc <em>à la fois</em> le
+              contenu de l'image source et le bruit à transformer dans une
+              seule et même séquence d'entrée.
+            </li>
+            <li>
+              <strong>Encodage de l'instruction&nbsp;:</strong> le texte de
+              l'instruction est encodé par un encodeur de texte (proche de
+              celui de la section&nbsp;06) puis injecté par attention croisée,
+              comme un prompt classique.
+            </li>
+            <li>
+              <strong>Attention conjointe&nbsp;:</strong> pendant le
+              débruitage, l'attention du Transformer (section&nbsp;05) relie
+              chaque région en cours de génération à la fois aux régions
+              correspondantes de l'image source et aux mots de l'instruction —
+              c'est ce mécanisme qui permet au modèle de recopier fidèlement
+              les zones non concernées et de ne transformer que ce que
+              l'instruction demande.
+            </li>
+            <li>
+              <strong>Décodage final&nbsp;:</strong> le latent obtenu après
+              débruitage est décodé par le VAE en une image, comme dans le
+              pipeline standard de la section&nbsp;08.
+            </li>
+          </ol>
+
+          <figure class="wide">
+            <div class="svg-wrap">
+              <svg
+                class="diagram-svg"
+                viewBox="0 0 1100 480"
+                xmlns="http://www.w3.org/2000/svg"
+                role="img"
+                aria-label="Comparaison entre le pipeline texte-vers-image et le pipeline d'édition par instruction"
+              >
+                <defs>
+                  <linearGradient id="edit-src" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#c9a24a"/>
+                    <stop offset="1" stop-color="#f2d78a"/>
+                  </linearGradient>
+                  <linearGradient id="edit-txt" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#7b6bff"/>
+                    <stop offset="1" stop-color="#4ec9c1"/>
+                  </linearGradient>
+                  <marker id="arrow-edit" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#4ec9c1"/>
+                  </marker>
+                </defs>
+
+                <text x="550" y="28" text-anchor="middle" class="label-title" font-size="15">
+                  Texte-vers-image versus édition par instruction
+                </text>
+
+                <!-- Ligne 1 : Texte vers image -->
+                <text x="30" y="80" class="label-mono" fill="#4ec9c1" font-size="12">Texte-vers-image</text>
+                <g transform="translate(30, 95)">
+                  <rect x="0" y="0" width="140" height="55" rx="6" fill="#251f45" stroke="#7b6bff" stroke-width="1.5"/>
+                  <text x="70" y="24" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">Bruit pur</text>
+                  <text x="70" y="42" text-anchor="middle" class="label-muted" font-size="9">aucune info</text>
+                </g>
+                <line x1="170" y1="122" x2="230" y2="122" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-edit)"/>
+                <g transform="translate(230, 90)">
+                  <rect x="0" y="0" width="180" height="65" rx="6" fill="url(#edit-txt)" opacity="0.9"/>
+                  <text x="90" y="26" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Diffusion Transformer</text>
+                  <text x="90" y="46" text-anchor="middle" fill="#fff" font-size="9" opacity="0.85">guidé par texte seul</text>
+                </g>
+                <line x1="410" y1="122" x2="470" y2="122" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-edit)"/>
+                <g transform="translate(470, 95)">
+                  <rect x="0" y="0" width="140" height="55" rx="6" fill="#16122a" stroke="#c9a24a" stroke-width="1.5"/>
+                  <text x="70" y="24" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">Image générée</text>
+                  <text x="70" y="42" text-anchor="middle" class="label-muted" font-size="9">contenu inédit</text>
+                </g>
+                <g transform="translate(230, 40)">
+                  <rect x="0" y="0" width="180" height="30" rx="5" fill="#7b6bff" opacity="0.25"/>
+                  <text x="90" y="20" text-anchor="middle" class="label-mono" font-size="9" fill="#fff">« un renard dans la neige »</text>
+                </g>
+
+                <!-- Ligne 2 : Edition par instruction -->
+                <text x="30" y="230" class="label-mono" fill="#c9a24a" font-size="12">Édition par instruction</text>
+                <g transform="translate(30, 245)">
+                  <rect x="0" y="0" width="140" height="55" rx="6" fill="url(#edit-src)" opacity="0.9"/>
+                  <text x="70" y="24" text-anchor="middle" fill="#0e0b1a" font-size="11" font-weight="700">Image source</text>
+                  <text x="70" y="42" text-anchor="middle" fill="#0e0b1a" font-size="9" opacity="0.8">latent VAE riche</text>
+                </g>
+                <g transform="translate(30, 310)">
+                  <rect x="0" y="0" width="140" height="45" rx="6" fill="#251f45" stroke="#7b6bff" stroke-width="1.5"/>
+                  <text x="70" y="20" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Instruction</text>
+                  <text x="70" y="36" text-anchor="middle" class="label-mono" font-size="8">« pelage en blanc »</text>
+                </g>
+                <line x1="170" y1="272" x2="230" y2="272" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-edit)"/>
+                <line x1="170" y1="332" x2="230" y2="290" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-edit)"/>
+                <g transform="translate(230, 240)">
+                  <rect x="0" y="0" width="180" height="65" rx="6" fill="url(#edit-txt)" opacity="0.9"/>
+                  <text x="90" y="24" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Diffusion Transformer</text>
+                  <text x="90" y="42" text-anchor="middle" fill="#fff" font-size="9" opacity="0.85">séquence concaténée</text>
+                  <text x="90" y="56" text-anchor="middle" fill="#fff" font-size="9" opacity="0.85">image + texte</text>
+                </g>
+                <line x1="410" y1="272" x2="470" y2="272" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-edit)"/>
+                <g transform="translate(470, 245)">
+                  <rect x="0" y="0" width="140" height="55" rx="6" fill="#16122a" stroke="#c9a24a" stroke-width="1.5"/>
+                  <text x="70" y="24" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">Image éditée</text>
+                  <text x="70" y="42" text-anchor="middle" class="label-muted" font-size="9">reste conservé</text>
+                </g>
+
+                <text x="550" y="400" text-anchor="middle" class="label-muted" font-size="11">
+                  Même architecture de fond (Diffusion Transformer, section 05) — seule la nature de l'entrée change&nbsp;:
+                </text>
+                <text x="550" y="420" text-anchor="middle" class="label-muted" font-size="11">
+                  bruit pur guidé par texte contre latent image riche guidé par une instruction de transformation.
+                </text>
+              </svg>
+            </div>
+            <figcaption>
+              <strong>Deux pipelines, une seule architecture.</strong> Le
+              texte-vers-image part d'un bruit sans information et laisse le
+              texte définir tout le contenu&nbsp;; l'édition par instruction
+              part du latent riche d'une image réelle, concaténé au bruit, et
+              n'utilise le texte que pour cibler la transformation à
+              appliquer — le reste de l'image est naturellement préservé par
+              l'attention du Transformer.
+            </figcaption>
+          </figure>
+
+          <h3>Cohérence et itération</h3>
+          <p>
+            Le principal défi de ces modèles est la <strong>préservation de
+            l'identité</strong>&nbsp;: un visage, un logo ou une posture ne
+            doivent pas dériver au fil des retouches. FLUX.1 Kontext a
+            notamment introduit un entraînement spécifique pour rester stable
+            sur plusieurs tours d'édition successifs (modifier l'image une
+            première fois, puis relancer une seconde instruction sur le
+            résultat), un scénario fréquent en production où l'on affine une
+            image par petites touches successives plutôt qu'en une seule
+            passe.
+          </p>
+
+          <h3>FLUX.2&nbsp;: une même famille pour tous les besoins</h3>
+          <p>
+            Black Forest Labs illustre bien cette unification entre
+            génération et édition avec sa gamme <strong>FLUX.2</strong>, ses
+            modèles les plus récents. Plutôt qu'un seul modèle, la famille se
+            décline en plusieurs tailles pensées pour des contraintes
+            différentes&nbsp;: <strong>FLUX.2 [dev]</strong> (32&nbsp;milliards
+            de paramètres) vise la qualité maximale et la meilleure fidélité
+            au prompt, tandis que <strong>FLUX.2 [klein]</strong> — décliné en
+            variantes <strong>9B</strong> et <strong>4B</strong> — privilégie
+            la vitesse, avec une génération ou une édition en moins d'une
+            seconde sur du matériel grand public. Tous ces modèles partagent
+            la même architecture unifiée&nbsp;: un seul réseau gère aussi bien
+            le texte-vers-image classique que l'édition par instruction
+            décrite plus haut, la différence ne portant que sur la taille du
+            modèle et son niveau de distillation. Cette segmentation en
+            plusieurs tailles (32&nbsp;Md, 9&nbsp;Md, 4&nbsp;Md) permet de
+            couvrir un large spectre de besoins&nbsp;: qualité de production
+            en studio pour le modèle le plus grand, prototypage interactif en
+            temps réel pour les variantes Klein, jusqu'à l'exécution sur une
+            simple carte grand public pour la version 4B, publiée sous licence
+            Apache&nbsp;2.0.
+          </p>
+
+          <h3>Panorama des modèles d'édition</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Modèle</th>
+                  <th>Éditeur</th>
+                  <th>Statut</th>
+                  <th>Particularité</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>FLUX.2 [dev]</td>
+                  <td>Black Forest Labs</td>
+                  <td>Ouvert (poids, 32&nbsp;Md de paramètres)</td>
+                  <td>
+                    Modèle phare de la famille FLUX.2, unifie
+                    texte-vers-image et édition, multi-référence jusqu'à
+                    10&nbsp;images, meilleure fidélité de prompt de la gamme
+                  </td>
+                </tr>
+                <tr>
+                  <td>FLUX.2 [klein] 9B</td>
+                  <td>Black Forest Labs</td>
+                  <td>Ouvert (licence non commerciale)</td>
+                  <td>
+                    Version distillée en 4 étapes, génération et édition en
+                    moins d'une seconde, qualité proche d'un modèle 5&nbsp;fois
+                    plus gros
+                  </td>
+                </tr>
+                <tr>
+                  <td>FLUX.2 [klein] 4B</td>
+                  <td>Black Forest Labs</td>
+                  <td>Ouvert (Apache&nbsp;2.0)</td>
+                  <td>
+                    Variante la plus légère, tourne sur GPU grand public
+                    (~13&nbsp;Go de VRAM), texte-vers-image et édition dans le
+                    même modèle
+                  </td>
+                </tr>
+                <tr>
+                  <td>Qwen-Image-Edit</td>
+                  <td>Alibaba (open source)</td>
+                  <td>Ouvert</td>
+                  <td>
+                    Accepte jusqu'à 14 images de référence simultanées,
+                    excellent en édition régionale fine
+                  </td>
+                </tr>
+                <tr>
+                  <td>Ideogram 4.0</td>
+                  <td>Ideogram</td>
+                  <td>Ouvert (poids publiés)</td>
+                  <td>
+                    Premier modèle open source de l'éditeur (9,3&nbsp;Md de
+                    paramètres), unifie texte-vers-image et édition, rendu
+                    typographique de référence conservé en version ouverte
+                  </td>
+                </tr>
+                <tr>
+                  <td>Nano Banana / Nano Banana 2</td>
+                  <td>Google DeepMind</td>
+                  <td>Fermé (Gemini)</td>
+                  <td>
+                    Édition pilotée par un LLM qui raisonne sur l'instruction
+                    avant de modifier l'image (voir section&nbsp;16)
+                  </td>
+                </tr>
+                <tr>
+                  <td>Seedream 4.0</td>
+                  <td>ByteDance</td>
+                  <td>Fermé (API)</td>
+                  <td>
+                    Génération et édition dans une seule architecture, sans
+                    changer d'outil (voir section&nbsp;16)
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout">
+            <span class="callout-label">À retenir</span>
+            <p>
+              L'édition par instruction ne remplace pas le texte-vers-image,
+              elle le complète&nbsp;: on décrit une image à partir de rien
+              quand on part d'une idée, on édite par instruction quand on part
+              d'une image concrète — une photo personnelle, un rendu produit, une
+              création précédente — qu'on veut faire évoluer sans tout
+              recommencer. Techniquement, ces deux usages partagent la même
+              architecture de diffusion&nbsp;; seule la manière de construire
+              l'entrée du modèle diffère.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+<div class="divider"></div>
+

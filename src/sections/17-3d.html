@@ -1,0 +1,312 @@
+            <!-- ==========================================
+           SECTION 14 — LA GÉNÉRATION 3D
+           ==========================================  -->
+      <section id="3d">
+        <div class="container">
+          <span class="section-number">16 — LA TROISIÈME DIMENSION</span>
+          <h2 class="section-title">
+            De l'image à l'objet&nbsp;: la <em>génération 3D</em>
+          </h2>
+          <p class="section-lede">
+            Générer un objet 3D à partir d'un texte ou d'une image pose un
+            défi différent de l'image ou de la vidéo&nbsp;: il ne s'agit plus
+            de produire des pixels, mais une <em>géométrie</em> cohérente sous
+            tous les angles, accompagnée d'une texture qui s'applique
+            proprement à cette surface. Deux grandes familles de méthodes
+            coexistent aujourd'hui pour y parvenir.
+          </p>
+
+          <h3>Pourquoi la 3D est un problème différent</h3>
+          <p>
+            Une image 2D est une grille de pixels&nbsp;: une structure simple,
+            régulière, sur laquelle la diffusion s'applique naturellement (on
+            l'a vu dès la section 04). Un objet 3D, lui, n'a pas de
+            représentation « native » évidente. On peut le décrire comme un
+            <strong>maillage</strong> (<em>mesh</em>&nbsp;: sommets, arêtes,
+            faces), un <strong>champ de radiance neuronal</strong> (NeRF), ou
+            un <strong>nuage de gaussiennes</strong> (Gaussian Splatting) — et
+            chacune de ces représentations a des propriétés mathématiques très
+            différentes d'une grille de pixels, ce qui complique l'application
+            directe de la diffusion.
+          </p>
+
+          <div class="callout">
+            <span class="callout-label">Repère</span>
+            <p>
+              Générer une image cohérente sous un seul angle est déjà difficile.
+              Générer un objet dont <em>toutes les vues possibles</em> restent
+              cohérentes entre elles — de face, de dos, de dessus — multiplie la
+              contrainte par le nombre de points de vue possibles, quasiment
+              infini.
+            </p>
+          </div>
+
+          <h3>Voie 1&nbsp;: la diffusion 2D « élevée » en 3D</h3>
+          <p>
+            La première génération d'outils (DreamFusion, Magic3D, 2022-2023)
+            ne réentraîne pas un modèle sur des données 3D&nbsp;: elle
+            réutilise un modèle de diffusion d'image déjà entraîné (comme
+            Stable Diffusion) et l'utilise comme <em>juge de plausibilité</em>
+            pour optimiser progressivement un objet 3D.
+          </p>
+          <ol>
+            <li>
+              On initialise une représentation 3D vide ou aléatoire, le plus
+              souvent un <strong>NeRF</strong> (un petit réseau de neurones qui
+              encode la couleur et la densité de chaque point de l'espace).
+            </li>
+            <li>
+              On rend ce NeRF sous un angle de caméra aléatoire, produisant une
+              image 2D.
+            </li>
+            <li>
+              On envoie cette image au modèle de diffusion 2D et on mesure à
+              quel point elle ressemble à «&nbsp;un chat en céramique&nbsp;»
+              (le prompt), via une technique appelée
+              <strong>Score Distillation Sampling</strong> (SDS).
+            </li>
+            <li>
+              On rétropropage ce signal jusqu'aux paramètres du NeRF pour
+              l'ajuster, puis on recommence avec un nouvel angle de caméra —
+              des centaines de fois.
+            </li>
+          </ol>
+          <p>
+            Cette approche fonctionne sans données 3D d'entraînement
+            spécifiques, mais elle est <strong>lente</strong> (30 minutes à
+            plusieurs heures par objet) et souffre du «&nbsp;problème de
+            Janus&nbsp;»&nbsp;: comme le modèle 2D n'a aucune notion de
+            cohérence globale, il arrive qu'il fasse apparaître un second
+            visage à l'arrière d'une tête, chaque vue étant optimisée presque
+            indépendamment.
+          </p>
+
+          <h3>Voie 2&nbsp;: la diffusion 3D native</h3>
+          <p>
+            Les systèmes actuels les plus utilisés (Hunyuan3D, Tripo, Rodin,
+            Meshy) entraînent directement un modèle de diffusion sur des
+            <strong>données 3D à grande échelle</strong> (des millions
+            d'objets 3D existants), sans passer par l'intermédiaire d'un
+            modèle image. Le principe général suit un pipeline en deux
+            temps&nbsp;:
+          </p>
+          <ul>
+            <li>
+              <strong>Étape géométrie&nbsp;:</strong> un modèle de diffusion
+              apprend à débruiter directement une représentation 3D compacte
+              (souvent une grille de « latents de forme » proche du VAE vu en
+              section 07, mais en trois dimensions) pour produire un maillage
+              propre, sans texture.
+            </li>
+            <li>
+              <strong>Étape texture&nbsp;:</strong> un second modèle,
+              généralement dérivé d'un modèle de diffusion d'image classique,
+              génère les textures en «&nbsp;peignant&nbsp;» plusieurs vues du
+              maillage puis en les projetant sur sa surface (UV mapping).
+            </li>
+          </ul>
+
+          <figure class="wide">
+            <div class="svg-wrap">
+              <svg
+                class="diagram-svg"
+                viewBox="0 0 1100 460"
+                xmlns="http://www.w3.org/2000/svg"
+                role="img"
+                aria-label="Pipeline de génération 3D native en deux étapes : géométrie puis texture"
+              >
+                <defs>
+                  <linearGradient id="grad-geo" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#7b6bff"/>
+                    <stop offset="1" stop-color="#4ec9c1"/>
+                  </linearGradient>
+                  <linearGradient id="grad-tex" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#c9a24a"/>
+                    <stop offset="1" stop-color="#f2d78a"/>
+                  </linearGradient>
+                  <marker id="arrow-3d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#4ec9c1"/>
+                  </marker>
+                </defs>
+
+                <text x="550" y="30" text-anchor="middle" class="label-title" font-size="16">
+                  Pipeline de génération 3D native (type Hunyuan3D)
+                </text>
+
+                <!-- Entrée : image ou texte -->
+                <g transform="translate(40, 90)">
+                  <rect x="0" y="0" width="130" height="90" rx="8" fill="#251f45" stroke="#2f2856" stroke-width="1.5"/>
+                  <text x="65" y="35" text-anchor="middle" fill="#fff" font-weight="600" font-size="13">Image ou</text>
+                  <text x="65" y="53" text-anchor="middle" fill="#fff" font-weight="600" font-size="13">texte source</text>
+                  <text x="65" y="75" text-anchor="middle" class="label-muted" font-size="10">« un vase en grès »</text>
+                </g>
+
+                <line x1="170" y1="135" x2="240" y2="135" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-3d)"/>
+
+                <!-- Etape 1 : diffusion géométrie -->
+                <g transform="translate(240, 60)">
+                  <rect x="0" y="0" width="220" height="150" rx="8" fill="url(#grad-geo)" opacity="0.9"/>
+                  <text x="110" y="30" text-anchor="middle" fill="#fff" font-weight="700" font-size="14">Diffusion — géométrie</text>
+                  <text x="110" y="55" text-anchor="middle" fill="#fff" font-size="11" opacity="0.9">débruitage d'un latent 3D</text>
+                  <text x="110" y="75" text-anchor="middle" fill="#fff" font-size="11" opacity="0.9">(mêmes principes que la section 04)</text>
+                  <!-- petite forme wireframe -->
+                  <polygon points="80,110 110,95 140,110 140,135 110,148 80,135" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.85"/>
+                  <line x1="80" y1="110" x2="140" y2="135" stroke="#fff" stroke-width="1" opacity="0.5"/>
+                  <line x1="140" y1="110" x2="80" y2="135" stroke="#fff" stroke-width="1" opacity="0.5"/>
+                </g>
+
+                <line x1="460" y1="135" x2="530" y2="135" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-3d)"/>
+                <text x="505" y="120" text-anchor="middle" class="label-mono" fill="#4ec9c1" font-size="10">maillage nu</text>
+
+                <!-- Etape 2 : texturing multi-vue -->
+                <g transform="translate(550, 60)">
+                  <rect x="0" y="0" width="230" height="150" rx="8" fill="url(#grad-tex)" opacity="0.95"/>
+                  <text x="115" y="30" text-anchor="middle" fill="#0e0b1a" font-weight="700" font-size="14">Diffusion — texture</text>
+                  <text x="115" y="55" text-anchor="middle" fill="#0e0b1a" font-size="11" opacity="0.9">génère plusieurs vues du</text>
+                  <text x="115" y="72" text-anchor="middle" fill="#0e0b1a" font-size="11" opacity="0.9">maillage puis les projette (UV)</text>
+                  <!-- mini vues -->
+                  <rect x="55" y="90" width="35" height="35" rx="4" fill="#0e0b1a" opacity="0.5"/>
+                  <rect x="97" y="90" width="35" height="35" rx="4" fill="#0e0b1a" opacity="0.65"/>
+                  <rect x="139" y="90" width="35" height="35" rx="4" fill="#0e0b1a" opacity="0.8"/>
+                </g>
+
+                <line x1="760" y1="135" x2="830" y2="135" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-3d)"/>
+
+                <!-- Sortie -->
+                <g transform="translate(830, 60)">
+                  <rect x="0" y="0" width="220" height="150" rx="8" fill="#16122a" stroke="#c9a24a" stroke-width="1.5"/>
+                  <text x="110" y="30" text-anchor="middle" fill="#fff" font-weight="600" font-size="13">Objet 3D texturé</text>
+                  <text x="110" y="50" text-anchor="middle" class="label-mono" font-size="10">export .glb / .obj</text>
+                  <polygon points="70,90 110,72 150,90 150,110 110,128 70,110" fill="none" stroke="#c9a24a" stroke-width="1.5"/>
+                  <polygon points="70,90 110,72 150,90" fill="#c9a24a" opacity="0.35"/>
+                </g>
+
+                <text x="550" y="270" text-anchor="middle" class="label-muted" font-size="12">
+                  Contrairement à l'approche « SDS » (voie 1), aucune optimisation itérative par angle de caméra&nbsp;:
+                </text>
+                <text x="550" y="290" text-anchor="middle" class="label-muted" font-size="12">
+                  le maillage complet est produit en une seule passe de débruitage, en quelques secondes à quelques minutes.
+                </text>
+
+                <!-- Chronologie -->
+                <g transform="translate(150, 340)">
+                  <line x1="0" y1="20" x2="800" y2="20" stroke="#2f2856" stroke-width="2"/>
+                  <circle cx="0" cy="20" r="5" fill="#7b6bff"/>
+                  <circle cx="400" cy="20" r="5" fill="#4ec9c1"/>
+                  <circle cx="800" cy="20" r="5" fill="#c9a24a"/>
+                  <text x="0" y="45" text-anchor="middle" class="label-mono" font-size="10">latent bruité</text>
+                  <text x="400" y="45" text-anchor="middle" class="label-mono" font-size="10">maillage nu</text>
+                  <text x="800" y="45" text-anchor="middle" class="label-mono" font-size="10">maillage texturé</text>
+                </g>
+              </svg>
+            </div>
+            <figcaption>
+              <strong>Pipeline de génération 3D native.</strong> Une première
+              diffusion produit un maillage géométrique propre à partir d'un
+              latent 3D bruité ; une seconde diffusion, opérant sur plusieurs
+              vues 2D du maillage, génère et projette la texture. Le tout se
+              fait en une passe de débruitage par étape, sans optimisation
+              itérative caméra par caméra.
+            </figcaption>
+          </figure>
+
+          <h3>Le cas particulier du Gaussian Splatting</h3>
+          <p>
+            Une autre représentation 3D, le <strong>3D Gaussian
+            Splatting</strong>, gagne du terrain depuis 2023. Plutôt qu'un
+            maillage de triangles, la scène est représentée par un nuage de
+            millions de petites «&nbsp;taches&nbsp;» gaussiennes en 3D — chacune
+            avec une position, une taille, une orientation, une couleur et une
+            opacité. Ce format se prête très bien au rendu en temps réel et à
+            l'optimisation directe à partir de photos, ce qui en fait la base
+            de nombreux outils de <em>reconstruction</em> 3D à partir de
+            vidéos ; certains travaux récents l'utilisent aussi comme cible de
+            génération native, en diffusant directement des ensembles de
+            gaussiennes plutôt qu'un maillage.
+          </p>
+
+          <h3>Panorama des outils de génération 3D</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Outil</th>
+                  <th>Éditeur</th>
+                  <th>Approche</th>
+                  <th>Sortie</th>
+                  <th>Particularité</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Hunyuan3D 2.x</td>
+                  <td>Tencent (open source)</td>
+                  <td>Diffusion 3D native (géométrie puis texture)</td>
+                  <td>Maillage texturé (.glb)</td>
+                  <td>
+                    Pipeline en deux modèles ouverts, forte qualité de
+                    topologie, largement adopté par la communauté ComfyUI
+                  </td>
+                </tr>
+                <tr>
+                  <td>Tripo (P1.0 / H3.1)</td>
+                  <td>Tripo AI</td>
+                  <td>
+                    Diffusion 3D native « spatiale unifiée », résolution
+                    holistique de la structure
+                  </td>
+                  <td>Maillage prêt pour moteur de jeu</td>
+                  <td>
+                    Génération en quelques secondes, orientée production
+                    (topologie propre directement exploitable)
+                  </td>
+                </tr>
+                <tr>
+                  <td>Rodin</td>
+                  <td>Deemos</td>
+                  <td>Diffusion 3D native multi-vue</td>
+                  <td>Maillage texturé haute fidélité</td>
+                  <td>
+                    Réputé pour le niveau de détail géométrique sur des sujets
+                    complexes (personnages, mécanique)
+                  </td>
+                </tr>
+                <tr>
+                  <td>DreamFusion / Stable-DreamFusion</td>
+                  <td>Google Research / communauté</td>
+                  <td>Score Distillation Sampling sur NeRF</td>
+                  <td>NeRF ou maillage extrait</td>
+                  <td>
+                    Pas de données 3D nécessaires à l'entraînement, mais lent
+                    et sujet au « problème de Janus »
+                  </td>
+                </tr>
+                <tr>
+                  <td>3D Gaussian Splatting</td>
+                  <td>Recherche académique / open source</td>
+                  <td>Optimisation directe (reconstruction) ou diffusion (génération)</td>
+                  <td>Nuage de gaussiennes 3D</td>
+                  <td>
+                    Rendu en temps réel photoréaliste, base de nombreux outils
+                    de capture de scènes réelles
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout">
+            <span class="callout-label">À retenir</span>
+            <p>
+              La génération 3D suit la même logique de diffusion que l'image et
+              la vidéo, mais appliquée à des représentations géométriques
+              (latents de forme, maillages, gaussiennes) plutôt qu'à des
+              pixels. Les systèmes les plus rapides et les plus fiables
+              aujourd'hui entraînent la diffusion <em>directement</em> sur des
+              données 3D, plutôt que de « détourner » un modèle d'image via
+              une optimisation itérative coûteuse.
+            </p>
+          </div>
+        </div>
+      </section>
+

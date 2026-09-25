@@ -1,0 +1,351 @@
+            <!-- ==========================================
+           SECTION 15 — L'ÉCOSYSTÈME OPEN SOURCE
+           ==========================================  -->
+      <section id="opensource">
+        <div class="container">
+          <span class="section-number">17 — L'ÉCOSYSTÈME LIBRE</span>
+          <h2 class="section-title">
+            Le monde <em>open source</em> de la génération d'images
+          </h2>
+          <p class="section-lede">
+            Derrière les interfaces grand public comme Midjourney ou Sora se
+            cache un écosystème parallèle&nbsp;: des  modèles
+            librement téléchargeables avec leurs poids (weights), des logiciels gratuits pour les faire
+            tourner sur sa propre machine, et une communauté qui publie
+            quotidiennement de nouvelles techniques. Cet écosystème a été
+            déterminant dans la démocratisation de ces technologies.</p>
+
+          <h3>Pourquoi l'open source compte</h3>
+          <p>
+            Quand Stability AI a publié les poids de Stable Diffusion en août
+            2022, elle a changé la donne&nbsp;: pour la première fois, un
+            modèle de génération d'image de qualité pouvait tourner
+            gratuitement, hors ligne, sur un ordinateur personnel. Cette
+            ouverture a plusieurs conséquences concrètes qui expliquent
+            pourquoi tant de créateurs et de professionnels s'y intéressent&nbsp;:
+          </p>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-icon">1</div>
+              <h4>Contrôle total et confidentialité</h4>
+              <p>
+                Les images ne transitent par aucun serveur tiers. Utile pour
+                les projets sous contrat de confidentialité, les contenus
+                sensibles, ou simplement pour garder la main sur ses données
+                et ses créations.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">2</div>
+              <h4>Coût marginal nul</h4>
+              <p>
+                Une fois le matériel amorti, générer des images ne coûte que
+                de l'électricité. Pour un usage intensif (des milliers
+                d'images), c'est très largement moins cher qu'un abonnement
+                cloud facturé au rendu.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">3</div>
+              <h4>Personnalisation poussée</h4>
+              <p>
+                Entraîner son propre LoRA sur un style, un personnage ou un
+                produit précis n'est possible qu'avec un accès aux poids du
+                modèle — ce qu'aucun service fermé n'autorise.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">4</div>
+              <h4>Pas de censure ni de dérive commerciale</h4>
+              <p>
+                Les modèles fermés changent de comportement sans préavis
+                (mise à jour, filtre, dépréciation). Un modèle open source
+                téléchargé reste identique indéfiniment&nbsp;: la
+                reproductibilité d'un workflow est garantie dans le temps.
+              </p>
+            </div>
+          </div>
+
+          <h3>Les grands acteurs de l'ouverture</h3>
+          <p>
+            Plusieurs organisations publient régulièrement des modèles ouverts
+            ou quasi ouverts, avec des philosophies de licence différentes&nbsp;:
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Acteur</th>
+                  <th>Modèles phares</th>
+                  <th>Licence typique</th>
+                  <th>Positionnement</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Stability AI</td>
+                  <td>Stable Diffusion 1.5, SDXL, SD3, Stable Video Diffusion</td>
+                  <td>Ouverte (avec restrictions selon versions)</td>
+                  <td>Pionnier de l'ouverture, écosystème le plus mature</td>
+                </tr>
+                <tr>
+                  <td>Black Forest Labs</td>
+                  <td>Flux.1 (dev, schnell)</td>
+                  <td>Non-commerciale (dev) / Apache 2.0 (schnell)</td>
+                  <td>Fondé par les créateurs originaux de Stable Diffusion</td>
+                </tr>
+                <tr>
+                  <td>Alibaba (Tongyi Lab)</td>
+                  <td>Wan 2.2, Qwen-Image</td>
+                  <td>Apache 2.0</td>
+                  <td>Modèles vidéo et image totalement libres, y compris usage commercial</td>
+                </tr>
+                <tr>
+                  <td>Tencent</td>
+                  <td>Hunyuan3D, HunyuanVideo</td>
+                  <td>Licence communautaire ouverte</td>
+                  <td>Fort investissement sur la génération 3D et vidéo ouverte</td>
+                </tr>
+                <tr>
+                  <td>Lightricks</td>
+                  <td>LTX Video / LTX 2.3</td>
+                  <td>Ouverte</td>
+                  <td>Modèles vidéo optimisés pour la vitesse et l'exécution locale</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Les logiciels pour les faire tourner</h3>
+          <p>
+            Télécharger des poids de modèle ne suffit pas&nbsp;: il faut un
+            logiciel pour orchestrer le chargement, le prompt, l'échantillonnage
+            et l'affichage. Plusieurs interfaces se sont imposées, chacune avec
+            une philosophie différente.
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Logiciel</th>
+                  <th>Philosophie</th>
+                  <th>Idéal pour</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Automatic1111 / Forge</td>
+                  <td>Interface web classique à onglets et sliders</td>
+                  <td>Débuter rapidement, usage simple</td>
+                </tr>
+                <tr>
+                  <td>InvokeAI</td>
+                  <td>Studio créatif avec canevas unifié</td>
+                  <td>Artistes et illustrateurs, retouche avancée</td>
+                </tr>
+                <tr>
+                  <td>ComfyUI</td>
+                  <td>Graphe de nœuds visuel, modulaire</td>
+                  <td>
+                    Power users, pipelines complexes et reproductibles,
+                    automatisation
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>InvokeAI, le studio créatif</h3>
+          <p>
+            InvokeAI se positionne comme un <em>outil professionnel pour
+            artistes</em>, avec une interface soignée pensée pour rester dans
+            un flux de création plutôt que dans un laboratoire technique. Sa fonctionnalité phare est le
+            <strong>Unified Canvas</strong>&nbsp;: un espace de travail à
+            calques où l'on peut peindre, esquisser, effacer et régénérer des
+            zones précises d'une composition, un peu comme dans un logiciel de
+            retouche classique, mais où chaque coup de pinceau peut déclencher
+            une nouvelle génération locale.
+          </p>
+          <ul>
+            <li>
+              <strong>Gestion de modèles intégrée&nbsp;:</strong> checkpoints,
+              LoRA, inversions textuelles et ControlNet se gèrent depuis un
+              gestionnaire visuel, sans manipulation de fichiers.
+            </li>
+            <li>
+              <strong>Workflows par nœuds, en option&nbsp;:</strong> InvokeAI
+              propose aussi un mode graphe pour les pipelines avancés, mais
+              l'interface «&nbsp;canevas&nbsp;» reste l'expérience par défaut.
+            </li>
+            <li>
+              <strong>Entraînement intégré&nbsp;:</strong> une interface dédiée
+              permet d'entraîner ses propres LoRA et inversions textuelles sans
+              quitter l'application.
+            </li>
+            <li>
+              <strong>100&nbsp;% local et licence Apache&nbsp;2.0&nbsp;:</strong>
+              exécution entièrement hors ligne, code source librement
+              réutilisable y compris commercialement.
+            </li>
+          </ul>
+          <p>
+            En résumé&nbsp;: InvokeAI est souvent le point d'entrée recommandé
+            pour qui vient du monde de l'illustration ou de la retouche photo
+            et veut une expérience polie, sans passer par l'apprentissage d'un
+            langage de nœuds.
+          </p>
+
+          <h3>ComfyUI, le moteur des power users</h3>
+          <p>
+            ComfyUI adopte une philosophie radicalement différente&nbsp;:
+            plutôt qu'une page avec des curseurs, on construit visuellement
+            un <strong>graphe de nœuds</strong> où chaque étape du pipeline —
+            charger un modèle, encoder un prompt, échantillonner, décoder,
+            sauvegarder — est un bloc que l'on relie aux autres
+            . C'est devenu, avec plus de 100&nbsp;000
+            étoiles sur GitHub, l'outil de référence pour quiconque veut
+            dépasser les limites des interfaces «&nbsp;boîte noire&nbsp;»
+            .
+          </p>
+
+          <div class="callout">
+            <span class="callout-label">Pourquoi ComfyUI domine chez les power users</span>
+            <p>
+              <strong>Modularité&nbsp;:</strong> chaque étape est un nœud
+              indépendant que l'on peut remplacer, brancher ou mettre en cache
+              séparément — un changement de modèle ne casse pas tout le
+              pipeline.<br>
+              <strong>Reproductibilité totale&nbsp;:</strong> un workflow
+              ComfyUI est un simple fichier JSON qui encode l'intégralité du
+              pipeline&nbsp;; le partager permet à n'importe qui d'obtenir
+              exactement le même résultat en le glissant dans l'interface
+              .<br>
+              <strong>Support des modèles de pointe dès leur sortie&nbsp;:</strong>
+              Flux, HunyuanVideo, Wan 2.2, SD3 disposent de nœuds officiels dès
+              le premier jour.<br>
+              <strong>Écosystème communautaire massif&nbsp;:</strong> plus de
+              5&nbsp;000 nœuds personnalisés développés par la communauté
+              ajoutent LoRA, ControlNet, IPAdapter, AnimateDiff et d'innombrables
+              utilitaires.<br>
+              <strong>Mode API&nbsp;:</strong> les mêmes workflows sont
+              appelables depuis Python ou curl, ce qui permet d'automatiser une chaîne de génération sans réinventer l'interface
+            . </p>
+          </div>
+
+          <p>
+            Cette approche a un coût&nbsp;: la courbe d'apprentissage de
+            ComfyUI est plus raide que celle d'Automatic1111 ou d'InvokeAI
+            . Mais pour des pipelines complexes — upscaling
+            multi-étapes, combinaison d'IPAdapter et de ControlNet, animation
+            avec AnimateDiff, génération vidéo avec Wan ou HunyuanVideo — le
+            graphe de nœuds rend ces workflow réellement possibles, là où
+            elles deviendraient ingérables dans une interface classique.</p>
+
+          <figure class="wide">
+            <div class="svg-wrap">
+              <svg
+                class="diagram-svg"
+                viewBox="0 0 1100 380"
+                xmlns="http://www.w3.org/2000/svg"
+                role="img"
+                aria-label="Schéma simplifié d'un graphe de nœuds ComfyUI"
+              >
+                <defs>
+                  <linearGradient id="grad-node" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#7b6bff"/>
+                    <stop offset="1" stop-color="#4ec9c1"/>
+                  </linearGradient>
+                  <marker id="arrow-node" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#4ec9c1"/>
+                  </marker>
+                </defs>
+
+                <text x="550" y="30" text-anchor="middle" class="label-title" font-size="16">
+                  Un pipeline ComfyUI type&nbsp;: du modèle à l'image finale
+                </text>
+
+                <!-- Load Checkpoint -->
+                <g transform="translate(40, 90)">
+                  <rect x="0" y="0" width="150" height="70" rx="6" fill="#251f45" stroke="#c9a24a" stroke-width="1.5"/>
+                  <text x="75" y="28" text-anchor="middle" fill="#fff" font-weight="600" font-size="12">Load Checkpoint</text>
+                  <text x="75" y="48" text-anchor="middle" class="label-mono" font-size="10">Flux.1 dev</text>
+                </g>
+
+                <!-- CLIP Text Encode -->
+                <g transform="translate(40, 200)">
+                  <rect x="0" y="0" width="150" height="70" rx="6" fill="#251f45" stroke="#7b6bff" stroke-width="1.5"/>
+                  <text x="75" y="28" text-anchor="middle" fill="#fff" font-weight="600" font-size="12">CLIP Text Encode</text>
+                  <text x="75" y="48" text-anchor="middle" class="label-mono" font-size="9">« un phare, orage »</text>
+                </g>
+
+                <line x1="190" y1="125" x2="270" y2="150" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-node)"/>
+                <line x1="190" y1="235" x2="270" y2="180" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-node)"/>
+
+                <!-- KSampler -->
+                <g transform="translate(270, 120)">
+                  <rect x="0" y="0" width="170" height="100" rx="6" fill="url(#grad-node)" opacity="0.9"/>
+                  <text x="85" y="30" text-anchor="middle" fill="#fff" font-weight="700" font-size="13">KSampler</text>
+                  <text x="85" y="50" text-anchor="middle" fill="#fff" font-size="10" opacity="0.9">boucle de débruitage</text>
+                  <text x="85" y="68" text-anchor="middle" fill="#fff" font-size="10" opacity="0.9">(section 04)</text>
+                  <text x="85" y="86" text-anchor="middle" fill="#fff" font-size="9" opacity="0.8">steps=28, cfg=3.5</text>
+                </g>
+
+                <line x1="440" y1="170" x2="520" y2="170" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-node)"/>
+
+                <!-- ControlNet branch -->
+                <g transform="translate(270, 260)">
+                  <rect x="0" y="0" width="170" height="60" rx="6" fill="#251f45" stroke="#f2d78a" stroke-width="1.5"/>
+                  <text x="85" y="25" text-anchor="middle" fill="#fff" font-weight="600" font-size="12">ControlNet Apply</text>
+                  <text x="85" y="45" text-anchor="middle" class="label-mono" font-size="9">canny edges</text>
+                </g>
+                <line x1="360" y1="260" x2="360" y2="220" stroke="#f2d78a" stroke-width="2" marker-end="url(#arrow-node)"/>
+
+                <!-- VAE Decode -->
+                <g transform="translate(540, 130)">
+                  <rect x="0" y="0" width="150" height="80" rx="6" fill="#251f45" stroke="#4ec9c1" stroke-width="1.5"/>
+                  <text x="75" y="30" text-anchor="middle" fill="#fff" font-weight="600" font-size="12">VAE Decode</text>
+                  <text x="75" y="50" text-anchor="middle" class="label-mono" font-size="10">latent → pixels</text>
+                  <text x="75" y="66" text-anchor="middle" class="label-muted" font-size="9">(section 07)</text>
+                </g>
+
+                <line x1="690" y1="170" x2="770" y2="170" stroke="#4ec9c1" stroke-width="2" marker-end="url(#arrow-node)"/>
+
+                <!-- Save Image -->
+                <g transform="translate(790, 140)">
+                  <rect x="0" y="0" width="150" height="60" rx="6" fill="#16122a" stroke="#c9a24a" stroke-width="1.5"/>
+                  <text x="75" y="25" text-anchor="middle" fill="#fff" font-weight="600" font-size="12">Save Image</text>
+                  <text x="75" y="45" text-anchor="middle" class="label-mono" font-size="10">image.png</text>
+                </g>
+
+                <text x="550" y="340" text-anchor="middle" class="label-muted" font-size="11">
+                  Chaque bloc est un nœud indépendant, remplaçable et réutilisable ; l'ensemble du graphe se sauvegarde en un fichier JSON.
+                </text>
+              </svg>
+            </div>
+            <figcaption>
+              <strong>Anatomie simplifiée d'un workflow ComfyUI.</strong>
+              Chaque étape vue dans les sections précédentes de cette
+              présentation — encodage du prompt (section 06), boucle de
+              débruitage (section 04), décodage VAE (section 07), guidage
+              ControlNet (section 10) — correspond ici à un nœud visuel
+              explicite que l'on peut inspecter, remplacer ou dériver.
+            </figcaption>
+          </figure>
+
+          <div class="callout">
+            <span class="callout-label">À retenir</span>
+            <p>
+              L'open source n'est pas qu'une question de gratuité&nbsp;: c'est
+              ce qui permet de comprendre, modifier et faire confiance à ces
+              modèles dans la durée. InvokeAI offre l'expérience la plus
+              accessible pour un usage créatif classique&nbsp;; ComfyUI, grâce
+              à sa modularité et à ses workflows partageables en JSON, s'est
+              imposé comme le socle sur lequel se construit la quasi-totalité
+              des innovations communautaires — LoRA, ControlNet, animation,
+              vidéo et 3D confondus.
+            </p>
+          </div>
+        </div>
+      </section>
+

@@ -1,0 +1,124 @@
+      <!-- ==========================================
+           SECTION 12 — COMPARAISON MODÈLES
+           ========================================== -->
+      <section id="modeles">
+        <div class="container">
+          <span class="section-number">14 — PANORAMA</span>
+          <h2 class="section-title">
+            Les grands modèles actuels, <em>comparés</em>
+          </h2>
+          <p class="section-lede">
+            Vue d'ensemble des architectures dominantes en 2025. Les
+            spécifications évoluent vite — l'important est de comprendre les
+            familles.
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Modèle</th>
+                  <th>Architecture</th>
+                  <th>Encodeur texte</th>
+                  <th>Espace latent</th>
+                  <th>Distinctions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Stable Diffusion 1.5</td>
+                  <td>U-Net</td>
+                  <td>CLIP L/14</td>
+                  <td>Oui (VAE)</td>
+                  <td>Open source, écosystème massif (LoRA, ControlNet)</td>
+                </tr>
+                <tr>
+                  <td>SDXL</td>
+                  <td>U-Net (2× plus grand)</td>
+                  <td>CLIP + OpenCLIP</td>
+                  <td>Oui (VAE)</td>
+                  <td>Résolution native 1024×1024, refiner en 2 étapes</td>
+                </tr>
+                <tr>
+                  <td>Stable Diffusion 3</td>
+                  <td>MM-DiT (Transformer)</td>
+                  <td>T5-XXL + CLIP L + CLIP G</td>
+                  <td>Oui (VAE 16 canaux)</td>
+                  <td>Rendu du texte fiable, cohérence multi-sujet</td>
+                </tr>
+                <tr>
+                  <td>Flux.1</td>
+                  <td>DiT (Transformer)</td>
+                  <td>T5-XXL + CLIP</td>
+                  <td>Oui</td>
+                  <td>Anatomie humaine, prompts complexes, rendu texte</td>
+                </tr>
+                <tr>
+                  <td>DALL·E 3</td>
+                  <td>Diffusion (fermée)</td>
+                  <td>GPT-4 en amont (recaption)</td>
+                  <td>N/C</td>
+                  <td>Meilleure compréhension linguistique via LLM</td>
+                </tr>
+                <tr>
+                  <td>Midjourney v6/v7</td>
+                  <td>Diffusion (fermée)</td>
+                  <td>Propriétaire</td>
+                  <td>N/C</td>
+                  <td>Rendu esthétique poussé, style «&nbsp;maison&nbsp;»</td>
+                </tr>
+                <tr>
+                  <td>Imagen 3</td>
+                  <td>Diffusion cascadée</td>
+                  <td>T5-XXL</td>
+                  <td>Non (pixel-space multi-résolution)</td>
+                  <td>Compréhension linguistique, sécurité</td>
+                </tr>
+                <tr>
+                  <td>Nano Banana Pro</td>
+                  <td>Multimodal (Google)</td>
+                  <td>Intégré (Gemini)</td>
+                  <td>N/C</td>
+                  <td>Édition conversationnelle multi-tour</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Trois grandes familles techniques</h3>
+
+          <div class="grid-3">
+            <div class="card">
+              <div class="card-icon">1</div>
+              <h4>U-Net + latent</h4>
+              <p>
+                Le paradigme historique de Stable Diffusion (1.5, SDXL). U-Net
+                convolutionnel opérant sur un espace latent compressé par un
+                VAE. Léger, écosystème massif, mais compréhension textuelle
+                limitée par CLIP.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">2</div>
+              <h4>DiT + latent</h4>
+              <p>
+                La nouvelle vague (SD3, Flux, PixArt). Transformer de diffusion
+                opérant sur un latent. Meilleure passage à l'échelle, meilleure
+                compréhension du prompt grâce à T5-XXL, rendu du texte dans
+                l'image fiable.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">3</div>
+              <h4>Diffusion cascadée</h4>
+              <p>
+                Google Imagen. Trois modèles en cascade : un premier génère une
+                image 64×64, un deuxième la super-résout à 256×256, un troisième
+                à 1024×1024. Pas d'espace latent — travail direct sur les
+                pixels, mais à basse résolution d'abord.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+

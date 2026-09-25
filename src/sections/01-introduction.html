@@ -1,0 +1,84 @@
+      <!-- ==========================================
+           SECTION 1 — INTRODUCTION
+           ========================================== -->
+      <section id="introduction">
+        <div class="container">
+          <span class="section-number">01 — INTRODUCTION</span>
+          <h2 class="section-title">
+            Un miracle statistique nommé <em>génération d'image</em>
+          </h2>
+          <p class="section-lede">
+            En quelques secondes, un modèle d'IA transforme une phrase — «&nbsp;un
+            renard roux en costume trois-pièces lisant Kant sous la pluie&nbsp;» — en
+            une image cohérente, détaillée, parfois artistique. Ce qui semblait
+            appartenir à la science-fiction est devenu, en cinq ans, une routine.
+            Comment est-ce possible ?
+          </p>
+
+          <p>
+            La réponse tient en un renversement conceptuel très élégant :
+            <strong>plutôt que d'apprendre à dessiner, une IA générative apprend à
+              effacer du bruit</strong>. On lui donne à voir des millions d'images
+            réelles, qu'on brouille progressivement en y injectant du bruit aléatoire
+            jusqu'à obtenir une neige de pixel. Puis on lui enseigne à
+            faire l'opération inverse&nbsp;: retirer, étape après étape, ce bruit,
+            pour reconstruire une image plausible. Une fois entraînée, on peut
+            <strong>partir de  bruit pur</strong> &nbsp; et laisser le modèle
+            «&nbsp;sculpter&nbsp;» une image nouvelle.</p>
+
+          <p>
+            Ce document explique en détail comment cette idée simple se transforme
+            en système fonctionnel. Nous verrons&nbsp;: une petite histoire de l'IA, les
+            grands principes mathématiques qui sont à l'oeuvre, l'architecture concrète des modèles
+            modernes (Stable Diffusion, Midjourney, Flux), le rôle du texte
+            via CLIP, la nature de l'espace latent, la mécanique de l'entraînement,
+            les techniques de contrôle (ControlNet, LoRA, IP-Adapter) et enfin les
+          limites et enjeux éthiques.</p>
+
+          <div class="callout">
+            <span class="callout-label">À qui s'adresse ce document</span>
+            <p>
+              Ce texte est technique mais accessible. Aucune connaissance préalable
+              en apprentissage profond n'est requise&nbsp;: les concepts sont
+              introduits progressivement, avec des analogies et des schémas. Un
+              minimum de familiarité avec la programmation aide, sans être
+              nécessaire. Les équations sont présentes mais optionnelles à la
+              compréhension.
+            </p>
+          </div>
+
+          <h3>Ce qu'une IA générative n'est <em>pas</em></h3>
+          <p>
+            Avant d'entrer dans le vif du sujet, écartons quelques idées reçues et incompréhensions qui
+            polluent le débat &nbsp;:</p>
+          <ul>
+            <li>
+              <strong>Ce n'est pas un moteur de recherche.</strong> Le modèle ne va
+              pas «&nbsp;chercher&nbsp;» une image dans une base de données. Il n'a
+              accès à aucune image lors de la génération. Tout ce qu'il possède, ce
+              sont ses <em>poids</em> &nbsp;(weights) — quelques gigaoctets de nombres — qui
+              encodent statistiquement ce qu'est «&nbsp;une image plausible&nbsp;».</li>
+            <li>
+              <strong>Ce n'est pas un collage.</strong> Un modèle bien entraîné ne
+              recopie pas des morceaux d'images d'entraînement (bien qu'un
+              sur-apprentissage puisse produire des cas de mémorisation partielle
+              qu'on cherche à éviter). Il synthétise une image entièrement nouvelle
+              à partir de bruit.
+            </li>
+            <li>
+              <strong>Ce n'est pas de la magie.</strong> C'est un enchaînement
+              d'opérations mathématiques déterministes (aux tirages aléatoires
+              près) qu'on peut, en principe, suivre pas à pas.
+            </li>
+            <li>
+              <strong>Ce n'est pas «&nbsp;une&nbsp;» IA.</strong> Un pipeline
+              moderne comme Stable Diffusion contient au moins trois réseaux de
+              neurones distincts qui coopèrent (un encodeur de texte, un modèle de
+              diffusion, un décodeur d'image). C'est un système, pas un monolithe.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+

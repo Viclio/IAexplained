@@ -1,0 +1,76 @@
+      <!-- ==========================================
+           CONCLUSION
+           ========================================== -->
+      <section id="conclusion">
+        <div class="container">
+          <span class="section-number">21 — CONCLUSION</span>
+          <h2 class="section-title">
+            Récapitulatif en <em>huit points</em>
+          </h2>
+
+          <ol style="font-size: var(--text-base);">
+            <li>
+              <strong>Le problème central.</strong> Générer une image, c'est
+              échantillonner un point de très grande dimension selon la
+              distribution des images «&nbsp;plausibles&nbsp;». Cette
+              distribution est trop complexe pour être modélisée directement.
+            </li>
+            <li>
+              <strong>L'astuce de la diffusion.</strong> On contourne le problème
+              en apprenant à débruiter progressivement. Un modèle qui sait
+              retirer un peu de bruit à toutes les étapes peut, partant de bruit
+              pur, sculpter une image.
+            </li>
+            <li>
+              <strong>Le U-Net.</strong> Architecture historique qui prédit le
+              bruit à retirer. Structure en U (encodeur–goulot–décodeur) avec
+              skip connections. Progressivement remplacé par les Diffusion
+              Transformers (DiT) dans les modèles récents.
+            </li>
+            <li>
+              <strong>CLIP.</strong> Modèle auxiliaire qui traduit une phrase en
+              un vecteur dans un espace partagé avec les images. Il est le pont
+              entre le langage humain et le processus de diffusion.
+            </li>
+            <li>
+              <strong>L'espace latent.</strong> Stable Diffusion ne travaille
+              pas sur les pixels mais sur une version compressée (~48× plus
+              petite) produite par un VAE. C'est ce qui rend la génération
+              accessible sur GPU grand public.
+            </li>
+            <li>
+              <strong>Le pipeline complet.</strong> Prompt → CLIP → bruit
+              aléatoire → boucle de débruitage guidée par attention croisée
+              (avec Classifier-Free Guidance) → décodage VAE → image finale.
+            </li>
+            <li>
+              <strong>L'entraînement.</strong> Des milliards de paires (image,
+              texte) sont vues des millions de fois. La tâche apprise est
+              simple&nbsp;: prédire le bruit gaussien qu'on a ajouté. Tout le
+              reste — cohérence, style, esthétique — émerge statistiquement.
+            </li>
+            <li>
+              <strong>Le contrôle et les limites.</strong> LoRA, ControlNet et
+              IP-Adapter permettent un contrôle fin. Mais anatomie, texte,
+              raisonnement spatial et enjeux éthiques restent des défis actifs.
+            </li>
+          </ol>
+
+          <div class="callout" style="margin-top: var(--space-12)">
+            <span class="callout-label">Pour aller plus loin</span>
+            <p>
+              Trois ressources incontournables pour approfondir&nbsp;: le blog
+              «&nbsp;The Illustrated Stable Diffusion&nbsp;» de <a href="https://jalammar.github.io/illustrated-stable-diffusion/">Jay Alammar</a>
+              — la meilleure introduction visuelle. Le papier
+              <a href="https://arxiv.org/abs/2006.11239">DDPM (Ho et al., 2020)</a>
+              — la référence originelle, très lisible. Et le papier
+              <a href="https://arxiv.org/abs/2112.10752">Latent Diffusion Models
+              (Rombach et al., 2022)</a> — la publication fondatrice de Stable
+              Diffusion.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+

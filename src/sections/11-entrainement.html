@@ -1,0 +1,135 @@
+      <!-- ==========================================
+           SECTION 9 — ENTRAÎNEMENT
+           ========================================== -->
+      <section id="entrainement">
+        <div class="container">
+          <span class="section-number">11 — ENTRAÎNEMENT</span>
+          <h2 class="section-title">
+            Comment un tel modèle <em>apprend</em> ?
+          </h2>
+          <p class="section-lede">
+            Nous avons vu comment un modèle entraîné génère une image. Reste la
+            question inverse : comment l'a-t-on entraîné pour qu'il en soit
+            capable ? Le processus est étonnamment simple à formuler.
+          </p>
+
+          <h3>Les données</h3>
+          <p>
+            Un modèle comme Stable Diffusion 1.5 a été entraîné sur le dataset
+            <strong>LAION-5B</strong>, qui contient environ 5 milliards de
+            paires (image, texte) collectées du web. Un sous-ensemble filtré,
+            LAION-Aesthetics (600 millions de paires jugées «&nbsp;esthétiques&nbsp;»),
+            a servi pour la phase finale. Chaque paire est de la forme&nbsp;:
+          </p>
+          <pre><code>image: photo_chat_1234.jpg (résolution variable)
+texte: "an orange tabby cat sitting on a red couch, warm lighting"</code></pre>
+
+          <h3>La boucle d'entraînement</h3>
+          <p>
+            L'entraînement se déroule en pas répétés (des centaines de millions),
+            chaque pas suivant ce schéma&nbsp;:
+          </p>
+          <ol>
+            <li>
+              Tirer aléatoirement un couple (image, légende) du dataset.
+            </li>
+            <li>
+              Encoder l'image en un latent <code>z<sub>0</sub></code> via le VAE.
+            </li>
+            <li>
+              Encoder la légende en un vecteur <code>c</code> via l'encodeur de
+              texte de CLIP.
+            </li>
+            <li>
+              Tirer aléatoirement un timestep <code>t</code> entre 1 et 1000.
+            </li>
+            <li>
+              Générer un bruit gaussien <code>ε</code> et l'appliquer selon le
+              calendrier de diffusion&nbsp;: <code>z<sub>t</sub> = √(ᾱ<sub>t</sub>) · z<sub>0</sub> + √(1 − ᾱ<sub>t</sub>) · ε</code>.
+            </li>
+            <li>
+              Passer <code>(z<sub>t</sub>, t, c)</code> au U-Net, qui prédit
+              <code>ε̂</code>.
+            </li>
+            <li>
+              Calculer la perte MSE&nbsp;: <code>L = ||ε − ε̂||²</code>.
+            </li>
+            <li>
+              Rétropropager le gradient et ajuster les poids du U-Net.
+            </li>
+          </ol>
+
+          <p>
+            C'est tout. La beauté de la méthode est là&nbsp;: <strong>la seule
+            chose que le U-Net apprend, c'est à prédire du bruit gaussien</strong>.
+            Aucune notion de «&nbsp;chat&nbsp;», d'esthétique ou de composition
+            n'est explicitement enseignée. Ces concepts émergent statistiquement
+            de la répétition sur des milliards d'exemples.
+          </p>
+
+          <div class="callout">
+            <span class="callout-label">Ordre de grandeur</span>
+            <p>
+              Entraîner Stable Diffusion 1.5 a demandé environ
+              <strong>150&nbsp;000 heures GPU</strong> sur des NVIDIA A100 (soit
+              plusieurs semaines sur un cluster de centaines de GPU) et un coût
+              estimé à environ 600&nbsp;000&nbsp;$. Les modèles plus récents
+              (SD3, Flux, Imagen) dépassent le million de dollars d'entraînement.
+              C'est pour cela qu'ils sont surtout produits par de grandes
+              structures.
+            </p>
+          </div>
+
+          <h3>Fine-tuning et personnalisation</h3>
+          <p>
+            Ré-entraîner un modèle entier est prohibitif. En revanche, on peut
+            l'<em>affiner</em> à peu de frais pour lui apprendre un style ou un
+            sujet particulier&nbsp;:
+          </p>
+
+          <div class="grid-3">
+            <div class="card">
+              <div class="card-icon">DB</div>
+              <h4>DreamBooth</h4>
+              <p>
+                Fine-tune l'intégralité du modèle sur ~20 images d'un sujet
+                spécifique (une personne, un objet) associé à un token rare
+                (<code>sks</code>). Résultat : le modèle sait désormais rendre
+                ce sujet dans n'importe quel contexte. Coûte quelques heures de
+                GPU.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">Lo</div>
+              <h4>LoRA</h4>
+              <p>
+                <em>Low-Rank Adaptation.</em> Au lieu de modifier les poids du
+                U-Net, on ajoute de petites matrices d'ajustement (typiquement
+                &lt; 200 Mo). Rapide à entraîner (30 min), léger à distribuer,
+                combinable. Standard de fait pour les styles.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">TI</div>
+              <h4>Textual Inversion</h4>
+              <p>
+                On n'apprend rien au U-Net. On apprend uniquement un nouveau
+                token d'embedding (un vecteur de 768 valeurs) qui va agir comme
+                un «&nbsp;mot personnalisé&nbsp;» dans les prompts. Ultra-léger
+                (quelques Ko), mais moins expressif que LoRA.
+              </p>
+            </div>
+          </div>
+
+          <p>
+            Ces techniques ont donné naissance à un écosystème très riche
+            (CivitAI, Hugging Face) où l'on trouve des LoRAs pour des styles
+            (aquarelle, esthétique années 80, tel artiste), des concepts (une
+            pose spécifique, un vêtement) ou des personnages. Un modèle de base
+            + quelques LoRAs = une infinité de spécialisations.
+          </p>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+

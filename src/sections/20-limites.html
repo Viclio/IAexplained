@@ -1,0 +1,188 @@
+      <!-- ==========================================
+           SECTION 17 — LIMITES ET ENJEUX
+           ========================================== -->
+      <section id="limites">
+        <div class="container">
+          <span class="section-number">19 — LIMITES</span>
+          <h2 class="section-title">
+            Ce que ces modèles font <em>mal</em>, et pourquoi
+          </h2>
+           </p>
+
+
+
+
+<div class="grid-2">
+        <div class="card">
+          <h4>Le cas emblématique des mains</h4>
+          <p>
+            Les mains restent l'exemple le plus cité des limites visuelles de l'IA générative. Cause : elles sont très articulées, souvent partiellement visibles, et statistiquement moins « stables » que les visages dans les données d'entraînement. Les modèles apprennent la texture d'une main mais pas sa contrainte anatomique rigide (toujours 5 doigts, jamais fusionnés). Ce défaut s'est considérablement amélioré depuis SDXL et Flux, mais reste visible dès qu'on s'attarde sur le détail.
+          </p>
+          </div>
+            <div class="card">
+              <h4>Texte dans l'image</h4>
+              <p>
+                Longtemps illisible. Cause&nbsp;: CLIP tokenise le texte
+                globalement, sans notion de rendu typographique. Les
+                architectures récentes (DiT + T5-XXL) résolvent en partie
+                le problème en ajoutant une compréhension caractère par
+                caractère.
+              </p>
+            </div>
+            <div class="card">
+              <h4>Compter, dénombrer</h4>
+              <p>
+                «&nbsp;Cinq pommes rouges sur une table&nbsp;» donne souvent
+                4, 6 ou 7 pommes. Cause&nbsp;: la diffusion est un processus
+                spatial local, pas un raisonnement symbolique. Compter est
+                étranger à ce qu'apprennent ces modèles.
+              </p>
+            </div>
+            <div class="card">
+              <h4>Relations spatiales complexes</h4>
+              <p>
+                «&nbsp;Un livre rouge à gauche du chat, sous une lampe
+                verte&nbsp;» est mal respecté. Cause&nbsp;: l'attention croisée
+                mélange les concepts (attribute binding). Les DiT récents avec
+                T5 gèrent mieux ces compositions.
+              </p>
+            </div>
+            <div class="card">
+              <h4>Cohérence multi-tour</h4>
+              <p>
+                Générer «&nbsp;le même personnage dans dix scènes différentes&nbsp;»
+                est ardu. Chaque image est indépendante ; sans IP-Adapter,
+                LoRA de personnage ou seed fixe combinée à des astuces, la
+                cohérence dérive.
+              </p>
+            </div>
+            <div class="card">
+              <h4>Composition rare ou absurde</h4>
+              <p>
+                Les modèles sont statistiques. Une composition très rare dans le
+                dataset (un cheval sur un astronaute plutôt qu'un astronaute
+                sur un cheval) sera «&nbsp;corrigée&nbsp;» vers la version plus
+                fréquente. On peut le contourner par du prompt engineering ou
+                de la génération assistée.
+              </p>
+            </div>
+          </div>
+
+
+
+          <h3>Deux limites plus profondes, au-delà des artefacts visuels</h3>
+          <p>
+            Les défauts ci-dessus sont des symptômes visibles. Deux
+            limitations plus fondamentales, elles, ne se voient pas
+            directement dans une image ratée&nbsp;— elles concernent la
+            nature même de ce que ces modèles font, et de ce qu'ils ne
+            font pas.
+          </p>
+
+          <div class="grid-2">
+            <div class="card">
+              <h4>Aucune compréhension « réelle » de l'image</h4>
+              <p>
+                Un modèle de diffusion ne « sait » pas ce qu'est un chat, une
+                main ou une ombre au sens où un humain le comprend. Il n'a
+                jamais touché de fourrure, jamais ressenti la gravité,
+                jamais vu le monde en trois dimensions&nbsp;: il a seulement
+                observé des corrélations statistiques entre des pixels et des
+                mots, répétées des milliards de fois. Ce qui ressemble à de
+                la « compréhension » est en réalité une <strong>approximation
+                statistique</strong> extrêmement fine de ce que devrait
+                contenir une image plausible, étant donné un texte.
+              </p>
+            </div>
+            <div class="card">
+              <h4>Pourquoi ça compte concrètement</h4>
+              <p>
+                Cette absence de compréhension explique directement plusieurs
+                limites déjà vues&nbsp;: le modèle ne compte pas vraiment les
+                objets, ne raisonne pas sur la physique d'une articulation, et
+                ne vérifie jamais la cohérence logique de ce qu'il produit. Il
+                génère ce qui est <em>statistiquement probable</em>, pas ce
+                qui est <em>logiquement correct</em>&nbsp;— deux choses qui se
+                recoupent souvent, mais pas toujours.
+              </p>
+            </div>
+          </div>
+
+          <div class="callout callout-warn">
+            <span class="callout-label">Une image de synthèse, pas une pensée</span>
+            <p>
+              Demander à un modèle « pourquoi cette main a-t-elle six
+              doigts&nbsp;? » n'a pas de sens à proprement parler&nbsp;: il n'y
+              a pas eu de raisonnement en amont sur l'anatomie, seulement un
+              débruitage guidé par des probabilités apprises. Le modèle ne
+              peut ni s'auto-corriger par introspection, ni expliquer ses
+              propres erreurs&nbsp;— il n'a tout simplement pas de
+              représentation explicite des règles qu'il enfreint.
+            </p>
+          </div>
+
+          <h3>Pas de créativité au sens propre&nbsp;: organiser plutôt qu'inventer</h3>
+          <p>
+            Un modèle génératif ne part jamais de rien. Même son point de
+            départ « bruit pur » n'est qu'une graine statistique qui sera
+            sculptée selon des motifs déjà observés dans son entraînement.
+            Concrètement, une IA d'image <strong>recombine et réorganise</strong>
+            des motifs visuels existants&nbsp;— compositions, styles,
+            textures, poses&nbsp;— plutôt que d'inventer une forme, une
+            technique ou une intention radicalement nouvelle, comme peut le
+            faire un mouvement artistique humain.
+          </p>
+
+          <div class="grid-3">
+            <div class="card">
+              <div class="card-icon">◆</div>
+              <h4>Recombinaison, pas invention</h4>
+              <p>
+                Un prompt inédit produit une image inédite au niveau des
+                pixels, mais rarement au niveau des idées&nbsp;: le modèle
+                mélange des éléments déjà vus dans des proportions nouvelles,
+                sans intention artistique propre.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">◆</div>
+              <h4>Aucun vécu, aucune intention</h4>
+              <p>
+                Un artiste crée en réaction à une émotion, une époque, une
+                expérience vécue. Le modèle, lui, ne « vit » rien&nbsp;: il
+                optimise une fonction de vraisemblance statistique, sans
+                intention ni message à transmettre.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">◆</div>
+              <h4>Un avantage paradoxal</h4>
+              <p>
+                Cette limite reste, pour l'instant, un rempart&nbsp;: la
+                créativité au sens fort — rupture, invention de nouveaux
+                langages visuels — demeure une prérogative humaine que ces
+                outils ne remplacent pas, seulement démultiplient.
+              </p>
+            </div>
+          </div>
+
+          <div class="callout">
+            <span class="callout-label">Question ouverte</span>
+            <p>
+              Cette frontière entre « recombiner » et « créer » est-elle
+              stable dans le temps, ou seulement provisoire&nbsp;? Les
+              modèles progressent vite sur la cohérence, le raisonnement
+              visuel et la composition&nbsp;— rien ne garantit qu'une
+              distinction aussi nette entre statistique et créativité restera
+              valable indéfiniment. Pour l'instant, la vraie rupture
+              artistique reste l'apanage de l'humain&nbsp;; la question de
+              <strong>pour combien de temps</strong> encore reste, elle,
+              largement ouverte.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <div class="divider"></div>
+

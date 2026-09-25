@@ -1,0 +1,234 @@
+      <!-- ==========================================
+           SECTION 6 — CLIP
+           ========================================== -->
+      <section id="clip">
+        <div class="container">
+          <span class="section-number">07 — GUIDAGE TEXTUEL</span>
+          <h2 class="section-title">
+            CLIP, ou comment le <em>langage entre dans le modèle</em>
+          </h2>
+          <p class="section-lede">
+            Jusqu'ici, notre modèle produit des images plausibles — mais
+            aléatoires. Comment lui faire produire une image qui correspond à
+            une description précise ? La réponse tient en un modèle auxiliaire :
+            CLIP.
+          </p>
+
+          <p>
+            CLIP est un réseau entraîné par OpenAI sur 400 millions de paires
+            (image, texte) extraites du web (typiquement, la balise <code>alt</code>
+            d'une image dans une page HTML). Il est composé de deux encodeurs
+            distincts&nbsp;:
+          </p>
+          <ul>
+            <li>
+              <strong>Un encodeur d'images</strong> (typiquement un Vision
+              Transformer) qui transforme une image en un vecteur de 512 ou 768
+              dimensions.
+            </li>
+            <li>
+              <strong>Un encodeur de texte</strong> (typiquement un Transformer
+              BPE-tokenisé) qui transforme une phrase en un vecteur des mêmes
+              dimensions.
+            </li>
+          </ul>
+
+          <p>
+            L'entraînement est <em>contrastif</em>&nbsp;: on donne au modèle un
+            batch de <code>N</code> paires (image, légende). Il doit apprendre à
+            rapprocher, dans son espace vectoriel, les paires qui vont ensemble,
+            et à éloigner celles qui ne vont pas ensemble. À la fin de
+            l'entraînement, le vecteur du texte «&nbsp;un chien qui court sur la
+            plage&nbsp;» se retrouve tout près du vecteur des vraies photos de
+            chiens qui courent sur la plage — et loin des vecteurs de photos de
+            chats endormis.
+          </p>
+
+          <figure class="wide">
+            <div class="svg-wrap">
+              <svg
+                class="diagram-svg"
+                viewBox="0 0 1100 420"
+                xmlns="http://www.w3.org/2000/svg"
+                role="img"
+                aria-label="Fonctionnement de CLIP : encodage texte et image dans un espace partagé"
+              >
+                <defs>
+                  <marker id="arrow-white" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#ece9f5"/>
+                  </marker>
+                </defs>
+
+                <text x="550" y="30" text-anchor="middle" class="label-title" font-size="16">
+                  CLIP : deux encodeurs, un espace partagé
+                </text>
+
+                <!-- Entrée texte -->
+                <g transform="translate(30, 90)">
+                  <rect x="0" y="0" width="200" height="70" rx="8" fill="#251f45" stroke="#7b6bff" stroke-width="1.5"/>
+                  <text x="100" y="30" text-anchor="middle" fill="#fff" font-weight="600" font-size="13">« un chat roux</text>
+                  <text x="100" y="48" text-anchor="middle" fill="#fff" font-weight="600" font-size="13">assis sur un canapé »</text>
+                  <text x="100" y="82" text-anchor="middle" class="label-muted">phrase (tokenisée)</text>
+                </g>
+
+                <!-- Encodeur texte -->
+                <g transform="translate(280, 90)">
+                  <rect x="0" y="0" width="180" height="70" rx="8" fill="url(#unet-enc)" opacity="0.9"/>
+                  <text x="90" y="32" text-anchor="middle" fill="#fff" font-weight="600" font-size="13">Text Encoder</text>
+                  <text x="90" y="50" text-anchor="middle" fill="#fff" font-size="11" opacity="0.85">Transformer</text>
+                </g>
+
+                <line x1="230" y1="125" x2="280" y2="125" stroke="#ece9f5" stroke-width="1.5" marker-end="url(#arrow-white)"/>
+
+                <!-- Vecteur texte -->
+                <g transform="translate(510, 90)">
+                  <rect x="0" y="0" width="80" height="70" rx="8" fill="#16122a" stroke="#7b6bff" stroke-width="1.5"/>
+                  <text x="40" y="30" text-anchor="middle" class="label-mono">Tₑ</text>
+                  <text x="40" y="48" text-anchor="middle" fill="#fff" font-size="10">[768 dim]</text>
+                </g>
+
+                <line x1="460" y1="125" x2="510" y2="125" stroke="#ece9f5" stroke-width="1.5" marker-end="url(#arrow-white)"/>
+
+                <!-- Entrée image -->
+                <g transform="translate(30, 260)">
+                  <rect x="0" y="0" width="200" height="80" rx="8" fill="#251f45" stroke="#c9a24a" stroke-width="1.5"/>
+                  <!-- petit chat -->
+                  <ellipse cx="100" cy="45" rx="30" ry="26" fill="#c9a24a" opacity="0.8"/>
+                  <polygon points="80,28 84,15 92,26" fill="#c9a24a" opacity="0.8"/>
+                  <polygon points="120,28 116,15 108,26" fill="#c9a24a" opacity="0.8"/>
+                  <circle cx="90" cy="42" r="2.5" fill="#0e0b1a"/>
+                  <circle cx="110" cy="42" r="2.5" fill="#0e0b1a"/>
+                  <text x="100" y="102" text-anchor="middle" class="label-muted">image</text>
+                </g>
+
+                <!-- Encodeur image -->
+                <g transform="translate(280, 265)">
+                  <rect x="0" y="0" width="180" height="70" rx="8" fill="url(#unet-dec)" opacity="0.9"/>
+                  <text x="90" y="32" text-anchor="middle" fill="#fff" font-weight="600" font-size="13">Image Encoder</text>
+                  <text x="90" y="50" text-anchor="middle" fill="#fff" font-size="11" opacity="0.85">Vision Transformer</text>
+                </g>
+
+                <line x1="230" y1="300" x2="280" y2="300" stroke="#ece9f5" stroke-width="1.5" marker-end="url(#arrow-white)"/>
+
+                <!-- Vecteur image -->
+                <g transform="translate(510, 265)">
+                  <rect x="0" y="0" width="80" height="70" rx="8" fill="#16122a" stroke="#c9a24a" stroke-width="1.5"/>
+                  <text x="40" y="30" text-anchor="middle" class="label-mono">Iₑ</text>
+                  <text x="40" y="48" text-anchor="middle" fill="#fff" font-size="10">[768 dim]</text>
+                </g>
+
+                <line x1="460" y1="300" x2="510" y2="300" stroke="#ece9f5" stroke-width="1.5" marker-end="url(#arrow-white)"/>
+
+                <!-- Espace partagé -->
+                <g transform="translate(680, 90)">
+                  <rect x="0" y="0" width="380" height="250" rx="12" fill="#1e1938" stroke="#c9a24a" stroke-width="1.5" stroke-dasharray="6,4"/>
+                  <text x="190" y="30" text-anchor="middle" class="label-title" fill="#c9a24a" font-size="14">
+                    Espace vectoriel partagé
+                  </text>
+
+                  <!-- points -->
+                  <circle cx="140" cy="120" r="12" fill="#7b6bff"/>
+                  <text x="140" y="145" text-anchor="middle" class="label-mono" fill="#7b6bff">Tₑ</text>
+                  <circle cx="160" cy="130" r="12" fill="#c9a24a"/>
+                  <text x="180" y="150" text-anchor="middle" class="label-mono" fill="#c9a24a">Iₑ</text>
+
+                  <line x1="140" y1="120" x2="160" y2="130" stroke="#4ec9c1" stroke-width="2"/>
+                  <text x="150" y="175" text-anchor="middle" class="label-muted" font-size="11">
+                    distance faible → paire cohérente
+                  </text>
+
+                  <!-- distracteurs -->
+                  <circle cx="280" cy="180" r="10" fill="#c9a24a" opacity="0.5"/>
+                  <text x="280" y="200" text-anchor="middle" class="label-muted" font-size="10">chien</text>
+                  <circle cx="310" cy="105" r="10" fill="#c9a24a" opacity="0.5"/>
+                  <text x="310" y="95" text-anchor="middle" class="label-muted" font-size="10">voiture</text>
+                  <circle cx="255" cy="80" r="10" fill="#c9a24a" opacity="0.5"/>
+                  <text x="255" y="70" text-anchor="middle" class="label-muted" font-size="10">chat noir</text>
+                </g>
+
+                <!-- Flèches convergentes -->
+                <line x1="590" y1="125" x2="680" y2="180" stroke="#7b6bff" stroke-width="1.5" stroke-dasharray="3,3"/>
+                <line x1="590" y1="300" x2="680" y2="220" stroke="#c9a24a" stroke-width="1.5" stroke-dasharray="3,3"/>
+
+                <text x="80" y="405" class="label-muted">
+                  Objectif d'entraînement : maximiser la similarité cosinus des paires (image, légende) qui vont ensemble.
+                </text>
+              </svg>
+            </div>
+            <figcaption>
+              <strong>CLIP en résumé.</strong> Deux réseaux distincts encodent
+              texte et image dans un même espace vectoriel de haute dimension. Les
+              paires (image, description) authentiques doivent y être proches
+              (mesure&nbsp;: similarité cosinus). C'est cet espace partagé qui
+              permet ensuite de «&nbsp;traduire&nbsp;» un prompt en signal
+              exploitable par le modèle de diffusion.
+            </figcaption>
+          </figure>
+
+          <h3>Comment CLIP est utilisé dans la génération</h3>
+          <p>
+            Dans un pipeline comme Stable Diffusion, l'encodeur d'images de CLIP
+            n'est pas utilisé lors de la génération — seul l'encodeur de texte
+            l'est. Voici le processus&nbsp;:
+          </p>
+          <ol>
+            <li>
+              L'utilisateur écrit un prompt : <em>«&nbsp;a red fox in a
+              three-piece suit reading Kant in the rain&nbsp;»</em>.
+            </li>
+            <li>
+              Le texte est tokenisé (découpé en unités) et passé à l'encodeur de
+              texte de CLIP, qui produit une séquence de vecteurs (77 tokens ×
+              768 dimensions dans SD 1.5).
+            </li>
+            <li>
+              Cette séquence est fournie au U-Net à chaque étape du débruitage,
+              via des couches d'<strong>attention croisée</strong> insérées à
+              l'intérieur des blocs convolutionnels.
+            </li>
+            <li>
+              L'attention croisée permet à chaque «&nbsp;pixel&nbsp;» du U-Net de
+              «&nbsp;regarder&nbsp;» les mots du prompt et d'orienter la
+              prédiction du bruit en conséquence.
+            </li>
+          </ol>
+
+          <p>
+            L'<strong>attention croisée</strong> mérite un mot d'explication.
+            C'est un mécanisme qui, pour chaque position spatiale de l'image en
+            construction, calcule un score d'attention avec chaque token du
+            prompt, puis assemble un vecteur pondéré. Concrètement&nbsp;: quand
+            le U-Net décide de la couleur d'une région de l'image, il consulte
+            simultanément tous les mots du prompt pour savoir lesquels sont les
+            plus pertinents pour cette région.
+          </p>
+
+          <h3>La technique du <em>Classifier-Free Guidance</em></h3>
+          <p>
+            Il existe une astuce essentielle pour renforcer l'obéissance du
+            modèle au prompt&nbsp;: le <em>Classifier-Free Guidance</em> (CFG),
+            introduit par Ho et Salimans en 2022.
+          </p>
+          <p>
+            À chaque étape de débruitage, on fait <strong>deux prédictions</strong>
+            au lieu d'une&nbsp;:
+          </p>
+          <ul>
+            <li>Une prédiction <strong>avec</strong> le prompt (conditionnelle).</li>
+            <li>Une prédiction <strong>sans</strong> prompt (inconditionnelle, prompt vide).</li>
+          </ul>
+          <p>Puis on <em>extrapole</em> dans la direction de la prédiction conditionnelle&nbsp;:</p>
+          <div class="formula">
+            ε<sub>final</sub> = ε<sub>vide</sub> + w · (ε<sub>prompt</sub> − ε<sub>vide</sub>)
+          </div>
+          <p> Le paramètre <code>w</code> — appelé <em>guidance scale</em> ou CFG
+            — vaut typiquement entre 5 et 12. Plus il est élevé, plus le modèle
+            «&nbsp;colle&nbsp;» au prompt (au risque de rendre l'image sur-saturée
+            ou artificielle). Plus il est bas, plus le modèle prend de libertés
+            (avec plus de diversité mais parfois moins de fidélité). </p>
+          <p><em>Note :</em> &nbsp; Le CFG ne fonctionne qu'avec les modèles de base, et non les modèles distillés, qui sont maintenant majoritaires.&nbsp;&nbsp;</p>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+

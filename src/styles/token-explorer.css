@@ -1,0 +1,227 @@
+    .app-embed {
+      margin: var(--space-16) 0 var(--space-8);
+      padding: var(--space-8);
+      background: linear-gradient(135deg, #12102420 0%, #1a153420 100%);
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+    }
+    .app-header { margin-bottom: var(--space-8); }
+    .app-label {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--text-xs);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--color-primary, #c9a24a);
+      padding: 4px 12px;
+      border: 1px solid var(--color-primary, #c9a24a);
+      border-radius: 999px;
+      margin-bottom: var(--space-4);
+    }
+    .app-embed h3 {
+      font-family: 'Fraunces', serif;
+      font-size: var(--text-xl);
+      font-weight: 400;
+      margin: var(--space-3) 0 var(--space-4);
+      color: var(--color-text);
+    }
+    .app-intro {
+      color: var(--color-text-muted);
+      font-size: var(--text-base);
+      line-height: 1.7;
+      max-width: 68ch;
+    }
+    .app-controls {
+      display: flex;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .ts-input {
+      flex: 1;
+      min-width: 240px;
+      padding: 14px 18px;
+      background: var(--color-surface, #16122a);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      color: var(--color-text);
+      font-family: 'General Sans', sans-serif;
+      font-size: var(--text-base);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .ts-input:focus {
+      outline: none;
+      border-color: #7b6bff;
+      box-shadow: 0 0 0 3px rgba(123, 107, 255, 0.15);
+    }
+    .ts-btn {
+      padding: 14px 24px;
+      background: #7b6bff;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'General Sans', sans-serif;
+      font-size: var(--text-base);
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.2s;
+    }
+    .ts-btn:hover { background: #8f7fff; transform: translateY(-1px); }
+    .ts-btn:active { transform: translateY(0); }
+    .app-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-6);
+      font-size: var(--text-sm);
+    }
+    .ts-sugg-label { color: var(--color-text-faint, #6e6b8a); margin-right: var(--space-2); }
+    .ts-chip {
+      padding: 6px 12px;
+      background: transparent;
+      color: var(--color-text-muted);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      font-family: 'General Sans', sans-serif;
+      font-size: var(--text-xs);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .ts-chip:hover { border-color: #7b6bff; color: var(--color-text); }
+    .ts-axis-switcher {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin: -4px 0 var(--space-3);
+    }
+    .ts-axis-switcher-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--text-xs);
+      letter-spacing: 0.05em;
+      color: var(--color-text-faint, #6e6b8a);
+      margin-right: 4px;
+    }
+    .ts-axis-btn {
+      padding: 8px 16px;
+      background: transparent;
+      color: var(--color-text-muted);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      font-family: 'General Sans', sans-serif;
+      font-size: var(--text-sm);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .ts-axis-btn:hover { border-color: #7b6bff; color: var(--color-text); }
+    .ts-axis-btn.active {
+      background: #7b6bff;
+      border-color: #7b6bff;
+      color: white;
+    }
+    .app-canvas-wrap {
+      position: relative;
+      background: radial-gradient(ellipse at center, #14102a 0%, #0a0818 100%);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: var(--space-6);
+    }
+    .ts-canvas {
+      width: 100%;
+      height: 520px;
+      display: block;
+      cursor: grab;
+    }
+    .ts-canvas:active { cursor: grabbing; }
+    .ts-axes-legend {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--color-text-muted);
+      background: rgba(14, 11, 26, 0.7);
+      backdrop-filter: blur(8px);
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+      pointer-events: none;
+    }
+    .ts-axis-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .ts-status {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--color-text-faint, #6e6b8a);
+      background: rgba(14, 11, 26, 0.7);
+      backdrop-filter: blur(8px);
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+      pointer-events: none;
+      min-height: 16px;
+    }
+    .app-explainer {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+    .app-explainer-item {
+      display: flex;
+      gap: var(--space-3);
+      align-items: flex-start;
+    }
+    .app-explainer-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #7b6bff;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .app-explainer-item strong {
+      display: block;
+      color: var(--color-text);
+      font-family: 'General Sans', sans-serif;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .app-explainer-item p {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .callout-warn {
+      background: rgba(255, 217, 61, 0.06);
+      border-left-color: #ffd93d;
+    }
+    @media (max-width: 720px) {
+      .app-explainer { grid-template-columns: 1fr; }
+      .ts-canvas { height: 400px; }
+      .app-embed { padding: var(--space-6); }
+      .ts-axes-legend { font-size: 10px; }
+    }

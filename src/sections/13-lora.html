@@ -1,0 +1,224 @@
+      <!-- ==========================================
+           SECTION 12bis — LES LORA
+           ========================================== -->
+      <section id="lora">
+        <div class="container">
+          <span class="section-number">12bis — LES LORA</span>
+          <h2 class="section-title">
+            LoRA&nbsp;: personnaliser un modèle géant avec <em>quelques mégaoctets</em>
+          </h2>
+          <p class="section-lede">
+            Comment apprendre à un modèle de plusieurs milliards de paramètres
+            un nouveau visage, un style graphique ou un produit précis, sans
+            jamais retoucher ses poids d'origine ni posséder un supercalculateur&nbsp;?
+            La réponse s'appelle <strong>LoRA</strong>, une technique de
+            fine-tuning devenue le pilier de toute personnalisation locale
+            des IA génératrices d'images.
+          </p>
+
+          <h3>Le problème&nbsp;: ré-entraîner un modèle est hors de portée</h3>
+          <p>
+            Un modèle comme Stable Diffusion XL ou FLUX.1 contient plusieurs
+            milliards de paramètres, répartis dans des centaines de couches de
+            son U-Net ou de son Diffusion Transformer. Ré-entraîner
+            l'intégralité de ces poids pour apprendre, par exemple, le visage
+            d'une personne précise ou le style graphique d'un illustrateur
+            demanderait&nbsp;: des dizaines de gigaoctets de VRAM, des jours de
+            calcul sur des clusters de GPU professionnels, et un risque élevé
+            d'<em>oubli catastrophique</em>&nbsp;— le modèle « désapprend » ses
+            capacités générales en se spécialisant trop sur les nouvelles
+            données. Ce chemin est réservé aux laboratoires qui entraînent les
+            modèles de base eux-mêmes.
+          </p>
+
+          <div class="callout">
+            <span class="callout-label">L'idée clé</span>
+            <p>
+              Plutôt que de modifier les poids géants du modèle, LoRA
+              <strong>gèle entièrement le modèle de base</strong> et
+              n'entraîne qu'un tout petit nombre de paramètres additionnels,
+              insérés à côté des couches existantes. Le modèle original reste
+              intact&nbsp;; on lui greffe une petite correction apprise.
+            </p>
+          </div>
+
+          <h3>Le principe mathématique&nbsp;: une décomposition de bas rang</h3>
+          <p>
+            LoRA signifie <em>Low-Rank Adaptation</em> (« adaptation de bas
+            rang »), une méthode publiée d'abord pour les grands modèles de
+            langage, puis adaptée avec succès aux modèles de diffusion. L'idée
+            repose sur une observation simple&nbsp;: la correction utile à
+            apporter à une grande matrice de poids peut souvent être approchée
+            par le produit de deux matrices beaucoup plus petites.
+          </p>
+
+          <div class="formula">
+            W&prime; = W + ΔW = W + B·A, avec B&nbsp;(d×r) et A&nbsp;(r×k), r ≪ d, k
+          </div>
+
+          <p>
+            Au lieu d'entraîner directement la matrice <code>W</code>, LoRA
+            entraîne seulement <code>A</code> et <code>B</code>. Le paramètre
+            <code>r</code>, le <strong>rang</strong>, fixe la capacité du LoRA&nbsp;:
+            plus il est élevé, plus le module peut apprendre un concept riche,
+            mais plus il devient lourd. En pratique, des rangs de 8 à 32
+            couvrent déjà beaucoup de LoRA de personnage, de style ou de
+            produit, pour un coût bien inférieur à celui d'un fine-tuning
+            complet.
+          </p>
+
+          <figure class="wide">
+            <div class="svg-wrap">
+              <svg
+                class="diagram-svg"
+                viewBox="0 0 1100 460"
+                xmlns="http://www.w3.org/2000/svg"
+                role="img"
+                aria-label="Schéma de l'insertion d'une matrice LoRA de bas rang dans une couche gelée du modèle"
+              >
+                <defs>
+                  <linearGradient id="grad-frozen" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#251f45" />
+                    <stop offset="1" stop-color="#1e1938" />
+                  </linearGradient>
+                  <linearGradient id="grad-lora" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#7b6bff" />
+                    <stop offset="1" stop-color="#c9a24a" />
+                  </linearGradient>
+                </defs>
+                <text x="550" y="30" text-anchor="middle" class="label-title" font-size="16">Une couche du modèle, gelée, augmentée d'un LoRA</text>
+                <g transform="translate(80, 80)">
+                  <rect x="0" y="0" width="220" height="220" rx="12" fill="url(#grad-frozen)" stroke="#2f2856" stroke-width="1.5" />
+                  <text x="110" y="30" text-anchor="middle" class="label-mono" font-size="13">Poids gelés</text>
+                  <text x="110" y="115" text-anchor="middle" class="label-title" font-size="28" fill="#a29fbf">W</text>
+                  <text x="110" y="140" text-anchor="middle" class="label-muted" font-size="11">d × k (verrouillé)</text>
+                  <g transform="translate(94, 175)">
+                    <rect x="0" y="8" width="32" height="22" rx="4" fill="none" stroke="#c9a24a" stroke-width="2"/>
+                    <path d="M6,8 V0 a10,10 0 0 1 20,0 V8" fill="none" stroke="#c9a24a" stroke-width="2"/>
+                  </g>
+                </g>
+                <text x="335" y="200" text-anchor="middle" class="label-title" font-size="30" fill="#c9a24a">+</text>
+                <g transform="translate(380, 110)">
+                  <rect x="0" y="0" width="90" height="160" rx="10" fill="#16122a" stroke="url(#grad-lora)" stroke-width="2" />
+                  <text x="45" y="26" text-anchor="middle" class="label-mono" font-size="13" fill="#f2d78a">B</text>
+                  <text x="45" y="90" text-anchor="middle" class="label-muted" font-size="10">d × r</text>
+                  <text x="120" y="90" text-anchor="middle" class="label-title" font-size="22" fill="#c9a24a">×</text>
+                  <rect x="150" y="55" width="90" height="50" rx="10" fill="#16122a" stroke="url(#grad-lora)" stroke-width="2" />
+                  <text x="195" y="76" text-anchor="middle" class="label-mono" font-size="13" fill="#f2d78a">A</text>
+                  <text x="195" y="94" text-anchor="middle" class="label-muted" font-size="10">r × k</text>
+                </g>
+                <text x="620" y="200" text-anchor="middle" class="label-title" font-size="30" fill="#7b6bff">=</text>
+                <g transform="translate(680, 80)">
+                  <rect x="0" y="0" width="220" height="220" rx="12" fill="#1e1938" stroke="#7b6bff" stroke-width="2" />
+                  <text x="110" y="30" text-anchor="middle" class="label-mono" font-size="13" fill="#b3a8ff">Modèle personnalisé</text>
+                  <text x="110" y="115" text-anchor="middle" class="label-title" font-size="22" fill="#ece9f5">W + B·A</text>
+                  <text x="110" y="145" text-anchor="middle" class="label-muted" font-size="11">même architecture,</text>
+                  <text x="110" y="160" text-anchor="middle" class="label-muted" font-size="11">nouveau comportement</text>
+                  <text x="110" y="185" text-anchor="middle" class="label-muted" font-size="11">fichier LoRA&nbsp;: 10-300&nbsp;Mo</text>
+                </g>
+                <text x="550" y="420" text-anchor="middle" class="label-muted" font-size="12">Seules les petites matrices A et B sont entraînées ; le modèle principal reste intact.</text>
+              </svg>
+            </div>
+            <figcaption>
+              <strong>Fig.</strong> Un LoRA ajoute une correction compacte à une couche existante, au lieu de réécrire le modèle complet.
+            </figcaption>
+          </figure>
+
+          <h3>Pourquoi faire des LoRA&nbsp;?</h3>
+          <div class="grid-3">
+            <div class="card"><div class="card-icon">1</div><h4>Légèreté</h4><p>Un LoRA pèse souvent quelques dizaines de mégaoctets seulement. Il se partage, s'archive et se combine très facilement.</p></div>
+            <div class="card"><div class="card-icon">2</div><h4>Coût réduit</h4><p>Il demande bien moins de VRAM et de temps d'entraînement qu'un fine-tuning intégral, ce qui rend la personnalisation locale réaliste.</p></div>
+            <div class="card"><div class="card-icon">3</div><h4>Réversibilité</h4><p>Le modèle de base n'est jamais altéré&nbsp;: désactiver le LoRA suffit à revenir au comportement d'origine.</p></div>
+            <div class="card"><div class="card-icon">4</div><h4>Spécialisation</h4><p>On peut apprendre un visage, un style, un produit, une matière, une pose ou un concept visuel récurrent avec peu d'images bien choisies.</p></div>
+            <div class="card"><div class="card-icon">5</div><h4>Composabilité</h4><p>Plusieurs LoRA peuvent être empilés dans la même génération avec des poids différents pour mélanger style, identité et effets visuels.</p></div>
+            <div class="card"><div class="card-icon">6</div><h4>Écosystème</h4><p>Les interfaces comme ComfyUI, AUTOMATIC1111 ou Forge savent charger des LoRA nativement, ce qui en a fait un standard de fait.</p></div>
+          </div>
+
+          <h3>Cas d'usage typiques</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Type de LoRA</th><th>But principal</th><th>Données typiques</th><th>Rang fréquent</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Personnage</td><td>Maintenir une identité reconnaissable dans des scènes variées</td><td>10 à 20 photos diverses</td><td>16-32</td></tr>
+                <tr><td>Style</td><td>Capturer une signature graphique ou picturale</td><td>15 à 30 images cohérentes</td><td>16-64</td></tr>
+                <tr><td>Produit</td><td>Rendre un objet spécifique dans des visuels marketing</td><td>15 à 25 photos multi-angles</td><td>16-32</td></tr>
+                <tr><td>Concept</td><td>Apprendre une pose, une tenue, une composition ou un effet visuel</td><td>20 à 40 images illustratives</td><td>8-32</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Outils locaux disponibles</h3>
+          <p>
+            L'entraînement local de LoRA se fait aujourd'hui avec plusieurs
+            familles d'outils. Certains privilégient le contrôle total par
+            scripts, d'autres misent sur une interface graphique plus simple.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Outil</th><th>Approche</th><th>Atout principal</th><th>Profil type</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>kohya-ss / sd-scripts</td><td>Scripts Python</td><td>Référence historique, réglages très fins</td><td>Utilisateurs avancés</td></tr>
+                <tr><td>bmaltais/kohya_ss</td><td>Interface Gradio</td><td>Version plus accessible de l'écosystème kohya</td><td>Débutants à intermédiaires</td></tr>
+                <tr><td>FluxGym</td><td>UI légère</td><td>Orientation FLUX et simplicité</td><td>Cartes 12-20 Go</td></tr>
+                <tr><td>ComfyUI-FluxTrainer</td><td>Nœuds ComfyUI</td><td>Intégration directe au workflow visuel</td><td>Utilisateurs ComfyUI</td></tr>
+                <tr><td><strong>Ostris AI-Toolkit</strong></td><td>CLI + UI web</td><td>Support multi-modèles et maintenance rapide</td><td>Intermédiaires à experts</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Focus sur Ostris AI-Toolkit</h3>
+          <p>
+            <strong>AI-Toolkit</strong> est l'un des environnements les plus
+            complets pour entraîner des LoRA localement sur des modèles récents.
+            Son intérêt majeur est de ne pas se limiter à un seul socle&nbsp;:
+            il suit les familles FLUX, SDXL, SD3 et d'autres architectures au
+            fur et à mesure de leur arrivée dans l'écosystème open source.
+          </p>
+          <div class="grid-2">
+            <div class="card"><h4>Deux modes d'usage</h4><p>On peut travailler en ligne de commande via des fichiers de configuration reproductibles, ou via une interface web locale qui facilite le lancement, le suivi et l'arrêt des jobs.</p></div>
+            <div class="card"><h4>Approche structurée</h4><p>Le projet s'appuie sur des exemples de configuration, la reprise d'entraînement, une gestion claire des datasets image + légende et un suivi plus moderne que beaucoup d'outils historiques.</p></div>
+          </div>
+
+
+          
+
+          <h4>Préparer le dataset</h4>
+          <p>
+            Le principe reste simple&nbsp;: un dossier d'images, et pour chaque
+            image un fichier texte de même nom contenant une légende. Cette
+            séparation image / caption permet de contrôler exactement ce que le
+            LoRA doit apprendre, et avec quel mot déclencheur il sera invoqué.
+          </p>
+          <pre><code>mon_dataset/
+├── photo01.jpg
+├── photo01.txt   → "[trigger] portrait, lumière douce"
+├── photo02.jpg
+├── photo02.txt   → "[trigger] extérieur, de profil"
+└── ...</code></pre>
+
+          <h4>Quand choisir AI-Toolkit</h4>
+          <ul>
+            <li><strong>Si vous suivez les modèles récents</strong>, surtout dans l'univers FLUX et ses dérivés.</li>
+            <li><strong>Si vous voulez une UI locale</strong> sans renoncer aux fichiers de config et à la reproductibilité.</li>
+            <li><strong>Si vous avez besoin de souplesse</strong> pour adapter le training à différents modèles et contraintes mémoire.</li>
+            <li><strong>Si vous travaillez à cheval entre local et cloud</strong>, car l'outil s'intègre bien à des usages hybrides.</li>
+          </ul>
+
+          <h3>Intérêt pratique des LoRA</h3>
+          <p>
+            Le vrai pouvoir des LoRA n'est pas seulement technique&nbsp;: il est
+            organisationnel. Ils transforment un grand modèle générique en une
+            bibliothèque modulaire de spécialisations, que l'on peut charger,
+            combiner, tester et désactiver à volonté selon le besoin créatif,
+            éditorial ou commercial du moment.
+          </p>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+

@@ -1,0 +1,88 @@
+      <!-- ==========================================
+           SECTION 7 — ESPACE LATENT
+           ========================================== -->
+      <section id="latent">
+        <div class="container">
+          <span class="section-number">08 — L'ESPACE LATENT</span>
+          <h2 class="section-title">
+            Le tour de magie de Stable Diffusion : <em>ne jamais diffuser les pixels</em>
+          </h2>
+          <p class="section-lede">
+            Diffuser directement sur des images 1024×1024 est coûteux en mémoire
+            et en calcul — un U-Net devrait traiter plus de 3 millions de pixels
+            à chaque étape, 50 fois par image. Stable Diffusion contourne le
+            problème avec une idée brillante&nbsp;: compresser l'image dans un
+            espace latent, y faire la diffusion, puis décompresser à la fin.
+          </p>
+
+          <p>
+            Cette compression est faite par un VAE (<em>Variational
+            Autoencoder</em>), pré-entraîné indépendamment. Il possède deux
+            parties&nbsp;:
+          </p>
+          <ul>
+            <li>
+              <strong>L'encodeur E</strong>&nbsp;: transforme une image
+              <code>512×512×3</code> (786 432 valeurs) en un tenseur latent
+              <code>64×64×4</code> (16 384 valeurs, soit 48× moins).
+            </li>
+            <li>
+              <strong>Le décodeur D</strong>&nbsp;: fait l'opération inverse,
+              reconstruit une image lisible depuis le tenseur latent.
+            </li>
+          </ul>
+          <p>
+            Le VAE a été entraîné à ce que la reconstruction <code>D(E(x))</code>
+            soit visuellement proche de l'image originale <code>x</code>. La
+            compression est destructive (on perd des détails), mais massivement
+            plus légère à manipuler. C'est <strong>uniquement dans cet espace
+            latent que la diffusion opère</strong> ; les pixels ne sont touchés
+            qu'au tout début (encodage éventuel) et à la toute fin (décodage).
+          </p>
+
+          <figure>
+            <img
+              src="{{inline:assets/clip.jpg}}"
+              alt="Visualisation abstraite de l'espace latent comme un cosmos de points lumineux formant des amas correspondant à différents concepts."
+            />
+            <figcaption>
+              <strong>Une représentation de l'espace latent.</strong> Chaque «&nbsp;point&nbsp;»
+              lumineux représente une image possible, encodée dans quelques
+              milliers de dimensions. Des régions apparaissent&nbsp;: là où
+              vivent les chats, là où vivent les paysages, là où vivent les
+              portraits Renaissance. La diffusion se déplace dans cet espace,
+              partant d'un point aléatoire et convergeant vers une région
+              cohérente avec le prompt.
+            </figcaption>
+          </figure>
+
+          <h3>Pourquoi ça marche : la redondance des pixels</h3>
+          <p>
+            Une image naturelle contient énormément de redondance. Un ciel bleu
+            de 500×500 pixels est «&nbsp;presque&nbsp;» décrit par sa couleur
+            moyenne et sa texture. Un visage est «&nbsp;presque&nbsp;» décrit
+            par une centaine de paramètres (position des yeux, forme du nez, âge,
+            expression…). Le VAE apprend à extraire ces facteurs pertinents et à
+            jeter la redondance. Résultat&nbsp;: on peut faire toute la diffusion
+            en dimension basse sans perte perceptible de qualité.
+          </p>
+
+          <div class="callout">
+            <span class="callout-label">Chiffres pour se repérer</span>
+            <p>
+              Pour une image 512×512, un U-Net travaille dans SD 1.5 sur un
+              tenseur latent <code>64×64×4</code>. Cela réduit les calculs par un
+              facteur d'environ 48 par rapport au travail direct sur les pixels
+              — d'où la possibilité de faire tourner Stable Diffusion sur un GPU
+              grand public plutôt que sur un cluster.
+            </p>
+          </div>
+
+
+
+
+        </div>
+      </section>
+
+      <div class="divider"></div>
+

@@ -1,0 +1,283 @@
+            <!-- ==========================================
+           SECTION 16 — LA FRONTIÈRE 2026
+           ==========================================  -->
+      <section id="frontiere">
+        <div class="container">
+          <span class="section-number">18 — DERNIÈRES AVANCÉES</span>
+          <h2 class="section-title">
+            La frontière actuelle&nbsp;: modèles <em>ouverts et fermés</em>
+          </h2>
+          <p class="section-lede">
+            Le rythme des sorties s'est encore accéléré en 2026. Cinq modèles
+            illustrent bien les deux tendances qui traversent tout ce document
+            — l'ouverture croissante côté recherche (Z-Image Turbo, Krea&nbsp;2)
+            et la course à l'intelligence multimodale côté grands laboratoires
+            fermés (Ideogram&nbsp;4, Nano Banana&nbsp;2, Seedream). Tous
+            reposent sur les briques déjà vues&nbsp;: diffusion, DiT,
+            encodeurs de texte puissants — mais chacun pousse un curseur
+            différent.
+          </p>
+
+          <h3>Z-Image Turbo&nbsp;: la vitesse en open source</h3>
+          <p>
+            Publié par le Tongyi Lab d'Alibaba, <strong>Z-Image Turbo</strong>
+            est un modèle de diffusion de 6 milliards de paramètres, distillé
+            pour générer une image en <strong>8 étapes seulement</strong> — de
+            l'ordre de 2 à 3 secondes pour une image en 1024&nbsp;px sur une
+            carte grand public. Publié sous licence Apache&nbsp;2.0, il s'est
+            classé 8ᵉ toutes catégories sur le classement Artificial Analysis
+            dès sa sortie, en faisant le modèle ouvert le mieux classé de sa
+            génération. Il illustre l'aboutissement des techniques de
+            distillation évoquées en section&nbsp;09&nbsp;: on entraîne un
+            modèle «&nbsp;élève&nbsp;» à reproduire en très peu d'étapes ce
+            qu'un modèle «&nbsp;professeur&nbsp;» plus lent obtient en
+            50&nbsp;étapes classiques.
+          </p>
+
+          <h3>Krea&nbsp;2&nbsp;: l'esthétique et le contrôle de style</h3>
+          <p>
+            <strong>Krea&nbsp;2</strong> est le premier modèle fondationnel
+            entraîné entièrement «&nbsp;from scratch&nbsp;» par Krea AI&nbsp;:
+            un Diffusion Transformer dense de 12 milliards de paramètres,
+            associé à un encodeur de texte Qwen3-VL et à un VAE Qwen Image. Sa
+            spécificité n'est pas la vitesse mais le <strong>contrôle du
+            style</strong>&nbsp;: on peut lui fournir une ou plusieurs images
+            de référence («&nbsp;moodboards&nbsp;») et régler précisément
+            l'intensité avec laquelle chaque style influence le résultat, un
+            curseur de «&nbsp;créativité&nbsp;» permettant même de choisir entre
+            fidélité stricte au prompt et interprétation artistique libre. Le
+            modèle est publié en deux variantes ouvertes&nbsp;: <em>Raw</em>
+            (base non distillée, pour l'entraînement de LoRA) et <em>Turbo</em>
+            (distillée en 8 étapes, image 2K en ~2 secondes) — reprenant
+            exactement le schéma base/distillé déjà vu pour Z-Image.
+          </p>
+
+                    <h3>FLUX.2&nbsp;: la nouvelle génération de Black Forest Labs</h3>
+          <p>
+            Aux côtés des modèles ci-dessus, <strong>FLUX.2</strong> constitue
+            la mise à jour la plus récente de Black Forest Labs, déjà
+            présentée en détail en section&nbsp;11 sous l'angle de l'édition
+            par instruction. Contrairement aux autres modèles de ce panorama,
+            FLUX.2 n'est pas un modèle unique mais une <strong>famille</strong>
+            déclinée en plusieurs tailles pour couvrir des besoins très
+            différents&nbsp;: <strong>FLUX.2&nbsp;[dev]</strong>
+            (32&nbsp;milliards de paramètres, qualité et fidélité de prompt
+            maximales, poids ouverts) et <strong>FLUX.2&nbsp;[klein]</strong>,
+            décliné en variantes <strong>9B</strong> et <strong>4B</strong>,
+            distillées pour générer ou éditer une image en moins d'une
+            seconde&nbsp;; la version 4B est publiée sous licence
+            Apache&nbsp;2.0, ce qui en fait le premier modèle de qualité FLUX
+            réellement exploitable dans un produit commercial sans
+            restriction. Fait notable partagé avec Ideogram&nbsp;4&nbsp;: tous
+            les modèles de la famille FLUX.2 unifient nativement
+            texte-vers-image et édition d'image dans une seule architecture,
+            comme détaillé en section&nbsp;11.
+          </p>
+
+          <h3>Ideogram&nbsp;4&nbsp;: la précision typographique, désormais ouverte</h3>
+          <p>
+            <strong>Ideogram&nbsp;4</strong> poursuit la spécialité historique
+            de son éditeur&nbsp;: le rendu fiable de <strong>texte dans
+            l'image</strong>, ce défaut structurel décrit en section&nbsp;13
+            («&nbsp;texte illisible&nbsp;»). Le modèle supporte des rapports
+            d'aspect flexibles (toute résolution multiple de 16, de 256 à
+            2048&nbsp;px par côté), ce qui en fait un choix privilégié pour les
+            logos, affiches, interfaces et supports de communication où la
+            typographie doit rester nette et exacte, un cas d'usage où les
+            modèles généralistes échouent encore fréquemment. Fait notable,
+            Ideogram a publié en 2026 une <strong>version open source</strong>
+            de ce modèle&nbsp;: un Diffusion Transformer de 9,3&nbsp;milliards
+            de paramètres, dont les poids sont librement téléchargeables et
+            réentraînables, unifiant lui aussi texte-vers-image et édition
+            d'image dans une seule architecture — rejoignant ainsi la
+            dynamique d'ouverture décrite en section&nbsp;14.
+          </p>
+
+          <h3>Nano Banana&nbsp;2&nbsp;: l'image raisonnée par un LLM</h3>
+          <p>
+            <strong>Nano Banana&nbsp;2</strong> (nom commercial de Gemini
+            3.1&nbsp;Flash Image, Google DeepMind) pousse à l'extrême l'idée de
+            <em>modèle multimodal unifié</em>&nbsp;: la génération d'image est
+            directement intégrée au grand modèle de langage Gemini, qui peut
+            «&nbsp;réfléchir&nbsp;» avant de produire l'image via des niveaux de
+            raisonnement configurables (minimal à élevé). Cela lui permet de
+            mobiliser la connaissance du monde de Gemini et même des résultats
+            de recherche web pour ancrer une image dans des références réelles,
+            de maintenir la cohérence d'un même sujet sur plusieurs
+            générations, et de produire du texte intégré fiable et traduit
+            automatiquement dans l'image. Il est disponible à des résolutions
+            allant de 512&nbsp;px à 4K.
+          </p>
+
+          <h3>Seedream&nbsp;5.0&nbsp;: génération et édition unifiées</h3>
+          <p>
+            <strong>Seedream&nbsp;5.0</strong> (ByteDance) fusionne dans une
+            seule architecture les tâches de <em>génération</em> et
+            d'<em>édition</em> d'image, habituellement traitées par des
+            pipelines séparés (voir l'inpainting/ControlNet en
+            section&nbsp;10). Le modèle atteint une résolution native de 4K
+            avec une vitesse d'inférence nettement supérieure à sa génération
+            précédente, et se distingue par sa gestion de tâches complexes
+            combinant plusieurs images de référence, raisonnement visuel et
+            cohérence avec une image source — brouillant la frontière entre
+            «&nbsp;créer&nbsp;» et «&nbsp;modifier&nbsp;» une image.
+          </p>
+
+          <figure class="wide">
+            <img src="{{inline:assets/frontiere.jpg}}" alt="Grille comparative de six images illustrant le style distinctif de Z-Image Turbo, Krea 2, FLUX.2, Ideogram 4, Nano Banana 2 et Seedream 4.0" style="border-radius: var(--radius-lg); border: 1px solid var(--color-border);">
+            <figcaption>
+              <strong>Six styles, six spécialités.</strong> Illustration
+              conceptuelle du positionnement de chaque modèle&nbsp;: portrait
+              photoréaliste rapide (Z-Image Turbo), direction artistique
+              éditoriale contrôlée (Krea&nbsp;2), édition d'image quasi
+              instantanée avec préservation du sujet (FLUX.2), typographie
+              nette en contexte (Ideogram&nbsp;4), cohérence d'un même
+              personnage entre deux générations (Nano&nbsp;Banana&nbsp;2), et
+              rendu produit 4K de qualité commerciale (Seedream&nbsp;4.0).
+            </figcaption>
+          </figure>
+
+          <h3>Exemples de prompts et de résultats typiques</h3>
+          <div class="grid-2">
+            <div class="card">
+              <h4>Z-Image Turbo</h4>
+              <p>
+                <em>Prompt&nbsp;:</em> «&nbsp;Jeune femme en habit traditionnel
+                rouge, lumière du soir, détails du visage nets, texte
+                bilingue sur une enseigne en arrière-plan&nbsp;». Résultat en
+                8 étapes (~2&nbsp;secondes)&nbsp;: portrait photoréaliste avec
+                peau et éclairage crédibles, texte d'arrière-plan lisible
+                grâce à l'héritage de Qwen-Image.
+              </p>
+            </div>
+            <div class="card">
+              <h4>Krea 2</h4>
+              <p>
+                <em>Prompt&nbsp;:</em> «&nbsp;Portrait de rue expressif, superposition
+                vintage, accessoires colorés&nbsp;» + une image de référence de
+                style (moodboard). Résultat&nbsp;: la composition suit le
+                prompt tandis que la palette, le grain et l'éclairage
+                reprennent fidèlement l'image de référence fournie.
+              </p>
+            </div>
+            <div class="card">
+              <h4>FLUX.2 [klein]</h4>
+              <p>
+                <em>Prompt&nbsp;:</em> «&nbsp;Change l'arrière-plan de cette
+                photo produit en studio blanc épuré&nbsp;», appliqué à une
+                photo existante. Résultat en moins d'une seconde&nbsp;: le
+                sujet au premier plan reste identique au pixel près, seul le
+                fond est remplacé — texte-vers-image et édition cohabitant
+                dans le même modèle léger.
+              </p>
+            </div>
+            <div class="card">
+              <h4>Ideogram 4</h4>
+              <p>
+                <em>Prompt&nbsp;:</em> «&nbsp;Affiche minimaliste pour un festival
+                de design, grand titre &laquo;&nbsp;DESIGN&nbsp;&raquo; en
+                typographie géométrique&nbsp;». Résultat&nbsp;: texte
+                parfaitement épelé et net, sans les déformations de lettres
+                encore fréquentes chez les modèles généralistes.
+              </p>
+            </div>
+            <div class="card">
+              <h4>Nano Banana 2</h4>
+              <p>
+                <em>Prompt&nbsp;:</em> «&nbsp;Le même robot mascotte orange,
+                d'abord assis, puis debout en train de saluer&nbsp;», en deux
+                appels successifs. Résultat&nbsp;: l'identité visuelle du
+                personnage (couleurs, proportions, design) reste identique
+                d'une génération à l'autre, grâce au raisonnement intégré au
+                LLM Gemini.
+              </p>
+            </div>
+		    <div class="card">
+              <h4>Seedream 5.0&nbsp;</h4>
+              <p>
+                <em>Prompt&nbsp;:</em> «« Photo produit d'un flacon de parfum haut de gamme, surface réfléchissante, éclairage studio dramatique, rendu 4K ». En fournissant en plus une photo du flacon réel comme référence, Seedream 4.0 peut soit générer une variante inédite soit éditer directement la photo fournie (changer l'éclairage, le fond, l'angle) dans le même appel — sans changer d'outil entre génération et retouche.
+              </p>
+            </div>
+          </div>
+          
+        </div>
+
+          <h3>Vue d'ensemble</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Modèle</th>
+                  <th>Éditeur</th>
+                  <th>Statut</th>
+                  <th>Force distinctive</th>
+                  <th>Résolution</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Z-Image Turbo</td>
+                  <td>Alibaba (Tongyi Lab)</td>
+                  <td>Ouvert (Apache 2.0)</td>
+                  <td>Vitesse extrême (8 étapes), meilleur modèle ouvert du classement</td>
+                  <td>~1024 px</td>
+                </tr>
+                <tr>
+                  <td>Krea 2</td>
+                  <td>Krea AI</td>
+                  <td>Ouvert (licence communautaire)</td>
+                  <td>Contrôle du style, moodboards, variantes Raw/Turbo</td>
+                  <td>jusqu'à 2K</td>
+                </tr>
+                <tr>
+                  <td>FLUX.2 [dev] / [klein]</td>
+                  <td>Black Forest Labs</td>
+                  <td>Ouvert (dev &amp; klein 9B) / Apache 2.0 (klein 4B)</td>
+                  <td>Famille modulable (32/9/4 Md), texte-vers-image et édition unifiés</td>
+                  <td>jusqu'à 4 Mpx</td>
+                </tr>
+                <tr>
+                  <td>Ideogram 4</td>
+                  <td>Ideogram</td>
+                  <td>Ouvert (poids publiés, 9,3 Md de paramètres)</td>
+                  <td>Rendu typographique précis, ratios flexibles, génération et édition unifiées</td>
+                  <td>256 à 2048 px</td>
+                </tr>
+                <tr>
+                  <td>Nano Banana 2</td>
+                  <td>Google DeepMind</td>
+                  <td>Fermé (Gemini)</td>
+                  <td>Raisonnement intégré au LLM, ancrage par connaissance du monde</td>
+                  <td>512 px à 4K</td>
+                </tr>
+                <tr>
+                  <td>Seedream 5.0</td>
+                  <td>ByteDance</td>
+                  <td>Fermé (API)</td>
+                  <td>Génération et édition unifiées dans une seule architecture</td>
+                  <td>jusqu'à 4K</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout">
+            <span class="callout-label">À retenir</span>
+            <p>
+              Ces six modèles ne réinventent pas la diffusion&nbsp;: ils en
+              raffinent des aspects précis déjà expliqués dans ce document —
+              distillation pour la vitesse (Z-Image, Krea&nbsp;2 Turbo,
+              FLUX.2&nbsp;[klein]), encodeurs de texte et conditionnement pour
+              la fidélité au style ou à la typographie (Krea&nbsp;2,
+              Ideogram&nbsp;4), et fusion avec un LLM pour le raisonnement et
+              l'édition unifiée (Nano&nbsp;Banana&nbsp;2, Seedream). La ligne
+              de fracture entre ouvert et fermé s'estompe d'ailleurs&nbsp;:
+              Ideogram, historiquement fermé, a lui aussi publié les poids
+              d'Ideogram&nbsp;4 en 2026, rejoignant Z-Image, Krea et la famille
+              FLUX.2 dans le camp de l'ouverture décrit en section&nbsp;14.</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
