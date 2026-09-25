@@ -1,0 +1,450 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-25T07:28:38+00:00",
+  "title": "Design System: Diffusion & Pixels",
+  "extensions": {
+    "colorMeta": {
+      "burnished-ochre": {
+        "role": "primary",
+        "displayName": "Burnished Ochre",
+        "canonical": "#c9a24a",
+        "tonalRamp": [
+          "oklch(15.0% 0.115 85.2)",
+          "oklch(26.4% 0.115 85.2)",
+          "oklch(37.9% 0.115 85.2)",
+          "oklch(49.3% 0.115 85.2)",
+          "oklch(60.7% 0.115 85.2)",
+          "oklch(72.1% 0.115 85.2)",
+          "oklch(83.6% 0.115 85.2)",
+          "oklch(95.0% 0.115 85.2)"
+        ]
+      },
+      "ochre-highlight": {
+        "role": "primary",
+        "displayName": "Ochre Highlight",
+        "canonical": "#f2d78a",
+        "tonalRamp": [
+          "oklch(15.0% 0.101 90.8)",
+          "oklch(26.4% 0.101 90.8)",
+          "oklch(37.9% 0.101 90.8)",
+          "oklch(49.3% 0.101 90.8)",
+          "oklch(60.7% 0.101 90.8)",
+          "oklch(72.1% 0.101 90.8)",
+          "oklch(83.6% 0.101 90.8)",
+          "oklch(95.0% 0.101 90.8)"
+        ]
+      },
+      "lapis-violet": {
+        "role": "secondary",
+        "displayName": "Lapis Violet",
+        "canonical": "#7b6bff",
+        "tonalRamp": [
+          "oklch(15.0% 0.180 283.2)",
+          "oklch(26.4% 0.180 283.2)",
+          "oklch(37.9% 0.180 283.2)",
+          "oklch(49.3% 0.180 283.2)",
+          "oklch(60.7% 0.180 283.2)",
+          "oklch(72.1% 0.180 283.2)",
+          "oklch(83.6% 0.180 283.2)",
+          "oklch(95.0% 0.180 283.2)"
+        ]
+      },
+      "lapis-mist": {
+        "role": "secondary",
+        "displayName": "Lapis Mist",
+        "canonical": "#b3a8ff",
+        "tonalRamp": [
+          "oklch(15.0% 0.123 289.0)",
+          "oklch(26.4% 0.123 289.0)",
+          "oklch(37.9% 0.123 289.0)",
+          "oklch(49.3% 0.123 289.0)",
+          "oklch(60.7% 0.123 289.0)",
+          "oklch(72.1% 0.123 289.0)",
+          "oklch(83.6% 0.123 289.0)",
+          "oklch(95.0% 0.123 289.0)"
+        ]
+      },
+      "verdigris": {
+        "role": "tertiary",
+        "displayName": "Verdigris",
+        "canonical": "#4ec9c1",
+        "tonalRamp": [
+          "oklch(15.0% 0.109 189.1)",
+          "oklch(26.4% 0.109 189.1)",
+          "oklch(37.9% 0.109 189.1)",
+          "oklch(49.3% 0.109 189.1)",
+          "oklch(60.7% 0.109 189.1)",
+          "oklch(72.1% 0.109 189.1)",
+          "oklch(83.6% 0.109 189.1)",
+          "oklch(95.0% 0.109 189.1)"
+        ]
+      },
+      "madder-rose": {
+        "role": "tertiary",
+        "displayName": "Madder Rose",
+        "canonical": "#e26d8b",
+        "tonalRamp": [
+          "oklch(15.0% 0.148 5.7)",
+          "oklch(26.4% 0.148 5.7)",
+          "oklch(37.9% 0.148 5.7)",
+          "oklch(49.3% 0.148 5.7)",
+          "oklch(60.7% 0.148 5.7)",
+          "oklch(72.1% 0.148 5.7)",
+          "oklch(83.6% 0.148 5.7)",
+          "oklch(95.0% 0.148 5.7)"
+        ]
+      },
+      "midnight-indigo": {
+        "role": "neutral",
+        "displayName": "Midnight Indigo",
+        "canonical": "#0e0b1a",
+        "tonalRamp": [
+          "oklch(15.0% 0.031 291.7)",
+          "oklch(26.4% 0.031 291.7)",
+          "oklch(37.9% 0.031 291.7)",
+          "oklch(49.3% 0.031 291.7)",
+          "oklch(60.7% 0.031 291.7)",
+          "oklch(72.1% 0.031 291.7)",
+          "oklch(83.6% 0.031 291.7)",
+          "oklch(95.0% 0.031 291.7)"
+        ]
+      },
+      "ink-well": {
+        "role": "neutral",
+        "displayName": "Ink Well",
+        "canonical": "#16122a",
+        "tonalRamp": [
+          "oklch(15.0% 0.047 289.1)",
+          "oklch(26.4% 0.047 289.1)",
+          "oklch(37.9% 0.047 289.1)",
+          "oklch(49.3% 0.047 289.1)",
+          "oklch(60.7% 0.047 289.1)",
+          "oklch(72.1% 0.047 289.1)",
+          "oklch(83.6% 0.047 289.1)",
+          "oklch(95.0% 0.047 289.1)"
+        ]
+      },
+      "ink-well-raised": {
+        "role": "neutral",
+        "displayName": "Ink Well Raised",
+        "canonical": "#1e1938",
+        "tonalRamp": [
+          "oklch(15.0% 0.058 288.6)",
+          "oklch(26.4% 0.058 288.6)",
+          "oklch(37.9% 0.058 288.6)",
+          "oklch(49.3% 0.058 288.6)",
+          "oklch(60.7% 0.058 288.6)",
+          "oklch(72.1% 0.058 288.6)",
+          "oklch(83.6% 0.058 288.6)",
+          "oklch(95.0% 0.058 288.6)"
+        ]
+      },
+      "ink-well-high": {
+        "role": "neutral",
+        "displayName": "Ink Well High",
+        "canonical": "#251f45",
+        "tonalRamp": [
+          "oklch(15.0% 0.069 288.1)",
+          "oklch(26.4% 0.069 288.1)",
+          "oklch(37.9% 0.069 288.1)",
+          "oklch(49.3% 0.069 288.1)",
+          "oklch(60.7% 0.069 288.1)",
+          "oklch(72.1% 0.069 288.1)",
+          "oklch(83.6% 0.069 288.1)",
+          "oklch(95.0% 0.069 288.1)"
+        ]
+      },
+      "folio-rule": {
+        "role": "neutral",
+        "displayName": "Folio Rule",
+        "canonical": "#2f2856",
+        "tonalRamp": [
+          "oklch(15.0% 0.080 287.8)",
+          "oklch(26.4% 0.080 287.8)",
+          "oklch(37.9% 0.080 287.8)",
+          "oklch(49.3% 0.080 287.8)",
+          "oklch(60.7% 0.080 287.8)",
+          "oklch(72.1% 0.080 287.8)",
+          "oklch(83.6% 0.080 287.8)",
+          "oklch(95.0% 0.080 287.8)"
+        ]
+      },
+      "moonlit-vellum": {
+        "role": "neutral",
+        "displayName": "Moonlit Vellum",
+        "canonical": "#ece9f5",
+        "tonalRamp": [
+          "oklch(15.0% 0.016 297.5)",
+          "oklch(26.4% 0.016 297.5)",
+          "oklch(37.9% 0.016 297.5)",
+          "oklch(49.3% 0.016 297.5)",
+          "oklch(60.7% 0.016 297.5)",
+          "oklch(72.1% 0.016 297.5)",
+          "oklch(83.6% 0.016 297.5)",
+          "oklch(95.0% 0.016 297.5)"
+        ]
+      },
+      "faded-ink": {
+        "role": "neutral",
+        "displayName": "Faded Ink",
+        "canonical": "#a29fbf",
+        "tonalRamp": [
+          "oklch(15.0% 0.046 289.5)",
+          "oklch(26.4% 0.046 289.5)",
+          "oklch(37.9% 0.046 289.5)",
+          "oklch(49.3% 0.046 289.5)",
+          "oklch(60.7% 0.046 289.5)",
+          "oklch(72.1% 0.046 289.5)",
+          "oklch(83.6% 0.046 289.5)",
+          "oklch(95.0% 0.046 289.5)"
+        ]
+      },
+      "ghost-ink": {
+        "role": "neutral",
+        "displayName": "Ghost Ink",
+        "canonical": "#817e9b",
+        "tonalRamp": [
+          "oklch(15.0% 0.044 289.8)",
+          "oklch(26.4% 0.044 289.8)",
+          "oklch(37.9% 0.044 289.8)",
+          "oklch(49.3% 0.044 289.8)",
+          "oklch(60.7% 0.044 289.8)",
+          "oklch(72.1% 0.044 289.8)",
+          "oklch(83.6% 0.044 289.8)",
+          "oklch(95.0% 0.044 289.8)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero question only; key word in italic ochre highlight."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles, each with one gilded italic phrase."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "h3 subsections."
+      },
+      "subtitle": {
+        "displayName": "Subtitle",
+        "purpose": "h4 in ochre highlight; vellum inside cards and timeline."
+      },
+      "lede": {
+        "displayName": "Lede",
+        "purpose": "Section and hero introductions, faded ink, max 62ch."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text, max 72ch."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Figcaptions, tables, card text, nav links."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Monospace chapter numbers, years, callout labels, formulas."
+      }
+    },
+    "shadows": [
+      {
+        "name": "hairline",
+        "value": "0 1px 2px rgba(0,0,0,0.3)",
+        "purpose": "Defined; currently unused."
+      },
+      {
+        "name": "plate",
+        "value": "0 6px 20px rgba(0,0,0,0.35)",
+        "purpose": "Figures and SVG frames at rest; cards on hover."
+      },
+      {
+        "name": "levitation",
+        "value": "0 20px 60px rgba(0,0,0,0.5)",
+        "purpose": "Hero image only, with the Lapis Halo."
+      },
+      {
+        "name": "lapis-halo",
+        "value": "0 0 60px rgba(123,107,255,0.15)",
+        "purpose": "Violet glow reserved for the hero plate."
+      },
+      {
+        "name": "ochre-ember",
+        "value": "0 0 12px #c9a24a",
+        "purpose": "Glow on the hero eyebrow dot and timeline nodes."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-expo",
+        "value": "220ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "All UI state transitions (--transition)."
+      },
+      {
+        "name": "reveal",
+        "value": "700ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Reveal-on-scroll: opacity 0 to 1, translateY 24px to 0."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "single-column",
+        "value": "720px"
+      },
+      {
+        "name": "nav-collapse",
+        "value": "900px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Demo Button",
+      "kind": "button",
+      "description": "Violet-to-ochre gradient; the single main action of a demo.",
+      "html": "<button class=\"ds-btn-primary\">▶ Lancer le débruitage</button>",
+      "css": ".ds-btn-primary{font-family:'General Sans','Helvetica Neue',sans-serif;font-size:1rem;font-weight:600;color:#0e0b1a;background:linear-gradient(135deg,#7b6bff,#c9a24a);border:1px solid transparent;border-radius:10px;padding:8px 16px;cursor:pointer;transition:transform 220ms cubic-bezier(0.16,1,0.3,1),box-shadow 220ms cubic-bezier(0.16,1,0.3,1)}.ds-btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,0.35)}.ds-btn-primary:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(123,107,255,0.35)}.ds-btn-primary:active{transform:translateY(0)}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Raised ink-well button with hairline; border turns ochre on hover.",
+      "html": "<button class=\"ds-btn-secondary\">↺ Repartir du bruit pur</button>",
+      "css": ".ds-btn-secondary{font-family:'General Sans','Helvetica Neue',sans-serif;font-size:1rem;color:#ece9f5;background:#1e1938;border:1px solid #2f2856;border-radius:10px;padding:8px 16px;cursor:pointer;transition:all 220ms cubic-bezier(0.16,1,0.3,1)}.ds-btn-secondary:hover{border-color:#c9a24a;transform:translateY(-1px)}.ds-btn-secondary:focus-visible{outline:none;border-color:#7b6bff;box-shadow:0 0 0 3px rgba(123,107,255,0.35)}"
+    },
+    {
+      "name": "Solid Violet Button",
+      "kind": "button",
+      "refersTo": "button-solid",
+      "description": "Token-explorer action button.",
+      "html": "<button class=\"ds-btn-solid\">Encoder</button>",
+      "css": ".ds-btn-solid{padding:14px 24px;background:#7b6bff;color:#0e0b1a;border:none;border-radius:12px;font-family:'General Sans','Helvetica Neue',sans-serif;font-size:1rem;font-weight:500;cursor:pointer;transition:transform .15s,background .2s}.ds-btn-solid:hover{background:#8f7fff;transform:translateY(-1px)}.ds-btn-solid:active{transform:translateY(0)}.ds-btn-solid:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(123,107,255,0.35)}"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Token-explorer phrase field with violet focus ring.",
+      "html": "<input class=\"ds-input\" value=\"un chat roux sous la pluie\" />",
+      "css": ".ds-input{min-width:240px;padding:14px 18px;background:#16122a;border:1px solid #2f2856;border-radius:12px;color:#ece9f5;font-family:'General Sans','Helvetica Neue',sans-serif;font-size:1rem;transition:border-color .2s,box-shadow .2s}.ds-input:focus{outline:none;border-color:#7b6bff;box-shadow:0 0 0 3px rgba(123,107,255,0.15)}"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Suggestion / axis pill; active state fills violet.",
+      "html": "<span><button class=\"ds-chip\">un roi et une reine</button> <button class=\"ds-chip ds-chip-active\">Sémantique</button></span>",
+      "css": ".ds-chip{padding:6px 12px;background:transparent;color:#a29fbf;border:1px solid #2f2856;border-radius:999px;font-family:'General Sans','Helvetica Neue',sans-serif;font-size:.8125rem;cursor:pointer;transition:all .15s}.ds-chip:hover{border-color:#7b6bff;color:#ece9f5}.ds-chip:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(123,107,255,0.35)}.ds-chip-active{background:#7b6bff;border-color:#7b6bff;color:#0e0b1a}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Sticky frosted bar: brand in Fraunces, compact TOC links.",
+      "html": "<nav class=\"ds-nav\"><span class=\"ds-brand\"><svg viewBox=\"0 0 32 32\" width=\"26\" height=\"26\" fill=\"none\"><defs><linearGradient id=\"dsbg\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#7b6bff\"/><stop offset=\"1\" stop-color=\"#c9a24a\"/></linearGradient></defs><circle cx=\"16\" cy=\"16\" r=\"14\" stroke=\"url(#dsbg)\" stroke-width=\"1.5\"/><circle cx=\"16\" cy=\"16\" r=\"7\" fill=\"url(#dsbg)\" opacity=\"0.9\"/><circle cx=\"16\" cy=\"16\" r=\"2.5\" fill=\"#0e0b1a\"/></svg>Diffusion &amp; Pixels</span><span class=\"ds-toc\"><a href=\"#\">Intro</a><a href=\"#\">Diffusion</a><a href=\"#\">U-Net</a><a href=\"#\">CLIP</a></span></nav>",
+      "css": ".ds-nav{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:12px 24px;background:rgba(14,11,26,.85);backdrop-filter:blur(16px);border-bottom:1px solid #2f2856}.ds-brand{display:flex;align-items:center;gap:8px;font-family:Fraunces,Georgia,serif;font-weight:500;color:#ece9f5}.ds-toc{display:flex;gap:16px;font-family:'General Sans','Helvetica Neue',sans-serif;font-size:.8125rem}.ds-toc a{color:#a29fbf;text-decoration:none;padding:4px 8px;border-radius:6px;letter-spacing:.02em;transition:all 220ms cubic-bezier(0.16,1,0.3,1)}.ds-toc a:hover{color:#f2d78a;background:rgba(255,255,255,.04)}.ds-toc a:focus-visible{outline:none;box-shadow:0 0 0 2px #7b6bff}"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Bordered ink-well card with gradient icon; lifts on hover.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-icon\">1</div><h4>Encodeur de texte</h4><p>Traduit le prompt en vecteurs que le modèle comprend.</p></div>",
+      "css": ".ds-card{background:#16122a;border:1px solid #2f2856;border-radius:16px;padding:24px;max-width:300px;transition:all 220ms cubic-bezier(0.16,1,0.3,1)}.ds-card:hover{border-color:#c9a24a;transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.35)}.ds-card-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#7b6bff,#c9a24a);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-family:'JetBrains Mono','SF Mono',monospace;font-weight:600;color:#0e0b1a}.ds-card h4{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:1.25rem;letter-spacing:-.02em;margin:0 0 8px;color:#ece9f5}.ds-card p{font-family:'General Sans','Helvetica Neue',sans-serif;font-size:.9375rem;line-height:1.65;color:#a29fbf;margin:0}"
+    },
+    {
+      "name": "Callout",
+      "kind": "custom",
+      "refersTo": "callout",
+      "description": "Marginal note: ochre-to-violet left rule, mono ochre label.",
+      "html": "<div class=\"ds-callout\"><span class=\"ds-callout-label\">À retenir</span><p>Le modèle n'apprend pas à dessiner : il apprend à effacer du bruit.</p></div>",
+      "css": ".ds-callout{position:relative;border:1px solid #2f2856;background:linear-gradient(180deg,#16122a,#1e1938);border-radius:16px;padding:24px 32px;max-width:560px}.ds-callout::before{content:'';position:absolute;left:0;top:24px;bottom:24px;width:3px;background:linear-gradient(180deg,#c9a24a,#7b6bff);border-radius:9999px}.ds-callout-label{display:block;font-family:'JetBrains Mono','SF Mono',monospace;font-size:.8125rem;color:#c9a24a;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.ds-callout p{margin:0;font-family:'General Sans','Helvetica Neue',sans-serif;line-height:1.65;color:#ece9f5}"
+    },
+    {
+      "name": "Chapter Header",
+      "kind": "custom",
+      "description": "Mono ochre chapter number, Fraunces headline with one gilded italic phrase, faded lede.",
+      "html": "<header class=\"ds-chapter\"><span class=\"ds-num\">05 — ARCHITECTURE</span><h2>L'U-Net, cheval de bataille du <em>débruitage</em></h2><p>Comment un réseau en forme de U prédit le bruit à retirer.</p></header>",
+      "css": ".ds-num{display:inline-block;font-family:'JetBrains Mono','SF Mono',monospace;font-size:.8125rem;color:#c9a24a;letter-spacing:.2em;margin-bottom:16px}.ds-chapter h2{font-family:Fraunces,Georgia,serif;font-weight:500;font-size:2.5rem;line-height:1.1;letter-spacing:-.02em;color:#ece9f5;margin:0 0 16px}.ds-chapter h2 em{font-style:italic;color:#f2d78a}.ds-chapter p{font-family:'General Sans','Helvetica Neue',sans-serif;font-size:1.25rem;line-height:1.65;color:#a29fbf;max-width:62ch;margin:0}"
+    },
+    {
+      "name": "Timeline Entry",
+      "kind": "custom",
+      "description": "Ochre ring node on a fading spine, mono year, vellum h4.",
+      "html": "<div class=\"ds-tl\"><div class=\"ds-tl-item\"><div class=\"ds-tl-year\">2020</div><h4>DDPM</h4><p>Ho et al. rendent la diffusion compétitive.</p></div></div>",
+      "css": ".ds-tl{position:relative;padding-left:32px}.ds-tl::before{content:'';position:absolute;left:8px;top:8px;bottom:8px;width:1px;background:#2f2856}.ds-tl-item{position:relative}.ds-tl-item::before{content:'';position:absolute;left:-32px;top:8px;width:17px;height:17px;border-radius:50%;background:#0e0b1a;border:2px solid #c9a24a;box-shadow:0 0 0 4px #0e0b1a,0 0 12px rgba(201,162,74,.4)}.ds-tl-year{font-family:'JetBrains Mono','SF Mono',monospace;color:#c9a24a;font-size:.9375rem;font-weight:500;letter-spacing:.1em;margin-bottom:4px}.ds-tl-item h4{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:1.25rem;margin:0 0 8px;color:#ece9f5}.ds-tl-item p{font-family:'General Sans','Helvetica Neue',sans-serif;font-size:.9375rem;color:#a29fbf;margin:0}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Illuminated Manuscript",
+    "overview": "This is a scholarly book read at night, lit from within. A deep indigo page, close to black, carries text in pale vellum. Knowledge is marked out with burnished ochre, as a scribe would gild a chapter number or a marginal note. Lapis violet, the pigment of illuminated manuscripts, is the second ink: it glows behind the hero, colors the interactive instruments, and blends into the ochre wherever the reader is invited to act. Fraunces serif headlines give each chapter the gravity of a printed volume. A quiet sans carries the long reading, and a monospace hand annotates numbers, formulas and chapter marks.\n\nThe mood is **scholarly, nocturnal and warm**. The page is dense with content but paced generously: a narrow reading column of about 72 characters, large vertical breaks between chapters, and lines that fade out at their ends to separate sections. Figures, diagrams and demos are presented like plates in a volume. They sit on raised ink-well panels with a hairline border and lift off the page. Atmosphere comes from light, not decoration: three soft radial glows (violet, ochre, verdigris) are fixed behind the page, with a faint grain of noise over everything, a quiet nod to diffusion itself.",
+    "keyCharacteristics": [
+      "Dark-only indigo page. Ochre marks structure, violet marks interaction and light.",
+      "Serif display with italic ochre emphasis (`<em>`) inside every section title.",
+      "Monospace labels for chapter numbers, years, callout labels and formulas.",
+      "Lifted, bordered plates for figures, cards, callouts and demos.",
+      "Reveal-on-scroll pacing with one long, soft easing curve."
+    ],
+    "rules": [
+      {
+        "name": "The Ink-on-Pigment Rule",
+        "body": "Text set on a violet, ochre or violet-to-ochre fill is always Midnight Indigo, never white. Indigo reaches 5:1 on violet and 8:1 on ochre; white fails on both.",
+        "section": "colors"
+      },
+      {
+        "name": "The Axis Ink Rule",
+        "body": "In the token explorer, each axis keeps one ink whatever axis set is chosen: X is Madder Rose, Y is Verdigris, Z is Burnished Ochre. Words in a phrase take the manuscript inks in turn (lapis, ochre highlight, verdigris, madder rose, lapis mist), and every point also carries its word as a label, so color is never the only code.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Pigments Rule",
+        "body": "Ochre means *structure and knowledge*: numbering, emphasis, reading aids. Violet means *light and action*: glow, focus, interactive controls. When both appear together, they appear as the violet-to-ochre gradient, and only on a single focal element.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ghost Ink Rule",
+        "body": "Ghost Ink is the quietest *readable* ink. Use it for metadata a reader can safely skip, never for status or instructions; those use Faded Ink or brighter.",
+        "section": "colors"
+      },
+      {
+        "name": "The Gilded Word Rule",
+        "body": "Every section title holds exactly one italic ochre phrase: the word the chapter is really about. Don't gild more than one phrase per title.",
+        "section": "typography"
+      },
+      {
+        "name": "The Scribe's Hand Rule",
+        "body": "Monospace is for numbers, years, labels, formulas and code only. Never use it for sentences of prose.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lifted Plate Rule",
+        "body": "Anything the reader is meant to *study* (an illustration, a diagram, a demo) sits on a bordered ink-well plate that is raised off the page. Running text never gets a shadow.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Single Halo Rule",
+        "body": "The Lapis Halo and Levitation shadow belong to the hero alone. Elsewhere, the Plate shadow is the ceiling.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** open every chapter with the chapter header pattern: a monospace ochre number, a headline with exactly one italic ochre phrase, then a faded-ink lede.",
+      "**Do** put every illustration, diagram and demo on a lifted plate: Ink Well, a 1px Folio Rule border, 16px radius and the Plate shadow.",
+      "**Do** color diagrams with the three inks (ochre, violet, verdigris) and label them with the four diagram text roles.",
+      "**Do** use the CSS custom properties (`var(--color-*)`, `var(--space-*)`, `var(--radius-*)`) in new styles, never raw hex values or font names.",
+      "**Do** use the single easing curve `cubic-bezier(0.16, 1, 0.3, 1)`: 220ms for UI state and 700ms for reveal-on-scroll. Honor `prefers-reduced-motion`.",
+      "**Do** keep running text at 72ch or less, and ledes at 62ch or less."
+    ],
+    "donts": [
+      "**Don't** put white text on violet, ochre or the violet-to-ochre gradient, and don't use Ghost Ink for status or instructions (see the Ink-on-Pigment and Ghost Ink rules).",
+      "**Don't** introduce a light theme or light surfaces. The system is nocturnal only.",
+      "**Don't** use the violet-to-ochre gradient on more than one focal element per component (the card icon, the primary demo button, the callout rule).",
+      "**Don't** add radii outside the 6 / 10 / 16 / 24 / pill scale, as the token explorer's 12px and 20px do.",
+      "**Don't** reference `--space-5`. It isn't defined in the scale, so the simulator's `gap` values that use it are currently ignored.",
+      "**Don't** remove the browser focus ring without replacing it. Where a custom one exists, it is the violet ring used on the explorer's input and scene."
+    ]
+  }
+}
