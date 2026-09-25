@@ -21,6 +21,7 @@
 
 
     <div class="app-controls">
+      <label for="ts-input" class="visually-hidden">Phrase à encoder</label>
       <input
         type="text"
         id="ts-input"
@@ -36,9 +37,9 @@
 
     <div class="ts-axis-switcher">
       <span class="ts-axis-switcher-label">Axes&nbsp;:</span>
-      <button type="button" class="ts-axis-btn active" data-axisset="sem">Sémantique</button>
-      <button type="button" class="ts-axis-btn" data-axisset="sens">Sensoriel</button>
-      <button type="button" class="ts-axis-btn" data-axisset="temp">Temporel &amp; social</button>
+      <button type="button" class="ts-axis-btn active" data-axisset="sem" aria-pressed="true">Sémantique</button>
+      <button type="button" class="ts-axis-btn" data-axisset="sens" aria-pressed="false">Sensoriel</button>
+      <button type="button" class="ts-axis-btn" data-axisset="temp" aria-pressed="false">Temporel &amp; social</button>
     </div>
 
     <div class="app-suggestions">
@@ -51,13 +52,17 @@
     </div>
 
     <div class="app-canvas-wrap">
-      <div id="ts-canvas" class="ts-canvas" aria-label="Espace vectoriel 3D interactif"></div>
+      <div id="ts-canvas" class="ts-canvas" role="region" tabindex="0"
+        aria-label="Espace vectoriel 3D interactif. Flèches : tourner ; + et − : zoomer."></div>
+      <noscript>
+        <p class="ts-fallback">Cette démonstration nécessite JavaScript. Le reste de la page se lit sans.</p>
+      </noscript>
       <div class="ts-axes-legend">
-        <div><span class="ts-axis-dot" style="background:#ff6b6b"></span> Axe X — <em>vivant → inanimé</em></div>
-        <div><span class="ts-axis-dot" style="background:#4ecdc4"></span> Axe Y — <em>concret → abstrait</em></div>
-        <div><span class="ts-axis-dot" style="background:#ffd93d"></span> Axe Z — <em>positif → négatif</em></div>
+        <div><span class="ts-axis-dot" style="background:var(--color-rose)"></span> Axe X — <em>vivant → inanimé</em></div>
+        <div><span class="ts-axis-dot" style="background:var(--color-teal)"></span> Axe Y — <em>concret → abstrait</em></div>
+        <div><span class="ts-axis-dot" style="background:var(--color-primary)"></span> Axe Z — <em>positif → négatif</em></div>
       </div>
-      <div id="ts-status" class="ts-status"></div>
+      <div id="ts-status" class="ts-status" role="status"></div>
     </div>
 
     <div class="app-explainer">

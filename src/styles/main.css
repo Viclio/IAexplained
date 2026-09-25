@@ -32,7 +32,7 @@
         --color-border: #2f2856;
         --color-text: #ece9f5;
         --color-text-muted: #a29fbf;
-        --color-text-faint: #6e6b8a;
+        --color-text-faint: #817e9b; /* 5:1 on the page, 4.7:1 on ink-well panels */
 
         --color-primary: #c9a24a; /* or chaud */
         --color-primary-soft: #f2d78a;
@@ -79,6 +79,7 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         scroll-padding-top: 90px;
+        scrollbar-color: var(--color-border) var(--color-bg);
       }
 
       body {
@@ -119,6 +120,35 @@
       p,
       li {
         text-wrap: pretty;
+      }
+      .nowrap {
+        white-space: nowrap;
+      }
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      /* Skip link: off-screen until a keyboard user tabs onto it */
+      .skip-link {
+        position: fixed;
+        top: var(--space-3);
+        left: var(--space-3);
+        z-index: 100;
+        padding: var(--space-2) var(--space-4);
+        background: var(--color-surface-2);
+        color: var(--color-text);
+        border: 1px solid var(--color-accent);
+        border-radius: var(--radius-md);
+        transform: translateY(-200%);
+        transition: transform var(--transition);
+      }
+      .skip-link:focus {
+        transform: none;
       }
 
       a {
@@ -189,6 +219,8 @@
         letter-spacing: -0.01em;
         border: none;
         color: var(--color-text);
+        white-space: nowrap;
+        flex-shrink: 0;
       }
       .brand svg {
         width: 26px;
@@ -237,21 +269,32 @@
         }
         .menu-toggle {
           display: inline-flex;
+          width: 44px;
+          height: 44px;
         }
+        /* 21 chapters: two columns keep the sheet within one screen in portrait,
+           and it scrolls on its own when the phone is in landscape */
         .toc {
           display: none;
-          flex-direction: column;
+          grid-template-columns: 1fr 1fr;
+          gap: 0 var(--space-4);
           width: 100%;
-          gap: 2px;
-          padding-top: var(--space-2);
+          max-height: calc(100dvh - 96px);
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          padding-block: var(--space-2) var(--space-4);
           border-top: 1px solid var(--color-border);
           margin-top: var(--space-2);
+          font-size: var(--text-sm);
         }
         .toc.is-open {
-          display: flex;
+          display: grid;
         }
         .toc a {
-          padding: var(--space-2) var(--space-2);
+          display: flex;
+          align-items: center;
+          min-height: 44px;
+          padding: 0 var(--space-2);
         }
       }
 
@@ -474,6 +517,21 @@
       .callout p:last-child {
         margin-bottom: 0;
       }
+      /* Caution: the madder-rose pigment replaces the gilded rule; the label names it too */
+      .callout-warn {
+        background: linear-gradient(
+          180deg,
+          color-mix(in srgb, var(--color-rose) 7%, var(--color-surface)),
+          var(--color-surface-2)
+        );
+        border-color: color-mix(in srgb, var(--color-rose) 35%, var(--color-border));
+      }
+      .callout-warn::before {
+        background: var(--color-rose);
+      }
+      .callout-warn .callout-label {
+        color: var(--color-rose);
+      }
 
       /* Figure */
       figure {
@@ -518,6 +576,46 @@
         font-weight: 500;
       }
 
+      /* On phones an 1100-unit diagram squeezed to ~290px renders its labels at ~3px.
+         Instead, the plate bleeds to the screen edges and the diagram keeps a
+         readable width, explored with a sideways swipe. */
+      @media (max-width: 720px) {
+        figure:has(> .svg-wrap),
+        figure.wide:has(> .svg-wrap) {
+          margin-inline: calc(-1 * var(--space-6));
+        }
+        figure .svg-wrap {
+          overflow-x: auto;
+          overscroll-behavior-x: contain;
+          padding: var(--space-4);
+          border-radius: 0;
+          border-inline: none;
+          scrollbar-width: thin;
+          scrollbar-color: var(--color-border) transparent;
+        }
+        figure .svg-wrap svg {
+          width: 920px;
+          max-width: none;
+        }
+        figure .svg-wrap + figcaption {
+          padding-inline: var(--space-6);
+        }
+        figure .svg-wrap + figcaption::before {
+          content: 'Faites glisser le schéma';
+          display: block;
+          margin-bottom: var(--space-3);
+          padding-left: 32px;
+          background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='%23c9a24a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M1 6h22M5 2 1 6l4 4M19 2l4 4-4 4'/></svg>") no-repeat left center / 22px 11px;
+          font-family: var(--font-mono);
+          font-size: var(--text-xs);
+          letter-spacing: 0.08em;
+          color: var(--color-text-muted);
+        }
+        figcaption {
+          text-align: left;
+        }
+      }
+
       /* Grid layouts */
       .grid-2 {
         display: grid;
@@ -547,8 +645,12 @@
       }
       .card:hover {
         border-color: var(--color-primary);
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+      }
+      @media (hover: hover) {
+        .card:hover {
+          transform: translateY(-2px);
+          box-shadow: var(--shadow-md);
+        }
       }
       .card-icon {
         width: 40px;
@@ -561,7 +663,7 @@
         margin-bottom: var(--space-4);
         font-family: var(--font-mono);
         font-weight: 600;
-        color: #fff;
+        color: var(--color-bg);
       }
       .card h4 {
         margin-top: 0;
@@ -822,12 +924,24 @@
       }
       .denoise-btn:hover {
         border-color: var(--color-primary);
-        transform: translateY(-1px);
+      }
+      @media (hover: hover) {
+        .denoise-btn:hover {
+          transform: translateY(-1px);
+        }
+      }
+      @media (pointer: coarse) {
+        .denoise-btn {
+          min-height: 44px;
+        }
+        #denoise-slider {
+          height: 44px;
+        }
       }
       .denoise-btn-primary {
         background: linear-gradient(135deg, var(--color-accent), var(--color-primary));
         border-color: transparent;
-        color: #0e0b1a;
+        color: var(--color-bg);
         font-weight: 600;
       }
       .denoise-meta {

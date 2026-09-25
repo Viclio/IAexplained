@@ -42,15 +42,22 @@
               loadedImages[idx] = img;
               resolve(img);
             };
+            img.onerror = () => resolve(null);
             img.src = IMAGES[idx].src;
           });
         }
 
+        // Only the most recent request may replace the target: rapid clicks can
+        // resolve out of order. Returns false when the image could not be used.
+        let latestRequest = 0;
         async function setTargetImage(idx) {
+          const request = ++latestRequest;
           const img = await loadImage(idx);
+          if (!img || request !== latestRequest) return false;
           octx.clearRect(0, 0, SIZE, SIZE);
           octx.drawImage(img, 0, 0, SIZE, SIZE);
           targetData = octx.getImageData(0, 0, SIZE, SIZE);
+          return true;
         }
 
         function noiseValueSeeded(x, y, seedOffset) {
@@ -99,6 +106,8 @@
         let currentT = 1000;
 
         slider.addEventListener('input', () => {
+          // Grabbing the slider takes over from the animation
+          if (playing) pause();
           currentT = parseInt(slider.value, 10);
           render(currentT);
         });
@@ -117,11 +126,15 @@
           rafId = requestAnimationFrame(step);
         }
 
+        function pause() {
+          playing = false;
+          playBtn.textContent = '▶ Lancer le débruitage';
+          if (rafId) cancelAnimationFrame(rafId);
+        }
+
         playBtn.addEventListener('click', () => {
           if (playing) {
-            playing = false;
-            playBtn.textContent = '▶ Lancer le débruitage';
-            if (rafId) cancelAnimationFrame(rafId);
+            pause();
             return;
           }
           if (currentT <= 0) currentT = 1000;
@@ -131,17 +144,17 @@
         });
 
         resetBtn.addEventListener('click', () => {
-          playing = false;
-          if (rafId) cancelAnimationFrame(rafId);
-          playBtn.textContent = '▶ Lancer le débruitage';
+          pause();
           currentT = 1000;
           render(currentT);
         });
 
         shapeBtn.addEventListener('click', async () => {
-          shapeIndex = (shapeIndex + 1) % IMAGES.length;
-          await setTargetImage(shapeIndex);
-          render(currentT);
+          const next = (shapeIndex + 1) % IMAGES.length;
+          if (await setTargetImage(next)) {
+            shapeIndex = next;
+            render(currentT);
+          }
         });
 
         etaLabel.textContent = 'η fixe, 125 pas visuels';

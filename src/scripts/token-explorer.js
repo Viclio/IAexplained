@@ -1150,20 +1150,20 @@
       sem: {
         labels: ["vivant → inanimé", "concret → abstrait", "positif → négatif"],
         short: ["inanimé →", "↑ abstrait", "↗ négatif"],
-        colors: ["#ff6b6b", "#4ecdc4", "#ffd93d"],
-        hex: [0xff6b6b, 0x4ecdc4, 0xffd93d]
+        colors: ["#e26d8b", "#4ec9c1", "#c9a24a"],
+        hex: [0xe26d8b, 0x4ec9c1, 0xc9a24a]
       },
       sens: {
         labels: ["petit → grand", "calme → intense", "froid → chaud"],
         short: ["grand →", "↑ intense", "↗ chaud"],
-        colors: ["#9b8cff", "#6bc5ff", "#ff9d6b"],
-        hex: [0x9b8cff, 0x6bc5ff, 0xff9d6b]
+        colors: ["#e26d8b", "#4ec9c1", "#c9a24a"],
+        hex: [0xe26d8b, 0x4ec9c1, 0xc9a24a]
       },
       temp: {
         labels: ["ancien → moderne", "individuel → collectif", "naturel → artificiel"],
         short: ["moderne →", "↑ collectif", "↗ artificiel"],
-        colors: ["#a8e063", "#f67280", "#c06c84"],
-        hex: [0xa8e063, 0xf67280, 0xc06c84]
+        colors: ["#e26d8b", "#4ec9c1", "#c9a24a"],
+        hex: [0xe26d8b, 0x4ec9c1, 0xc9a24a]
       }
     };
     let currentAxisSet = "sem";
@@ -1204,7 +1204,13 @@
     ]);
 
     function normalize(word) {
-      return word.toLowerCase().normalize("NFC").replace(/[.,;:!?"'()]/g, "");
+      return word
+        .toLowerCase()
+        .normalize("NFC")
+        .replace(/[’ʼ]/g, "'")
+        // Élisions : « l'arbre » → « arbre », « qu'elle » → « elle »
+        .replace(/^(?:jusqu|lorsqu|puisqu|qu|[cdjlmnst])'(?=.)/, "")
+        .replace(/[.,;:!?"'()«»…–—\[\]{}]/g, "");
     }
 
     function lookupToken(raw) {
@@ -1228,407 +1234,61 @@
     // ============================================
     // RENDU THREE.JS
     // ============================================
-    const THREE = await import("https://esm.sh/three@0.160.0");
-
     const container = document.getElementById("ts-canvas");
     const status = document.getElementById("ts-status");
     const input = document.getElementById("ts-input");
     const submit = document.getElementById("ts-submit");
     const chips = document.querySelectorAll(".ts-chip");
-
-    const scene = new THREE.Scene();
-    scene.background = null;
-    scene.fog = new THREE.Fog(0x0a0818, 8, 20);
-
-    const camera = new THREE.PerspectiveCamera(
-      50,
-      container.clientWidth / container.clientHeight,
-      0.1, 100
-    );
-    camera.position.set(5.5, 3.5, 6.5);
-    camera.lookAt(0, 0, 0);
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    container.appendChild(renderer.domElement);
-
-    // Axes
-    const AXIS_LEN = 2.7;
-    function makeAxis(dir, color) {
-      const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.55 });
-      const geo = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, 0, 0),
-        new THREE.Vector3(dir[0] * AXIS_LEN, dir[1] * AXIS_LEN, dir[2] * AXIS_LEN),
-      ]);
-      const line = new THREE.Line(geo, mat);
-      scene.add(line);
-      return line;
-    }
-    let axisLines = [makeAxis([1,0,0], 0xff6b6b), makeAxis([0,1,0], 0x4ecdc4), makeAxis([0,0,1], 0xffd93d)];
-
-    // Grille de référence
-    const grid = new THREE.GridHelper(5.5, 11, 0x2f2856, 0x1e1938);
-    grid.position.y = -AXIS_LEN;
-    scene.add(grid);
-
-    // Étiquettes des axes (dynamiques, mises à jour lors de la permutation)
-    function makeAxisLabel(text, pos, color) {
-      const label = makeLabel(text, {
-        color, bg: "rgba(14,11,26,0.75)",
-        border: `rgba(255,255,255,0.15)`,
-        worldHeight: 0.14, weight: 500
-      });
-      label.position.set(pos[0], pos[1], pos[2]);
-      scene.add(label);
-      return label;
-    }
-    let axisLabelSprites = [
-      makeAxisLabel(AXIS_SETS[currentAxisSet].short[0], [AXIS_LEN + 0.35, 0, 0], AXIS_SETS[currentAxisSet].colors[0]),
-      makeAxisLabel(AXIS_SETS[currentAxisSet].short[1], [0, AXIS_LEN + 0.35, 0], AXIS_SETS[currentAxisSet].colors[1]),
-      makeAxisLabel(AXIS_SETS[currentAxisSet].short[2], [0, 0, AXIS_LEN + 0.35], AXIS_SETS[currentAxisSet].colors[2]),
-    ];
-
-    // Sprites de texte via canvas 2D — taille contrôlée par worldHeight
-    function makeLabel(text, opts = {}) {
-      const {
-        color = "#ece9f5", bg = "rgba(20,16,42,0.85)",
-        border = "rgba(80,70,120,0.6)",
-        weight = 500,
-        worldHeight = 0.16, // hauteur en unités monde
-        pillBg = true
-      } = opts;
-      const dpr = 2.5;
-      const fontPx = 48;
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      const font = `${weight} ${fontPx}px "General Sans", -apple-system, system-ui, sans-serif`;
-      ctx.font = font;
-      const metrics = ctx.measureText(text);
-      const padX = pillBg ? 14 : 4, padY = pillBg ? 8 : 2;
-      canvas.width = Math.ceil((metrics.width + padX * 2) * dpr);
-      canvas.height = Math.ceil((fontPx + padY * 2) * dpr);
-      ctx.scale(dpr, dpr);
-      ctx.font = font;
-      const w = canvas.width / dpr, h = canvas.height / dpr;
-      if (pillBg) {
-        ctx.fillStyle = bg;
-        ctx.strokeStyle = border;
-        ctx.lineWidth = 1.5;
-        const r = 8;
-        ctx.beginPath();
-        ctx.moveTo(r, 0);
-        ctx.lineTo(w - r, 0);
-        ctx.quadraticCurveTo(w, 0, w, r);
-        ctx.lineTo(w, h - r);
-        ctx.quadraticCurveTo(w, h, w - r, h);
-        ctx.lineTo(r, h);
-        ctx.quadraticCurveTo(0, h, 0, h - r);
-        ctx.lineTo(0, r);
-        ctx.quadraticCurveTo(0, 0, r, 0);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-      }
-      ctx.fillStyle = color;
-      ctx.textBaseline = "middle";
-      ctx.fillText(text, padX, h / 2);
-      const tex = new THREE.CanvasTexture(canvas);
-      tex.minFilter = THREE.LinearFilter;
-      tex.magFilter = THREE.LinearFilter;
-      const mat = new THREE.SpriteMaterial({
-        map: tex, transparent: true, depthTest: false, depthWrite: false
-      });
-      const sprite = new THREE.Sprite(mat);
-      const aspect = w / h;
-      sprite.scale.set(worldHeight * aspect, worldHeight, 1);
-      return sprite;
-    }
-
-    // Groupe des points du lexique de fond
-    // Affiché en permanence, mais de façon très discrète (petits points, faible
-    // opacité) et sans aucune étiquette — seuls les tokens de la phrase saisie
-    // sont nommés et mis en avant.
-    const bgGroup = new THREE.Group();
-    scene.add(bgGroup);
-    const activeGroup = new THREE.Group();
-    scene.add(activeGroup);
-
-    // Constante d'échelle monde
-    const SCALE = 2.5;
-
-    // Points de fond : seulement les points, les labels sont dynamiques
-    // (affichés uniquement pour les mots proches des tokens actifs)
-    const bgPoints = [];
-    function buildBackground() {
-      bgGroup.clear();
-      bgPoints.length = 0;
-      const words = Object.keys(LEXICON).filter(w => !w.endsWith("_c") && !w.endsWith("_v") && !w.endsWith("_n"));
-      // Points très discrets : petits, peu opaques, sans étiquette.
-      const geo = new THREE.SphereGeometry(0.014, 6, 6);
-      const mat = new THREE.MeshBasicMaterial({ color: 0x4a4768, transparent: true, opacity: 0.16, depthWrite: false });
-      words.forEach(w => {
-        const v = LEXICON[w][currentAxisSet];
-        const m = new THREE.Mesh(geo, mat);
-        const pos = new THREE.Vector3(v[0] * SCALE, v[1] * SCALE, v[2] * SCALE);
-        m.position.copy(pos);
-        bgGroup.add(m);
-        bgPoints.push({ word: w, pos, mesh: m });
-      });
-    }
-
-    // Groupe pour les labels des voisins du contexte actuel
-    const neighborGroup = new THREE.Group();
-    scene.add(neighborGroup);
-
-    function renderNeighbors(activePositions) {
-      neighborGroup.clear();
-      if (activePositions.length === 0) return;
-      // Pour chaque point de fond, calculer la distance minimale à un token actif
-      const candidates = bgPoints.map(p => {
-        let minD = Infinity;
-        activePositions.forEach(ap => {
-          const d = p.pos.distanceTo(ap);
-          if (d < minD) minD = d;
-        });
-        return { ...p, dist: minD };
-      });
-      candidates.sort((a, b) => a.dist - b.dist);
-      // Garder seulement les 8 plus proches à moins de 0.9 unités pour ne pas surcharger
-      const nearest = candidates.filter(c => c.dist < 0.9 && c.dist > 0.001).slice(0, 8);
-      nearest.forEach(n => {
-        const opacity = Math.max(0.55, 1 - n.dist / 0.9);
-        const label = makeLabel(n.word, {
-          color: `rgba(220,215,240,${opacity.toFixed(2)})`,
-          bg: "rgba(20,16,42,0.75)",
-          border: "rgba(120,110,170,0.45)",
-          worldHeight: 0.14,
-          weight: 400
-        });
-        label.position.set(n.pos.x, n.pos.y + 0.15, n.pos.z);
-        neighborGroup.add(label);
-      });
-    }
-
-    // Points actifs (mots de la phrase)
-    const PALETTE = [
-      { color: 0x7b6bff, label: "#c8beff" },
-      { color: 0xffd93d, label: "#fff0a0" },
-      { color: 0x4ecdc4, label: "#a8f0e9" },
-      { color: 0xff6b6b, label: "#ffb0b0" },
-      { color: 0xffa726, label: "#ffd28a" },
-      { color: 0xba68c8, label: "#e0b8e8" },
-    ];
-
-    function renderPhrase(tokens) {
-      activeGroup.clear();
-      let ci = 0;
-      const positions = [];
-      tokens.forEach(tok => {
-        if (!tok) return;
-        const pal = PALETTE[ci % PALETTE.length];
-        ci++;
-        const [x, y, z] = tok.vec.map(v => v * SCALE);
-        const pos = new THREE.Vector3(x, y, z);
-        positions.push(pos);
-        // Sphère principale
-        const sphere = new THREE.Mesh(
-          new THREE.SphereGeometry(0.08, 24, 24),
-          new THREE.MeshBasicMaterial({ color: tok.known ? pal.color : 0x6e6b8a })
-        );
-        sphere.position.copy(pos);
-        activeGroup.add(sphere);
-        // Halo
-        const halo = new THREE.Mesh(
-          new THREE.SphereGeometry(0.15, 24, 24),
-          new THREE.MeshBasicMaterial({ color: pal.color, transparent: true, opacity: 0.22 })
-        );
-        halo.position.copy(pos);
-        activeGroup.add(halo);
-        // Label — nettement plus grand que les voisins
-        const label = makeLabel(tok.word, {
-          color: tok.known ? "#ffffff" : "#c8c5dc",
-          bg: tok.known ? `rgba(30,20,60,0.95)` : "rgba(20,16,42,0.85)",
-          border: tok.known ? `rgba(200,190,255,0.85)` : "rgba(140,135,170,0.5)",
-          worldHeight: 0.18,
-          weight: 600
-        });
-        label.position.set(x, y + 0.20, z);
-        activeGroup.add(label);
-      });
-
-      // Lignes reliant les tokens dans l'ordre de la phrase
-      if (positions.length > 1) {
-        const geo = new THREE.BufferGeometry().setFromPoints(positions);
-        const mat = new THREE.LineDashedMaterial({
-          color: 0x7b6bff, transparent: true, opacity: 0.45,
-          dashSize: 0.15, gapSize: 0.10
-        });
-        const line = new THREE.Line(geo, mat);
-        line.computeLineDistances();
-        activeGroup.add(line);
-      }
-
-      // Le nuage de fond reste visible en permanence (discret, sans libellé) ;
-      // seuls les tokens de la phrase saisie sont nommés — aucune étiquette de voisin.
-      neighborGroup.clear();
-    }
-
-    buildBackground();
+    const axisButtons = document.querySelectorAll(".ts-axis-btn");
+    const legend = document.querySelector(".ts-axes-legend");
 
     // ============================================
-    // PERMUTATION ANIMEE ENTRE JEUX D'AXES
+    // ENCODAGE — fonctionne avec ou sans la scène 3D
     // ============================================
-    function updateAxisVisuals(setKey) {
-      const def = AXIS_SETS[setKey];
-      axisLines.forEach((line, i) => {
-        line.material.color.setHex(def.hex[i]);
-      });
-      const positions = [
-        [AXIS_LEN + 0.35, 0, 0],
-        [0, AXIS_LEN + 0.35, 0],
-        [0, 0, AXIS_LEN + 0.35],
-      ];
-      axisLabelSprites.forEach((sprite) => {
-        scene.remove(sprite);
-        sprite.material.map.dispose();
-        sprite.material.dispose();
-      });
-      axisLabelSprites = [
-        makeAxisLabel(def.short[0], positions[0], def.colors[0]),
-        makeAxisLabel(def.short[1], positions[1], def.colors[1]),
-        makeAxisLabel(def.short[2], positions[2], def.colors[2]),
-      ];
-      const legendItems = document.querySelectorAll(".ts-axes-legend > div");
-      legendItems.forEach((item, i) => {
-        const dot = item.querySelector(".ts-axis-dot");
-        const em = item.querySelector("em");
-        if (dot) dot.style.background = def.colors[i];
-        if (em) em.textContent = def.labels[i];
-      });
-    }
+    let render3D = null;      // fourni par startScene() une fois la 3D prête
+    let switchAxis3D = null;
 
-    function switchAxisSet(newSet) {
-      if (newSet === currentAxisSet || !AXIS_SETS[newSet]) return;
-      currentAxisSet = newSet;
+    const GESTURES = matchMedia("(pointer: coarse)").matches
+      ? "glissez pour tourner, pincez pour zoomer"
+      : "cliquez-glissez pour tourner, Ctrl + molette pour zoomer";
 
-      const duration = 800;
-      const t0 = performance.now();
-      const startPositions = bgPoints.map(p => p.pos.clone());
-      const targetPositions = bgPoints.map(p => {
-        const v = LEXICON[p.word][newSet];
-        return new THREE.Vector3(v[0] * SCALE, v[1] * SCALE, v[2] * SCALE);
-      });
-
-      function animateFrame() {
-        const t = Math.min((performance.now() - t0) / duration, 1);
-        const ease = 1 - Math.pow(1 - t, 3);
-        bgPoints.forEach((p, i) => {
-          const from = startPositions[i];
-          const to = targetPositions[i];
-          p.pos.set(
-            from.x + (to.x - from.x) * ease,
-            from.y + (to.y - from.y) * ease,
-            from.z + (to.z - from.z) * ease
-          );
-          if (p.mesh) p.mesh.position.copy(p.pos);
-        });
-        if (t < 1) requestAnimationFrame(animateFrame);
-      }
-      requestAnimationFrame(animateFrame);
-
-      updateAxisVisuals(newSet);
-
-      document.querySelectorAll(".ts-axis-btn").forEach(b => {
-        b.classList.toggle("active", b.dataset.axisset === newSet);
-      });
-
-      encode(input.value);
-    }
-
-    document.querySelectorAll(".ts-axis-btn").forEach(btn => {
-      btn.addEventListener("click", () => switchAxisSet(btn.dataset.axisset));
-    });
-
-    // ============================================
-    // CONTRÔLES ORBITAUX MANUELS (léger, pas d'import OrbitControls)
-    // ============================================
-    let isDragging = false;
-    let prevX = 0, prevY = 0;
-    let theta = Math.atan2(camera.position.x, camera.position.z);
-    let phi = Math.atan2(camera.position.y, Math.hypot(camera.position.x, camera.position.z));
-    let radius = camera.position.length();
-    const RADIUS_MIN = 4, RADIUS_MAX = 14;
-
-    function updateCamera() {
-      camera.position.x = radius * Math.cos(phi) * Math.sin(theta);
-      camera.position.y = radius * Math.sin(phi);
-      camera.position.z = radius * Math.cos(phi) * Math.cos(theta);
-      camera.lookAt(0, 0, 0);
-    }
-
-    renderer.domElement.addEventListener("pointerdown", (e) => {
-      isDragging = true;
-      prevX = e.clientX; prevY = e.clientY;
-      renderer.domElement.setPointerCapture(e.pointerId);
-    });
-    renderer.domElement.addEventListener("pointerup", (e) => {
-      isDragging = false;
-      try { renderer.domElement.releasePointerCapture(e.pointerId); } catch (_) {}
-    });
-    renderer.domElement.addEventListener("pointermove", (e) => {
-      if (!isDragging) return;
-      const dx = e.clientX - prevX;
-      const dy = e.clientY - prevY;
-      prevX = e.clientX; prevY = e.clientY;
-      theta -= dx * 0.008;
-      phi = Math.max(-1.3, Math.min(1.3, phi + dy * 0.008));
-      updateCamera();
-    });
-    renderer.domElement.addEventListener("wheel", (e) => {
-      e.preventDefault();
-      radius = Math.max(RADIUS_MIN, Math.min(RADIUS_MAX, radius + e.deltaY * 0.005));
-      updateCamera();
-    }, { passive: false });
-
-    // Rotation automatique lente quand pas d'interaction
-    let autoRotate = true;
-    renderer.domElement.addEventListener("pointerdown", () => { autoRotate = false; });
-
-    // Resize
-    const ro = new ResizeObserver(() => {
-      const w = container.clientWidth;
-      const h = container.clientHeight;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-    });
-    ro.observe(container);
-
-    function loop() {
-      if (autoRotate) {
-        theta += 0.0015;
-        updateCamera();
-      }
-      renderer.render(scene, camera);
-      requestAnimationFrame(loop);
-    }
-    loop();
-
-    // ============================================
-    // GESTION DE L'INPUT
-    // ============================================
     function encode(phrase) {
-      const rawWords = phrase.split(/\s+/).filter(Boolean);
-      const tokens = rawWords.map(lookupToken).filter(Boolean);
-      renderPhrase(tokens);
+      const tokens = phrase.split(/\s+/).filter(Boolean).map(lookupToken).filter(Boolean);
+      if (render3D) render3D(tokens);
+
       const known = tokens.filter(t => t.known).length;
       const unknown = tokens.length - known;
-      const parts = [];
-      parts.push(`${tokens.length} token${tokens.length > 1 ? "s" : ""} encodé${tokens.length > 1 ? "s" : ""}`);
-      parts.push(`${known} reconnu${known > 1 ? "s" : ""}`);
-      if (unknown > 0) parts.push(`${unknown} inconnu${unknown > 1 ? "s" : ""}`);
-      status.textContent = parts.join(" · ") + " · clique-glisse pour tourner, molette pour zoomer";
+      let text;
+      if (!phrase.trim()) {
+        text = "Tapez une phrase pour placer ses mots dans l'espace.";
+      } else if (!tokens.length) {
+        text = "Aucun mot porteur de sens : les mots outils (le, de, et…) sont ignorés.";
+      } else {
+        const parts = [];
+        parts.push(`${tokens.length} token${tokens.length > 1 ? "s" : ""} encodé${tokens.length > 1 ? "s" : ""}`);
+        parts.push(`${known} reconnu${known > 1 ? "s" : ""}`);
+        if (unknown > 0) parts.push(`${unknown} inconnu${unknown > 1 ? "s" : ""}`);
+        text = parts.join(" · ");
+        // Sans 3D, on montre au moins quels mots ont été reconnus
+        text += render3D
+          ? " · " + GESTURES
+          : " — " + tokens.slice(0, 12).map(t => (t.known ? t.word : t.word + " (?)")).join(", ")
+            + (tokens.length > 12 ? "…" : "");
+      }
+      status.textContent = text;
+    }
+
+    function selectAxisSet(set) {
+      if (switchAxis3D) switchAxis3D(set);
+      else if (AXIS_SETS[set] && set !== currentAxisSet) {
+        currentAxisSet = set;
+        encode(input.value);
+      }
+      axisButtons.forEach((b) => {
+        const on = b.dataset.axisset === currentAxisSet;
+        b.classList.toggle("active", on);
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+      });
     }
 
     submit.addEventListener("click", () => encode(input.value));
@@ -1639,6 +1299,509 @@
       input.value = c.dataset.phrase;
       encode(input.value);
     }));
+    axisButtons.forEach(btn => btn.addEventListener("click", () => selectAxisSet(btn.dataset.axisset)));
 
-    // Initial
-    encode(input.value);
+    // ============================================
+    // CHARGEMENT DE THREE.JS (réseau) ET REPLI
+    // ============================================
+    const THREE_URL = "https://esm.sh/three@0.160.0";
+    const LOAD_TIMEOUT = 15000;
+    let attempt = 0;
+
+    function showFallback(kind) {
+      legend.hidden = true;
+      container.removeAttribute("tabindex");
+      const box = document.createElement("div");
+      box.className = "ts-fallback";
+      box.setAttribute("role", "alert");
+      const title = document.createElement("p");
+      title.className = "ts-fallback-title";
+      const detail = document.createElement("p");
+      if (kind === "webgl") {
+        title.textContent = "Votre navigateur ne peut pas afficher la scène 3D.";
+        detail.textContent = "WebGL est désactivé ou indisponible sur cet appareil. L'analyse des mots reste disponible : les tokens reconnus s'affichent ci-dessous.";
+      } else {
+        title.textContent = "La scène 3D n'a pas pu se charger.";
+        detail.textContent = "La bibliothèque three.js est téléchargée depuis esm.sh : vérifiez votre connexion. En attendant, les tokens reconnus s'affichent ci-dessous.";
+      }
+      box.append(title, detail);
+      if (kind !== "webgl") {
+        const retry = document.createElement("button");
+        retry.type = "button";
+        retry.className = "ts-btn";
+        retry.textContent = "Réessayer";
+        retry.addEventListener("click", () => { box.remove(); boot(); });
+        box.append(retry);
+      }
+      container.append(box);
+    }
+
+    async function boot() {
+      status.textContent = "Chargement de la scène 3D…";
+      container.setAttribute("aria-busy", "true");
+      let THREE = null;
+      try {
+        // Un fragment différent à chaque essai évite de réutiliser un échec mis en cache
+        const url = attempt++ ? `${THREE_URL}#essai-${attempt}` : THREE_URL;
+        THREE = await Promise.race([
+          import(url),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("délai dépassé")), LOAD_TIMEOUT)),
+        ]);
+      } catch (err) {
+        console.warn("three.js indisponible :", err);
+        showFallback("network");
+      }
+      if (THREE) {
+        try {
+          startScene(THREE);
+          legend.hidden = false;
+          container.setAttribute("tabindex", "0");
+        } catch (err) {
+          console.warn("Scène 3D indisponible :", err);
+          showFallback("webgl");
+        }
+      }
+      container.removeAttribute("aria-busy");
+      encode(input.value);
+    }
+
+    // ============================================
+    // SCÈNE THREE.JS
+    // ============================================
+    function startScene(THREE) {
+      const scene = new THREE.Scene();
+      scene.background = null;
+      scene.fog = new THREE.Fog(0x0a0818, 8, 20);
+
+      const camera = new THREE.PerspectiveCamera(
+        50,
+        container.clientWidth / container.clientHeight,
+        0.1, 100
+      );
+      camera.position.set(5.5, 3.5, 6.5);
+      camera.lookAt(0, 0, 0);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+
+      // Axes
+      const AXIS_LEN = 2.7;
+      function makeAxis(dir, color) {
+        const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.55 });
+        const geo = new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(0, 0, 0),
+          new THREE.Vector3(dir[0] * AXIS_LEN, dir[1] * AXIS_LEN, dir[2] * AXIS_LEN),
+        ]);
+        const line = new THREE.Line(geo, mat);
+        scene.add(line);
+        return line;
+      }
+      let axisLines = [makeAxis([1,0,0], 0xe26d8b), makeAxis([0,1,0], 0x4ec9c1), makeAxis([0,0,1], 0xc9a24a)];
+
+      // Grille de référence
+      const grid = new THREE.GridHelper(5.5, 11, 0x2f2856, 0x1e1938);
+      grid.position.y = -AXIS_LEN;
+      scene.add(grid);
+
+      // Étiquettes des axes (dynamiques, mises à jour lors de la permutation)
+      function makeAxisLabel(text, pos, color) {
+        const label = makeLabel(text, {
+          color, bg: "rgba(14,11,26,0.75)",
+          border: `rgba(255,255,255,0.15)`,
+          worldHeight: 0.14, weight: 500
+        });
+        label.position.set(pos[0], pos[1], pos[2]);
+        scene.add(label);
+        return label;
+      }
+      let axisLabelSprites = [
+        makeAxisLabel(AXIS_SETS[currentAxisSet].short[0], [AXIS_LEN + 0.35, 0, 0], AXIS_SETS[currentAxisSet].colors[0]),
+        makeAxisLabel(AXIS_SETS[currentAxisSet].short[1], [0, AXIS_LEN + 0.35, 0], AXIS_SETS[currentAxisSet].colors[1]),
+        makeAxisLabel(AXIS_SETS[currentAxisSet].short[2], [0, 0, AXIS_LEN + 0.35], AXIS_SETS[currentAxisSet].colors[2]),
+      ];
+
+      // Sprites de texte via canvas 2D — taille contrôlée par worldHeight
+      function makeLabel(text, opts = {}) {
+        const {
+          color = "#ece9f5", bg = "rgba(20,16,42,0.85)",
+          border = "rgba(80,70,120,0.6)",
+          weight = 500,
+          worldHeight = 0.16, // hauteur en unités monde
+          pillBg = true
+        } = opts;
+        const dpr = 2.5;
+        const fontPx = 48;
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const font = `${weight} ${fontPx}px "General Sans", -apple-system, system-ui, sans-serif`;
+        ctx.font = font;
+        const metrics = ctx.measureText(text);
+        const padX = pillBg ? 14 : 4, padY = pillBg ? 8 : 2;
+        canvas.width = Math.ceil((metrics.width + padX * 2) * dpr);
+        canvas.height = Math.ceil((fontPx + padY * 2) * dpr);
+        ctx.scale(dpr, dpr);
+        ctx.font = font;
+        const w = canvas.width / dpr, h = canvas.height / dpr;
+        if (pillBg) {
+          ctx.fillStyle = bg;
+          ctx.strokeStyle = border;
+          ctx.lineWidth = 1.5;
+          const r = 8;
+          ctx.beginPath();
+          ctx.moveTo(r, 0);
+          ctx.lineTo(w - r, 0);
+          ctx.quadraticCurveTo(w, 0, w, r);
+          ctx.lineTo(w, h - r);
+          ctx.quadraticCurveTo(w, h, w - r, h);
+          ctx.lineTo(r, h);
+          ctx.quadraticCurveTo(0, h, 0, h - r);
+          ctx.lineTo(0, r);
+          ctx.quadraticCurveTo(0, 0, r, 0);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        }
+        ctx.fillStyle = color;
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, padX, h / 2);
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.minFilter = THREE.LinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        const mat = new THREE.SpriteMaterial({
+          map: tex, transparent: true, depthTest: false, depthWrite: false
+        });
+        const sprite = new THREE.Sprite(mat);
+        const aspect = w / h;
+        sprite.scale.set(worldHeight * aspect, worldHeight, 1);
+        return sprite;
+      }
+
+      // Groupe des points du lexique de fond
+      // Affiché en permanence, mais de façon très discrète (petits points, faible
+      // opacité) et sans aucune étiquette — seuls les tokens de la phrase saisie
+      // sont nommés et mis en avant.
+      const bgGroup = new THREE.Group();
+      scene.add(bgGroup);
+      const activeGroup = new THREE.Group();
+      scene.add(activeGroup);
+
+      // Constante d'échelle monde
+      const SCALE = 2.5;
+
+      // Points de fond : seulement les points, les labels sont dynamiques
+      // (affichés uniquement pour les mots proches des tokens actifs)
+      const bgPoints = [];
+      function buildBackground() {
+        bgGroup.clear();
+        bgPoints.length = 0;
+        const words = Object.keys(LEXICON).filter(w => !w.endsWith("_c") && !w.endsWith("_v") && !w.endsWith("_n"));
+        // Points très discrets : petits, peu opaques, sans étiquette.
+        const geo = new THREE.SphereGeometry(0.014, 6, 6);
+        const mat = new THREE.MeshBasicMaterial({ color: 0x4a4768, transparent: true, opacity: 0.16, depthWrite: false });
+        words.forEach(w => {
+          const v = LEXICON[w][currentAxisSet];
+          const m = new THREE.Mesh(geo, mat);
+          const pos = new THREE.Vector3(v[0] * SCALE, v[1] * SCALE, v[2] * SCALE);
+          m.position.copy(pos);
+          bgGroup.add(m);
+          bgPoints.push({ word: w, pos, mesh: m });
+        });
+      }
+
+      // Groupe pour les labels des voisins du contexte actuel
+      const neighborGroup = new THREE.Group();
+      scene.add(neighborGroup);
+
+      function renderNeighbors(activePositions) {
+        neighborGroup.clear();
+        if (activePositions.length === 0) return;
+        // Pour chaque point de fond, calculer la distance minimale à un token actif
+        const candidates = bgPoints.map(p => {
+          let minD = Infinity;
+          activePositions.forEach(ap => {
+            const d = p.pos.distanceTo(ap);
+            if (d < minD) minD = d;
+          });
+          return { ...p, dist: minD };
+        });
+        candidates.sort((a, b) => a.dist - b.dist);
+        // Garder seulement les 8 plus proches à moins de 0.9 unités pour ne pas surcharger
+        const nearest = candidates.filter(c => c.dist < 0.9 && c.dist > 0.001).slice(0, 8);
+        nearest.forEach(n => {
+          const opacity = Math.max(0.55, 1 - n.dist / 0.9);
+          const label = makeLabel(n.word, {
+            color: `rgba(220,215,240,${opacity.toFixed(2)})`,
+            bg: "rgba(20,16,42,0.75)",
+            border: "rgba(120,110,170,0.45)",
+            worldHeight: 0.14,
+            weight: 400
+          });
+          label.position.set(n.pos.x, n.pos.y + 0.15, n.pos.z);
+          neighborGroup.add(label);
+        });
+      }
+
+      // Points actifs (mots de la phrase)
+      // Couleurs des mots de la phrase : les encres du manuscrit (lapis, ocre, vert-de-gris, garance)
+      const PALETTE = [
+        { color: 0x7b6bff, label: "#c8beff" },
+        { color: 0xf2d78a, label: "#fff0c4" },
+        { color: 0x4ec9c1, label: "#a8f0e9" },
+        { color: 0xe26d8b, label: "#f5b3c4" },
+        { color: 0xb3a8ff, label: "#ddd8ff" },
+      ];
+
+      function renderPhrase(tokens) {
+        // Libère la mémoire GPU de la phrase précédente (géométries, matériaux, textures des étiquettes)
+        activeGroup.traverse((obj) => {
+          obj.geometry?.dispose();
+          obj.material?.map?.dispose();
+          obj.material?.dispose();
+        });
+        activeGroup.clear();
+        let ci = 0;
+        const positions = [];
+        tokens.forEach(tok => {
+          if (!tok) return;
+          const pal = PALETTE[ci % PALETTE.length];
+          ci++;
+          const [x, y, z] = tok.vec.map(v => v * SCALE);
+          const pos = new THREE.Vector3(x, y, z);
+          positions.push(pos);
+          // Sphère principale
+          const sphere = new THREE.Mesh(
+            new THREE.SphereGeometry(0.08, 24, 24),
+            new THREE.MeshBasicMaterial({ color: tok.known ? pal.color : 0x817e9b })
+          );
+          sphere.position.copy(pos);
+          activeGroup.add(sphere);
+          // Halo
+          const halo = new THREE.Mesh(
+            new THREE.SphereGeometry(0.15, 24, 24),
+            new THREE.MeshBasicMaterial({ color: pal.color, transparent: true, opacity: 0.22 })
+          );
+          halo.position.copy(pos);
+          activeGroup.add(halo);
+          // Label — nettement plus grand que les voisins
+          const label = makeLabel(tok.word, {
+            color: tok.known ? "#ffffff" : "#c8c5dc",
+            bg: tok.known ? `rgba(30,20,60,0.95)` : "rgba(20,16,42,0.85)",
+            border: tok.known ? `rgba(200,190,255,0.85)` : "rgba(140,135,170,0.5)",
+            worldHeight: 0.18,
+            weight: 600
+          });
+          label.position.set(x, y + 0.20, z);
+          activeGroup.add(label);
+        });
+
+        // Lignes reliant les tokens dans l'ordre de la phrase
+        if (positions.length > 1) {
+          const geo = new THREE.BufferGeometry().setFromPoints(positions);
+          const mat = new THREE.LineDashedMaterial({
+            color: 0x7b6bff, transparent: true, opacity: 0.45,
+            dashSize: 0.15, gapSize: 0.10
+          });
+          const line = new THREE.Line(geo, mat);
+          line.computeLineDistances();
+          activeGroup.add(line);
+        }
+
+        // Le nuage de fond reste visible en permanence (discret, sans libellé) ;
+        // seuls les tokens de la phrase saisie sont nommés — aucune étiquette de voisin.
+        neighborGroup.clear();
+      }
+
+      buildBackground();
+
+      // ============================================
+      // PERMUTATION ANIMEE ENTRE JEUX D'AXES
+      // ============================================
+      function updateAxisVisuals(setKey) {
+        const def = AXIS_SETS[setKey];
+        axisLines.forEach((line, i) => {
+          line.material.color.setHex(def.hex[i]);
+        });
+        const positions = [
+          [AXIS_LEN + 0.35, 0, 0],
+          [0, AXIS_LEN + 0.35, 0],
+          [0, 0, AXIS_LEN + 0.35],
+        ];
+        axisLabelSprites.forEach((sprite) => {
+          scene.remove(sprite);
+          sprite.material.map.dispose();
+          sprite.material.dispose();
+        });
+        axisLabelSprites = [
+          makeAxisLabel(def.short[0], positions[0], def.colors[0]),
+          makeAxisLabel(def.short[1], positions[1], def.colors[1]),
+          makeAxisLabel(def.short[2], positions[2], def.colors[2]),
+        ];
+        const legendItems = document.querySelectorAll(".ts-axes-legend > div");
+        legendItems.forEach((item, i) => {
+          const dot = item.querySelector(".ts-axis-dot");
+          const em = item.querySelector("em");
+          if (dot) dot.style.background = def.colors[i];
+          if (em) em.textContent = def.labels[i];
+        });
+      }
+
+      function switchAxisSet(newSet) {
+        if (newSet === currentAxisSet || !AXIS_SETS[newSet]) return;
+        currentAxisSet = newSet;
+
+        const duration = 800;
+        const t0 = performance.now();
+        const startPositions = bgPoints.map(p => p.pos.clone());
+        const targetPositions = bgPoints.map(p => {
+          const v = LEXICON[p.word][newSet];
+          return new THREE.Vector3(v[0] * SCALE, v[1] * SCALE, v[2] * SCALE);
+        });
+
+        function animateFrame() {
+          const t = Math.min((performance.now() - t0) / duration, 1);
+          const ease = 1 - Math.pow(1 - t, 3);
+          bgPoints.forEach((p, i) => {
+            const from = startPositions[i];
+            const to = targetPositions[i];
+            p.pos.set(
+              from.x + (to.x - from.x) * ease,
+              from.y + (to.y - from.y) * ease,
+              from.z + (to.z - from.z) * ease
+            );
+            if (p.mesh) p.mesh.position.copy(p.pos);
+          });
+          if (t < 1) requestAnimationFrame(animateFrame);
+        }
+        requestAnimationFrame(animateFrame);
+
+        updateAxisVisuals(newSet);
+
+        document.querySelectorAll(".ts-axis-btn").forEach(b => {
+          b.classList.toggle("active", b.dataset.axisset === newSet);
+        });
+
+        encode(input.value);
+      }
+
+      // ============================================
+      // CONTRÔLES ORBITAUX MANUELS (léger, pas d'import OrbitControls)
+      // ============================================
+      // Pointeurs actifs (souris, stylet ou doigts) : 1 = rotation, 2 = pincement
+      const pointers = new Map();
+      let pinchDist = 0;
+      let theta = Math.atan2(camera.position.x, camera.position.z);
+      let phi = Math.atan2(camera.position.y, Math.hypot(camera.position.x, camera.position.z));
+      let radius = camera.position.length();
+      const RADIUS_MIN = 4, RADIUS_MAX = 14;
+
+      function updateCamera() {
+        camera.position.x = radius * Math.cos(phi) * Math.sin(theta);
+        camera.position.y = radius * Math.sin(phi);
+        camera.position.z = radius * Math.cos(phi) * Math.cos(theta);
+        camera.lookAt(0, 0, 0);
+      }
+
+      // Au toucher, le canvas laisse le défilement vertical à la page (touch-action: pan-y
+      // en CSS) : un glissement horizontal fait tourner, deux doigts zooment.
+      const el = renderer.domElement;
+      const zoomBy = (delta) => {
+        radius = Math.max(RADIUS_MIN, Math.min(RADIUS_MAX, radius + delta));
+        updateCamera();
+      };
+      const spread = () => {
+        const [a, b] = [...pointers.values()];
+        return Math.hypot(a.x - b.x, a.y - b.y);
+      };
+      const release = (e) => {
+        pointers.delete(e.pointerId);
+        if (pointers.size < 2) pinchDist = 0;
+      };
+
+      el.addEventListener("pointerdown", (e) => {
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (pointers.size === 2) pinchDist = spread();
+        try { el.setPointerCapture(e.pointerId); } catch (_) {}
+      });
+      el.addEventListener("pointermove", (e) => {
+        const p = pointers.get(e.pointerId);
+        if (!p) return;
+        const dx = e.clientX - p.x;
+        const dy = e.clientY - p.y;
+        p.x = e.clientX; p.y = e.clientY;
+        if (pointers.size === 2) {
+          const d = spread();
+          if (pinchDist) zoomBy((pinchDist - d) * 0.02);
+          pinchDist = d;
+        } else if (pointers.size === 1) {
+          theta -= dx * 0.008;
+          phi = Math.max(-1.3, Math.min(1.3, phi + dy * 0.008));
+          updateCamera();
+        }
+      });
+      // pointercancel : le navigateur a repris le geste (défilement vertical)
+      ["pointerup", "pointercancel", "lostpointercapture"].forEach((t) => el.addEventListener(t, release));
+
+      // La molette seule fait défiler l'article ; Ctrl + molette (ou pincement
+      // sur pavé tactile, qui arrive avec ctrlKey) zoome.
+      let wheelHintTimer = 0;
+      el.addEventListener("wheel", (e) => {
+        if (!e.ctrlKey && !e.metaKey) {
+          clearTimeout(wheelHintTimer);
+          status.dataset.hint = "Ctrl + molette pour zoomer";
+          wheelHintTimer = setTimeout(() => delete status.dataset.hint, 1800);
+          return;
+        }
+        e.preventDefault();
+        zoomBy(e.deltaY * 0.005);
+      }, { passive: false });
+
+      // Clavier (la scène est focalisable) : flèches pour tourner, + / − pour zoomer
+      container.addEventListener("keydown", (e) => {
+        const step = 0.12;
+        switch (e.key) {
+          case "ArrowLeft": theta += step; break;
+          case "ArrowRight": theta -= step; break;
+          case "ArrowUp": phi = Math.min(1.3, phi + step); break;
+          case "ArrowDown": phi = Math.max(-1.3, phi - step); break;
+          case "+": case "=": zoomBy(-0.5); break;
+          case "-": case "_": case "−": zoomBy(0.5); break;
+          default: return;
+        }
+        e.preventDefault();
+        autoRotate = false;
+        updateCamera();
+      });
+      // Fenêtre quittée en plein geste : on oublie les pointeurs en cours
+      window.addEventListener("blur", () => { pointers.clear(); pinchDist = 0; });
+
+      // Rotation automatique lente quand pas d'interaction
+      let autoRotate = true;
+      el.addEventListener("pointerdown", () => { autoRotate = false; });
+
+      // Resize
+      const ro = new ResizeObserver(() => {
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      });
+      ro.observe(container);
+
+      function loop() {
+        if (autoRotate) {
+          theta += 0.0015;
+          updateCamera();
+        }
+        renderer.render(scene, camera);
+        requestAnimationFrame(loop);
+      }
+      loop();
+
+      render3D = renderPhrase;
+      switchAxis3D = switchAxisSet;
+    }
+
+    boot();
